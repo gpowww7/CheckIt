@@ -169,6 +169,15 @@ table.ix{width:100%;border-collapse:collapse}
 .rvb button.on{background:var(--acc)}
 .rvb:hover button{background:var(--acc)}
 .rvb button:hover~button{background:var(--rule)}
+.qt{margin-top:-4px}.qth{font-size:13px;color:var(--mut);margin-bottom:8px;display:flex;gap:8px}.qth span{opacity:.75}
+.qtl{display:flex;flex-wrap:wrap;gap:6px}
+.tg2{font-size:13px;line-height:1;padding:8px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--mut);background:none;transition:background .12s,color .12s,border-color .12s}
+.tg2:hover{color:var(--ink);border-color:var(--mut)}
+.tg2[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.ip .tg2[aria-pressed=true]{background:var(--ic);border-color:var(--ic);color:var(--on)}
+.tg2.tgadd{border-style:dashed}
+.tgin{font-size:13px;padding:7px 11px;border:1px solid var(--mut);border-radius:999px;width:150px;background:none;color:var(--ink)}
+.stg{font-size:12px;margin-top:6px;color:color-mix(in srgb,var(--on) 80%,transparent)}
 .rvt{font-size:13px;color:var(--mut);padding-bottom:1px}
 .rvm{display:inline-flex;align-items:flex-end;gap:2px;margin-left:10px;height:13px;vertical-align:-1px}
 .rvm i{width:3px;background:var(--rule);border-radius:1px}
@@ -496,7 +505,7 @@ main{padding-bottom:110px}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-4</small>
+      <button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-5</small>
     </div></details>
   </div>
 </header>
@@ -691,6 +700,20 @@ const md=iso=>new Date(iso).toLocaleDateString(undefined,{month:'short',day:'num
 const inGrp=(it,g)=>{const x=G.find(a=>a[0]===g)[2];return !x||x.includes(it.type)};
 const inStat=(it,s)=>s==='all'||(s==='open'?it.status!=='done':it.status===s);
 const hueKey=it=>{const h=col(it).replace('#','');const [r,g,b]=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255);const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;if(!d||d/(1-Math.abs(2*l-1))<.15)return 1000+(1-l)*100;let hu=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;hu=(hu*60+360)%360;return hu+l*.5};
+// Quick-take tags: a short set per type, plus the person's own tags for that type. Stored as it.tags (array of labels), so they sync with the item.
+const QT={movie:['Gripping','Funny','Moving','Dark','Gorgeous','Slow burn','Great ending','Rewatchable'],
+ show:['Bingeable','Funny','Moving','Gripping','Comfort watch','Slow start','Great finale','Fell off'],
+ album:['No skips','Grower','Chill','Energetic','Emotional','Late night','Great production','Front-loaded'],
+ song:['Earworm','Chill','Energetic','Emotional','Late night','Great lyrics','Dance','Grower'],
+ artist:['Deep catalog','Great live','Unique sound','Chill','Energetic','Emotional','Grower','Hit or miss'],
+ set:['Euphoric','Deep','Peak time','Smooth mixing','Great selection','Big moments','Chill','Slow start'],
+ game:['Addictive','Relaxing','Challenging','Great story','Gorgeous','Great co-op','Replayable','Too long']};
+const tagsFor=t=>{const base=QT[t]||[],seen=new Set(base.map(x=>x.toLowerCase())),own=new Map();
+  for(const i of st.items)if(i.type===t)for(const g of i.tags||[]){const k=g.toLowerCase();if(!seen.has(k))own.set(k,[g,(own.get(k)?.[1]||0)+1])}
+  return [...base,...[...own.values()].sort((a,b)=>b[1]-a[1]).map(x=>x[0])]};
+function tagBlock(it){const on=it.tags||[];if(!(it.status==='done'||it.status==='again'||on.length))return'';const has=new Set(on.map(x=>x.toLowerCase()));
+  const all=tagsFor(it.type);for(const g of on)if(!all.some(x=>x.toLowerCase()===g.toLowerCase()))all.push(g);
+  return `<div class="qt"><div class="qth">Quick take<span>${on.length?'':'Tap what fits'}</span></div><div class="qtl" role="group" aria-label="Quick take tags">${all.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" aria-pressed="${has.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}<button type="button" class="tg2 tgadd" data-tagadd>+ Your own</button><input class="tgin" id="tgin" maxlength="24" placeholder="Add a tag" hidden></div></div>`}
 const RV=['Once was enough','Maybe someday','Would revisit','Often','On repeat forever'];
 const rvMini=n=>n?`<span class="rvm" title="${RV[n-1]}">${[1,2,3,4,5].map(k=>`<i class="${k<=n?'on':''}" style="height:${3+k*2}px"></i>`).join('')}</span>`:'';
 const sorted=list=>{const l=[...list];
@@ -808,7 +831,7 @@ function drawStubs(){const l=st.items.filter(i=>(i.status==='done'||i.status==='
   let n=0;$('#view').innerHTML=`<div class="stubs">${[...by].map(([m,arr])=>`<section><h3>${m}<span>${arr.length} finished</span></h3><div class="sgrid">${arr.map(([it,t])=>{n++;
     return `<button type="button" class="stub" data-id="${it.id}" style="${cs(it)};--rot:${(hash(it.id)%5-2)*.25}deg"><div class="sl"><span>Admit one</span><b>No. ${String(hash(it.id)%9000+1000)}</b></div>
      <div class="sr"><div class="sk">${T[it.type]}, ${new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}</div><div class="st2">${esc(it.title)}</div>${it.creator?`<div class="sc2">${esc(it.creator)}</div>`:''}
-     <div class="sm">${it.rating?`<span class="stars">${stars(it.rating)}</span>`:''}${rvMini(it.rv)}${it.status==='again'?'<em>Revisit</em>':''}</div>${it.note?`<p>${esc(it.note)}</p>`:''}</div></button>`}).join('')}</div></section>`).join('')}</div>`}
+     <div class="sm">${it.rating?`<span class="stars">${stars(it.rating)}</span>`:''}${rvMini(it.rv)}${it.status==='again'?'<em>Revisit</em>':''}</div>${it.tags?.length?`<div class="stg">${it.tags.map(esc).join(' · ')}</div>`:''}${it.note?`<p>${esc(it.note)}</p>`:''}</div></button>`}).join('')}</div></section>`).join('')}</div>`}
 /* poster */
 const PPAL=[['Ink','#111214','#ffffff','#8396ff'],['Cobalt','#2b4bff','#ffffff','#ffd84a'],['Sun','#f2c230','#111214','#c4321f'],['Rose','#e85a71','#111214','#ffffff'],['Paper','#ffffff','#111214','#2b4bff']];
 const pst={pal:0,title:'Checkit Fest'};
@@ -889,6 +912,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
    <div class="seg" role="group" aria-label="Status">${Object.entries(S).map(([k,l])=>`<button type="button" data-st="${k}" aria-pressed="${it.status===k}">${l}</button>`).join('')}</div>
    <div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}<span>${it.rating?it.rating+' / 5':'Rate it'}</span></div>
    <div class="rv"><div class="rvb" role="group" aria-label="Revisit meter">${[1,2,3,4,5].map(n=>`<button type="button" data-rv="${n}" class="${n<=(it.rv||0)?'on':''}" style="height:${8+n*4}px" aria-label="${RV[n-1]}" title="${RV[n-1]}"></button>`).join('')}</div><span class="rvt">${it.rv?RV[it.rv-1]:'How much would you go back to it?'}</span></div>
+   ${tagBlock(it)}
    <textarea id="f-note" class="nt" rows="1" placeholder="Why is this on your list?">${esc(it.note)}</textarea>
    <label class="rb">Recommended by <input id="f-by" value="${esc(it.by)}" placeholder="Add a name"></label>
    ${watchBlock(it)}
@@ -908,11 +932,17 @@ function drawItem(){const it=cur,sh=shape(it.type);
   if($('#dr').dataset.more===it.id)$('#dr .more').open=true}
 $('#dr').addEventListener('toggle',e=>{const t=e.target;if(cur&&t.matches?.('details.sea,details.sn')){const k=cur.id+'/'+(t.dataset.sn??'all');if(t.open){SOPEN.add(k);if(t.dataset.sn!=null)loadSeason(cur,+t.dataset.sn)}else SOPEN.delete(k);return}if(e.target.classList?.contains('more'))$('#dr').dataset.more=e.target.open&&cur?cur.id:''},true);
 const upd=(fn,msg)=>{const before=JSON.stringify(st.items);fn();if(cur)delete cur.sample;save();render();if(msg)toast(msg,()=>{st.items=JSON.parse(before);save();render();if(cur){cur=st.items.find(i=>i.id===cur.id);cur?drawItem():closeItem()}})};
+$('#dr').addEventListener('keydown',e=>{if(e.target.id!=='tgin'||!cur)return;if(e.key==='Escape'){e.stopPropagation();drawItem();return}if(e.key!=='Enter')return;e.preventDefault();addTag(e.target.value)});
+$('#dr').addEventListener('focusout',e=>{if(e.target.id==='tgin'&&cur)setTimeout(()=>{if(document.activeElement?.id!=='tgin')addTag($('#tgin')?.value||'')},0)});
+function addTag(v){let g=v.trim().replace(/\s+/g,' ');if(!g){drawItem();return}g=g[0].toUpperCase()+g.slice(1);const k=g.toLowerCase(),ex=tagsFor(cur.type).find(x=>x.toLowerCase()===k)||g;
+  if(!(cur.tags||[]).some(x=>x.toLowerCase()===k))upd(()=>{cur.tags=[...(cur.tags||[]),ex];cur.touched=new Date().toISOString()});drawItem()}
 $('#dr').addEventListener('pointermove',e=>{const b=e.target.closest('.rate button[data-r]');if(b&&e.pointerType==='mouse')ratePaint(b.parentNode,rateAt(b,e.clientX))});
 $('#dr').addEventListener('pointerout',e=>{const rt=e.target.closest('.rate');if(rt&&cur&&!rt.contains(e.relatedTarget))ratePaint(rt,cur.rating||0)});
 $('#dr').addEventListener('click',e=>{const eo=e.target.closest('.eo');if(eo){eo.classList.toggle('open');return}const sy=e.target.closest('.syn');if(sy){sy.classList.toggle('open');return}const b=e.target.closest('button');if(!b||!cur)return;
   if(b.id==='dx')closeItem();
   else if(b.dataset.st){upd(()=>{setSt(cur,b.dataset.st)},`Marked ${S[b.dataset.st].toLowerCase()}`);drawItem()}
+  else if(b.dataset.tag!=null){const g=b.dataset.tag,k=g.toLowerCase();upd(()=>{const l=cur.tags||[];cur.tags=l.some(x=>x.toLowerCase()===k)?l.filter(x=>x.toLowerCase()!==k):[...l,g];if(!cur.tags.length)delete cur.tags;cur.touched=new Date().toISOString()});drawItem()}
+  else if(b.dataset.tagadd!=null){b.hidden=true;const i=$('#tgin');i.hidden=false;i.focus()}
   else if(b.dataset.rv){const n=+b.dataset.rv;upd(()=>{cur.rv=cur.rv===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
   else if(b.dataset.r){const n=e.detail===0?+b.dataset.r:rateAt(b,e.clientX);upd(()=>{cur.rating=cur.rating===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
   else if(b.hasAttribute('data-del')){removeItem(cur);closeItem()}});
