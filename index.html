@@ -206,6 +206,7 @@ table.ix{width:100%;border-collapse:collapse}
 .pv img{border-radius:5px}
 .wn{margin:4px 0 0;color:var(--mut);font-size:13px}
 .info{padding:4px 0 2px}
+.menu .ver{display:block;padding:8px 14px 4px;color:var(--mut);font-size:11.5px}
 .trk{display:block;margin:8px 0 4px}.trk summary{display:list-item;cursor:pointer;font-size:14px;font-weight:600;padding:6px 0}
 .trk ol{list-style:none;margin:4px 0 0;padding:0;font-size:14px;counter-reset:t}
 .trk li{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--rule);counter-increment:t}
@@ -482,7 +483,7 @@ main{padding-bottom:110px}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button>
+      <button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-1</small>
     </div></details>
   </div>
 </header>
@@ -835,8 +836,10 @@ addEventListener('popstate',()=>{if(location.hash.startsWith('#setup='))return;
   if(st.view!=='next'){st.view='next';try{history.replaceState(null,'','#next')}catch(e){}save();render();window.scrollTo(0,0)}
   else if(Date.now()-warnAt>2500){warnAt=Date.now();toast('Swipe back again to leave Checkit')}
   else{history.back();return}
-  try{history.pushState({ck:0},'')}catch(e){}});
-try{history.pushState({ck:0},'')}catch(e){}
+  try{history.pushState({ck:0},'')}catch(e){}needGuard=false});
+/* Chrome skips history steps added without a tap, so the guard step is added on a tap */
+let needGuard=true;const guard=()=>{if(needGuard){needGuard=false;try{history.pushState({ck:0},'')}catch(e){}}};
+addEventListener('pointerdown',guard,true);addEventListener('keydown',guard,true);
 new MutationObserver(()=>{const open=$('#res').classList.contains('on')||$('.add').classList.contains('full');const top=LS[LS.length-1];
   if(open&&!(top&&top.k==='search'&&!top.dead)&&!LS.some(x=>x.k==='search'&&!x.dead))layer('search');else if(!open)unlayer('search')}).observe($('#res'),{attributes:true,attributeFilter:['class']});
 const HN={youtube:'YouTube','youtu':'YouTube',soundcloud:'SoundCloud',mixcloud:'Mixcloud',twitch:'Twitch',vimeo:'Vimeo',bandcamp:'Bandcamp',apple:'Apple TV',tvmaze:'TVmaze',imdb:'IMDb',letterboxd:'Letterboxd',themoviedb:'TMDB',musicbrainz:'MusicBrainz'};
