@@ -570,11 +570,6 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
 @media(max-width:600px){.bw{padding-top:16px}.bty{gap:18px}.bty button{font-size:20px}.bct{display:block}.bsel{margin-top:10px}.bsel select{flex:1}.bch{margin-inline:-16px;padding-inline:16px}
 .bg{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 10px}.bg.w{grid-template-columns:repeat(2,minmax(0,1fr))}
 .bm b{font-size:13px}.bm small{font-size:12px}.ba{gap:4px}.ba button{height:34px;font-size:16px}.ba button span{display:none}}
-.ix th button.th{font:inherit;color:inherit;padding:0;display:inline-flex;gap:4px;align-items:center;cursor:pointer;white-space:nowrap}
-.ix th button.th:hover,.ix th[aria-sort] button.th{color:var(--ink)}
-.ix th button.th i{font-style:normal;font-size:11px;min-width:8px}
-.ix th.n button.th{margin-left:auto}
-.srev{font-size:15px;padding:0 4px;margin-left:-10px}
 </style>
 </head>
 <body>
@@ -589,7 +584,7 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-18</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-19</small>
     </div></details>
   </div>
 </header>
@@ -1275,7 +1270,7 @@ const BRG={movie:[[28,'Action'],[12,'Adventure'],[16,'Animation'],[35,'Comedy'],
  show:[[10759,'Action and adventure'],[16,'Animation'],[35,'Comedy'],[80,'Crime'],[99,'Documentary'],[18,'Drama'],[10751,'Family'],[10762,'Kids'],[9648,'Mystery'],[10765,'Sci-fi and fantasy'],[10768,'War and politics'],[37,'Western']],
  album:[[132,'Pop'],[116,'Hip hop'],[152,'Rock'],[165,'R&B'],[85,'Alternative'],[113,'Dance'],[106,'Electronic'],[84,'Country'],[197,'Latin'],[464,'Metal'],[169,'Soul and funk'],[129,'Jazz'],[98,'Classical'],[144,'Reggae'],[466,'Folk'],[153,'Blues']],
  game:[['action','Action'],['adventure','Adventure'],['role-playing-games-rpg','RPG'],['shooter','Shooter'],['strategy','Strategy'],['platformer','Platformer'],['puzzle','Puzzle'],['racing','Racing'],['sports','Sports'],['fighting','Fighting'],['simulation','Simulation'],['indie','Indie']]};
-/* top rated albums: a hand-picked critics' canon (year|artist|title|genre), written in rough order of acclaim within each decade; covers come from Deezer, then Apple Music */
+/* top rated albums: a hand-picked list of about 1,700 critics' favorites (year|artist|title|genre), written in rough order of acclaim within each decade; covers come from Deezer, then Apple Music */
 const BRA=`1959|Miles Davis|Kind of Blue|j
 1959|Dave Brubeck Quartet|Time Out|j
 1959|Charles Mingus|Mingus Ah Um|j
@@ -1714,13 +1709,1281 @@ const BRA=`1959|Miles Davis|Kind of Blue|j
 2022|Wet Leg|Wet Leg|i
 2023|Sufjan Stevens|Javelin|f
 2024|Vampire Weekend|Only God Was Above Us|i
-2024|Fontaines D.C.|Romance|i`.split('\n').map(l=>{const [y,a,t,g]=l.split('|');return[+y,a,t,g]});
+2024|Fontaines D.C.|Romance|i
+1958|Miles Davis|Milestones|j
+1957|Miles Davis|Birth of the Cool|j
+1958|Art Blakey and The Jazz Messengers|Moanin'|j
+1959|Bill Evans Trio|Portrait in Jazz|j
+1957|Sonny Rollins|Way Out West|j
+1956|Miles Davis Quintet|'Round About Midnight|j
+1958|Frank Sinatra|Frank Sinatra Sings for Only the Lonely|p
+1959|Frank Sinatra|No One Cares|p
+1958|Chuck Berry|Chuck Berry Is on Top|r
+1957|Buddy Holly|The "Chirping" Crickets|r
+1957|Little Richard|Here's Little Richard|r
+1959|Marty Robbins|Gunfighter Ballads and Trail Songs|f
+1958|Billie Holiday|Lady in Satin|j
+1957|Thelonious Monk with John Coltrane|Thelonious Monk with John Coltrane|j
+1959|Art Pepper|Art Pepper Meets the Rhythm Section|j
+1957|Patsy Cline|Patsy Cline|f
+1958|Ella Fitzgerald|Ella Fitzgerald Sings the Irving Berlin Song Book|j
+1959|Duke Ellington|Anatomy of a Murder|j
+1956|Duke Ellington|Ellington at Newport|j
+1958|Odetta|Odetta Sings Ballads and Blues|f
+1959|Muddy Waters|The Best of Muddy Waters|s
+1958|Howlin' Wolf|Moanin' in the Moonlight|s
+1960|John Coltrane|Giant Steps|j
+1961|Bill Evans Trio|Sunday at the Village Vanguard|j
+1961|Bill Evans Trio|Waltz for Debby|j
+1960|Miles Davis|Sketches of Spain|j
+1961|Oliver Nelson|The Blues and the Abstract Truth|j
+1963|John Coltrane and Johnny Hartman|John Coltrane and Johnny Hartman|j
+1964|Herbie Hancock|Empyrean Isles|j
+1965|Herbie Hancock|Maiden Voyage|j
+1964|Wayne Shorter|Speak No Evil|j
+1965|Miles Davis Quintet|E.S.P.|j
+1967|Miles Davis Quintet|Nefertiti|j
+1966|Miles Davis Quintet|Miles Smiles|j
+1964|Lee Morgan|The Sidewinder|j
+1963|Grant Green|Idle Moments|j
+1962|Sonny Rollins|The Bridge|j
+1961|Ornette Coleman|Free Jazz|j
+1965|Andrew Hill|Point of Departure|j
+1966|Albert Ayler|Spiritual Unity|j
+1965|Nina Simone|I Put a Spell on You|s
+1965|Nina Simone|Pastel Blues|s
+1966|Nina Simone|Wild Is the Wind|s
+1964|Sam Cooke|Ain't That Good News|s
+1962|Booker T. & The M.G.'s|Green Onions|s
+1966|Otis Redding|Otis Redding Dictionary of Soul|s
+1968|Aretha Franklin|Lady Soul|s
+1968|Marvin Gaye|In the Groove|s
+1969|Isaac Hayes|Hot Buttered Soul|s
+1965|The Temptations|The Temptations Sing Smokey|s
+1966|Four Tops|Reach Out|s
+1968|Sly & The Family Stone|Dance to the Music|s
+1965|James Brown|Papa's Got a Brand New Bag|s
+1967|Bobbie Gentry|Ode to Billie Joe|f
+1968|Glen Campbell|Wichita Lineman|f
+1965|Buck Owens|I've Got a Tiger by the Tail|f
+1968|Merle Haggard|Mama Tried|f
+1966|Loretta Lynn|You Ain't Woman Enough|f
+1962|Willie Nelson|...And Then I Wrote|f
+1963|Bob Dylan|The Freewheelin' Bob Dylan|f
+1964|Bob Dylan|The Times They Are a-Changin'|f
+1967|Bob Dylan|John Wesley Harding|f
+1969|Fairport Convention|Liege & Lief|f
+1969|Joni Mitchell|Clouds|f
+1969|Crosby, Stills & Nash|Crosby, Stills & Nash|f
+1969|The Flying Burrito Brothers|The Gilded Palace of Sin|f
+1968|The Byrds|Sweetheart of the Rodeo|f
+1966|The Byrds|Fifth Dimension|r
+1967|The Byrds|Younger Than Yesterday|r
+1965|The Byrds|Mr. Tambourine Man|r
+1966|The Rolling Stones|Aftermath|r
+1965|The Rolling Stones|Out of Our Heads|r
+1967|The Rolling Stones|Between the Buttons|r
+1965|The Who|My Generation|r
+1967|The Who|The Who Sell Out|r
+1966|The Kinks|Face to Face|r
+1967|The Kinks|Something Else by The Kinks|r
+1969|The Kinks|Arthur (Or the Decline and Fall of the British Empire)|r
+1967|The Zombies|Odessey and Oracle|r
+1966|The Yardbirds|Roger the Engineer|r
+1968|Small Faces|Ogdens' Nut Gone Flake|r
+1967|Buffalo Springfield|Buffalo Springfield Again|r
+1969|Neil Young with Crazy Horse|Everybody Knows This Is Nowhere|r
+1968|The Doors|Waiting for the Sun|r
+1967|The Doors|Strange Days|r
+1969|Grateful Dead|Live/Dead|r
+1968|Grateful Dead|Anthem of the Sun|r
+1969|Jefferson Airplane|Volunteers|r
+1968|Big Brother & The Holding Company|Cheap Thrills|r
+1968|Traffic|Traffic|r
+1969|Santana|Santana|l
+1969|Frank Zappa|Hot Rats|r
+1966|The Mothers of Invention|Freak Out!|r
+1968|The Mothers of Invention|We're Only in It for the Money|r
+1968|Silver Apples|Silver Apples|e
+1968|The United States of America|The United States of America|e
+1969|Can|Monster Movie|e
+1969|MC5|Kick Out the Jams|m
+1968|Blue Cheer|Vincebus Eruptum|m
+1968|Scott Walker|Scott 2|p
+1969|Scott Walker|Scott 4|p
+1967|Scott Walker|Scott|p
+1969|Serge Gainsbourg & Jane Birkin|Jane Birkin/Serge Gainsbourg|l
+1968|Os Mutantes|Os Mutantes|l
+1968|Caetano Veloso|Caetano Veloso|l
+1966|Sérgio Mendes & Brasil '66|Herb Alpert Presents Sergio Mendes & Brasil '66|l
+1969|Elvis Presley|From Elvis in Memphis|r
+1964|The Beach Boys|All Summer Long|p
+1965|The Beach Boys|Today!|p
+1964|The Kinks|Kinks|r
+1963|The Beatles|With the Beatles|r
+1963|The Beatles|Please Please Me|r
+1965|The Beatles|Help!|r
+1967|The Beatles|Magical Mystery Tour|r
+1964|The Supremes|Where Did Our Love Go|s
+1969|Pink Floyd|Ummagumma|r
+1969|Fleetwood Mac|Then Play On|r
+1969|Jethro Tull|Stand Up|r
+1966|Donovan|Sunshine Superman|f
+1969|Leonard Cohen|Songs from a Room|f
+1966|Paul Butterfield Blues Band|East-West|s
+1966|John Mayall & The Bluesbreakers|Blues Breakers with Eric Clapton|r
+1968|Laura Nyro|Eli and the Thirteenth Confession|p
+1969|Laura Nyro|New York Tendaberry|p
+1968|Nilsson|Aerial Ballet|p
+1966|Frank Sinatra|Sinatra at the Sands|p
+1967|Frank Sinatra & Antônio Carlos Jobim|Francis Albert Sinatra & Antonio Carlos Jobim|j
+1962|Stan Getz & Charlie Byrd|Jazz Samba|j
+1963|Thelonious Monk|Monk's Dream|j
+1962|Duke Ellington & John Coltrane|Duke Ellington & John Coltrane|j
+1961|John Coltrane|My Favorite Things|j
+1964|John Coltrane|Crescent|j
+1961|Etta James|At Last!|s
+1960|Elvis Presley|Elvis Is Back!|r
+1966|Simon & Garfunkel|Sounds of Silence|f
+1968|The Velvet Underground|White Light/White Heat|i
+1967|Tim Buckley|Goodbye and Hello|f
+1970|The Stooges|Fun House|m
+1970|Black Sabbath|Black Sabbath|m
+1971|Black Sabbath|Master of Reality|m
+1972|Black Sabbath|Vol. 4|m
+1973|Black Sabbath|Sabbath Bloody Sabbath|m
+1972|Deep Purple|Machine Head|m
+1970|Deep Purple|Deep Purple in Rock|m
+1976|Rainbow|Rising|m
+1976|Judas Priest|Sad Wings of Destiny|m
+1978|Judas Priest|Stained Class|m
+1979|Motörhead|Overkill|m
+1980|Motörhead|Ace of Spades|m
+1976|Thin Lizzy|Jailbreak|r
+1976|Blue Öyster Cult|Agents of Fortune|r
+1975|Aerosmith|Toys in the Attic|r
+1976|Aerosmith|Rocks|r
+1977|Ramones|Rocket to Russia|m
+1977|The Clash|The Clash|m
+1978|Buzzcocks|Another Music in a Different Kitchen|m
+1978|Wire|Chairs Missing|i
+1979|Wire|154|i
+1979|Gang of Four|Entertainment!|i
+1978|Magazine|Real Life|i
+1979|Public Image Ltd.|Metal Box|i
+1979|The Slits|Cut|i
+1979|The Raincoats|The Raincoats|i
+1978|Pere Ubu|The Modern Dance|i
+1977|Suicide|Suicide|e
+1977|Talking Heads|Talking Heads: 77|i
+1977|Iggy Pop|The Idiot|r
+1977|Iggy Pop|Lust for Life|r
+1977|David Bowie|"Heroes"|r
+1974|David Bowie|Diamond Dogs|r
+1975|David Bowie|Young Americans|r
+1976|David Bowie|Station to Station|r
+1970|David Bowie|The Man Who Sold the World|r
+1973|David Bowie|Aladdin Sane|r
+1979|David Bowie|Lodger|r
+1973|Roxy Music|For Your Pleasure|r
+1972|Roxy Music|Roxy Music|r
+1975|Roxy Music|Siren|r
+1974|Brian Eno|Here Come the Warm Jets|r
+1974|Sparks|Kimono My House|p
+1972|T. Rex|The Slider|r
+1971|T. Rex|Electric Warrior|r
+1973|The Who|Quadrophenia|r
+1970|The Who|Live at Leeds|r
+1970|The Kinks|Lola Versus Powerman and the Moneygoround, Part One|r
+1971|The Kinks|Muswell Hillbillies|r
+1970|Led Zeppelin|Led Zeppelin III|r
+1973|Led Zeppelin|Houses of the Holy|r
+1971|Pink Floyd|Meddle|r
+1977|Pink Floyd|Animals|r
+1971|Yes|Fragile|r
+1972|Yes|Close to the Edge|r
+1973|Genesis|Selling England by the Pound|r
+1974|King Crimson|Red|r
+1973|Mike Oldfield|Tubular Bells|e
+1976|Rush|2112|r
+1974|Queen|Sheer Heart Attack|r
+1977|Queen|News of the World|r
+1970|The Doors|Morrison Hotel|r
+1971|The Doors|L.A. Woman|r
+1970|Grateful Dead|American Beauty|f
+1970|Grateful Dead|Workingman's Dead|f
+1970|Crosby, Stills, Nash & Young|Déjà Vu|f
+1970|George Harrison|All Things Must Pass|r
+1970|John Lennon|John Lennon/Plastic Ono Band|r
+1971|John Lennon|Imagine|r
+1973|Paul McCartney & Wings|Band on the Run|r
+1970|Van Morrison|Moondance|r
+1974|Neil Young|On the Beach|f
+1975|Neil Young|Tonight's the Night|f
+1979|Neil Young & Crazy Horse|Rust Never Sleeps|r
+1975|Neil Young & Crazy Horse|Zuma|r
+1974|Joni Mitchell|Court and Spark|f
+1976|Joni Mitchell|Hejira|f
+1975|Joni Mitchell|The Hissing of Summer Lawns|f
+1970|Joni Mitchell|Ladies of the Canyon|f
+1970|Nick Drake|Bryter Layter|f
+1970|Cat Stevens|Tea for the Tillerman|f
+1970|James Taylor|Sweet Baby James|f
+1971|Leonard Cohen|Songs of Love and Hate|f
+1974|Richard and Linda Thompson|I Want to See the Bright Lights Tonight|f
+1971|John Prine|John Prine|f
+1972|Townes Van Zandt|The Late Great Townes Van Zandt|f
+1975|Emmylou Harris|Pieces of the Sky|f
+1974|Gram Parsons|Grievous Angel|f
+1973|Gram Parsons|GP|f
+1973|Willie Nelson|Shotgun Willie|f
+1973|Waylon Jennings|Honky Tonk Heroes|f
+1971|Dolly Parton|Coat of Many Colors|f
+1970|Kris Kristofferson|Kristofferson|f
+1975|Bob Dylan & The Band|The Basement Tapes|f
+1976|Bob Dylan|Desire|f
+1974|Big Star|Radio City|i
+1978|Big Star|Third/Sister Lovers|i
+1978|Bruce Springsteen|Darkness on the Edge of Town|r
+1973|Bruce Springsteen|The Wild, the Innocent & the E Street Shuffle|r
+1976|Tom Waits|Small Change|r
+1978|Warren Zevon|Excitable Boy|r
+1974|Jackson Browne|Late for the Sky|f
+1972|Randy Newman|Sail Away|p
+1974|Steely Dan|Pretzel Logic|r
+1972|Steely Dan|Can't Buy a Thrill|r
+1970|Elton John|Tumbleweed Connection|p
+1970|Elton John|Elton John|p
+1971|Nilsson|Nilsson Schmilsson|p
+1979|Supertramp|Breakfast in America|r
+1975|Fleetwood Mac|Fleetwood Mac|r
+1979|Fleetwood Mac|Tusk|r
+1977|Billy Joel|The Stranger|p
+1972|Paul Simon|Paul Simon|f
+1973|Paul Simon|There Goes Rhymin' Simon|f
+1975|Paul Simon|Still Crazy After All These Years|f
+1973|Lynyrd Skynyrd|(Pronounced 'Lĕh-'nérd 'Skin-'nérd)|r
+1971|The Allman Brothers Band|At Fillmore East|r
+1972|The Allman Brothers Band|Eat a Peach|r
+1970|Santana|Abraxas|l
+1974|Bob Marley & The Wailers|Natty Dread|l
+1973|The Wailers|Catch a Fire|l
+1973|The Wailers|Burnin'|l
+1978|Bob Marley & The Wailers|Kaya|l
+1979|Bob Marley & The Wailers|Survival|l
+1972|Jimmy Cliff|The Harder They Come|l
+1976|Peter Tosh|Legalize It|l
+1977|Culture|Two Sevens Clash|l
+1976|Burning Spear|Marcus Garvey|l
+1976|Max Romeo & The Upsetters|War Ina Babylon|l
+1973|Fela Kuti|Gentleman|l
+1976|Fela Kuti|Zombie|l
+1972|Milton Nascimento & Lô Borges|Clube da Esquina|l
+1976|Jorge Ben|África Brasil|l
+1972|Caetano Veloso|Transa|l
+1974|Elis Regina & Antônio Carlos Jobim|Elis & Tom|l
+1971|Chico Buarque|Construção|l
+1976|Kraftwerk|Radio-Activity|e
+1978|Kraftwerk|The Man-Machine|e
+1971|Can|Tago Mago|e
+1972|Can|Ege Bamyasi|e
+1973|Can|Future Days|e
+1972|Neu!|Neu!|e
+1975|Neu!|Neu! '75|e
+1974|Tangerine Dream|Phaedra|e
+1976|Jean-Michel Jarre|Oxygène|e
+1977|Donna Summer|I Remember Yesterday|s
+1979|Giorgio Moroder|E=MC²|e
+1979|Chic|Risqué|s
+1972|Marvin Gaye|Trouble Man|s
+1973|Marvin Gaye|Let's Get It On|s
+1976|Marvin Gaye|I Want You|s
+1978|Marvin Gaye|Here, My Dear|s
+1974|Stevie Wonder|Fulfillingness' First Finale|s
+1972|Stevie Wonder|Music of My Mind|s
+1970|Curtis Mayfield|Curtis|s
+1970|Funkadelic|Free Your Mind... and Your Ass Will Follow|s
+1978|Funkadelic|One Nation Under a Groove|s
+1977|Parliament|Funkentelechy vs. the Placebo Syndrome|s
+1971|Isaac Hayes|Shaft|s
+1973|Al Green|Call Me|s
+1971|Bill Withers|Just as I Am|s
+1972|Bill Withers|Still Bill|s
+1974|Minnie Riperton|Perfect Angel|s
+1975|Earth, Wind & Fire|That's the Way of the World|s
+1974|Shuggie Otis|Inspiration Information|s
+1972|The Temptations|All Directions|s
+1972|Donny Hathaway|Live|s
+1970|Aretha Franklin|Spirit in the Dark|s
+1972|Aretha Franklin|Amazing Grace|s
+1974|Gil Scott-Heron & Brian Jackson|Winter in America|s
+1972|Miles Davis|On the Corner|j
+1971|Miles Davis|A Tribute to Jack Johnson|j
+1975|Miles Davis|Agharta|j
+1971|Mahavishnu Orchestra|The Inner Mounting Flame|j
+1977|Weather Report|Heavy Weather|j
+1970|Alice Coltrane|Journey in Satchidananda|j
+1969|Pharoah Sanders|Karma|j
+1979|The Specials|The Specials|l
+1979|The Cure|Three Imaginary Boys|i
+1979|The Police|Reggatta de Blanc|r
+1978|The Police|Outlandos d'Amour|r
+1978|The Jam|All Mod Cons|r
+1979|The Jam|Setting Sons|r
+1977|The Stranglers|Rattus Norvegicus|m
+1977|Richard Hell & The Voidoids|Blank Generation|m
+1979|Elvis Costello & The Attractions|Armed Forces|r
+1978|Patti Smith Group|Easter|i
+1976|Boston|Boston|r
+1977|Meat Loaf|Bat Out of Hell|r
+1978|The Cars|The Cars|r
+1979|Tom Petty and the Heartbreakers|Damn the Torpedoes|r
+1978|Television|Adventure|i
+1973|Lou Reed|Berlin|r
+1972|Captain Beefheart & His Magic Band|Clear Spot|r
+1974|Robert Wyatt|Rock Bottom|r
+1973|New York Dolls|New York Dolls|m
+1978|Kate Bush|Lionheart|p
+1975|ABBA|ABBA|p
+1977|ABBA|ABBA: The Album|p
+1975|Bee Gees|Main Course|p
+1983|Talking Heads|Speaking in Tongues|i
+1984|Talking Heads|Stop Making Sense|i
+1985|Talking Heads|Little Creatures|i
+1982|The Clash|Combat Rock|m
+1980|The Clash|Sandinista!|m
+1981|The Rolling Stones|Tattoo You|r
+1981|New Order|Movement|i
+1989|New Order|Technique|e
+1987|New Order|Substance|e
+1985|New Order|Low-Life|e
+1980|Echo & the Bunnymen|Crocodiles|i
+1984|Echo & the Bunnymen|Ocean Rain|i
+1983|U2|War|r
+1984|U2|The Unforgettable Fire|r
+1980|The Cure|Seventeen Seconds|i
+1982|The Cure|Pornography|i
+1985|The Cure|The Head on the Door|i
+1987|The Cure|Kiss Me, Kiss Me, Kiss Me|i
+1980|Siouxsie and the Banshees|Kaleidoscope|i
+1981|Siouxsie and the Banshees|Juju|i
+1982|Kate Bush|The Dreaming|p
+1989|Kate Bush|The Sensual World|p
+1985|The Smiths|Meat Is Murder|i
+1987|The Smiths|Strangeways, Here We Come|i
+1987|The Smiths|Louder Than Bombs|i
+1988|Morrissey|Viva Hate|i
+1985|R.E.M.|Fables of the Reconstruction|i
+1986|R.E.M.|Lifes Rich Pageant|i
+1987|R.E.M.|Document|i
+1984|R.E.M.|Reckoning|i
+1988|R.E.M.|Green|i
+1987|Sonic Youth|Sister|i
+1986|Sonic Youth|EVOL|i
+1985|Hüsker Dü|New Day Rising|m
+1985|Hüsker Dü|Flip Your Wig|m
+1985|The Replacements|Tim|i
+1987|The Replacements|Pleased to Meet Me|i
+1983|Violent Femmes|Violent Femmes|i
+1988|Dinosaur Jr.|Bug|i
+1988|Soundgarden|Louder Than Love|m
+1989|Nirvana|Bleach|r
+1981|Black Flag|Damaged|m
+1982|Bad Brains|Bad Brains|m
+1984|Meat Puppets|Meat Puppets II|i
+1986|Big Black|Atomizer|m
+1987|Big Black|Songs About Fucking|m
+1984|Minor Threat|Complete Discography|m
+1989|Fugazi|13 Songs|m
+1983|Metallica|Kill 'Em All|m
+1988|Metallica|...And Justice for All|m
+1983|Iron Maiden|Piece of Mind|m
+1984|Iron Maiden|Powerslave|m
+1988|Iron Maiden|Seventh Son of a Seventh Son|m
+1980|Judas Priest|British Steel|m
+1982|Judas Priest|Screaming for Vengeance|m
+1980|Ozzy Osbourne|Blizzard of Ozz|m
+1981|Ozzy Osbourne|Diary of a Madman|m
+1980|Black Sabbath|Heaven and Hell|m
+1983|Dio|Holy Diver|m
+1984|Van Halen|1984|m
+1983|Def Leppard|Pyromania|m
+1987|Def Leppard|Hysteria|m
+1986|Bon Jovi|Slippery When Wet|r
+1990|Megadeth|Rust in Peace|m
+1987|Anthrax|Among the Living|m
+1988|Slayer|South of Heaven|m
+1990|Slayer|Seasons in the Abyss|m
+1987|Napalm Death|Scum|m
+1987|Death|Scream Bloody Gore|m
+1984|Mercyful Fate|Don't Break the Oath|m
+1985|Celtic Frost|To Mega Therion|m
+1988|Queensrÿche|Operation: Mindcrime|m
+1985|Prince and The Revolution|Around the World in a Day|p
+1986|Prince and The Revolution|Parade|p
+1982|Prince|1999|p
+1981|Prince|Controversy|s
+1988|Prince|Lovesexy|p
+1983|Madonna|Madonna|p
+1986|Madonna|True Blue|p
+1985|Whitney Houston|Whitney Houston|p
+1987|Whitney Houston|Whitney|p
+1982|Marvin Gaye|Midnight Love|s
+1983|Lionel Richie|Can't Slow Down|p
+1984|Tina Turner|Private Dancer|p
+1986|Anita Baker|Rapture|s
+1985|Sade|Promise|s
+1988|Sade|Stronger Than Pride|s
+1980|Diana Ross|Diana|s
+1981|Rick James|Street Songs|s
+1984|Run-D.M.C.|Run-D.M.C.|h
+1985|LL Cool J|Radio|h
+1987|Public Enemy|Yo! Bum Rush the Show|h
+1988|Boogie Down Productions|By All Means Necessary|h
+1987|Boogie Down Productions|Criminal Minded|h
+1988|EPMD|Strictly Business|h
+1988|Big Daddy Kane|Long Live the Kane|h
+1988|Eric B. & Rakim|Follow the Leader|h
+1988|Slick Rick|The Great Adventures of Slick Rick|h
+1989|Jungle Brothers|Done by the Forces of Nature|h
+1988|Ultramagnetic MC's|Critical Beatdown|h
+1982|Grandmaster Flash and the Furious Five|The Message|h
+1986|Kraftwerk|Electric Café|e
+1983|Herbie Hancock|Future Shock|j
+1981|Depeche Mode|Speak & Spell|e
+1986|Depeche Mode|Black Celebration|e
+1987|Depeche Mode|Music for the Masses|e
+1981|The Human League|Dare|e
+1981|Soft Cell|Non-Stop Erotic Cabaret|e
+1984|Frankie Goes to Hollywood|Welcome to the Pleasuredome|p
+1982|ABC|The Lexicon of Love|p
+1982|Duran Duran|Rio|p
+1981|Orchestral Manoeuvres in the Dark|Architecture & Morality|e
+1982|Yazoo|Upstairs at Eric's|e
+1986|Pet Shop Boys|Please|e
+1987|Pet Shop Boys|Actually|e
+1983|Eurythmics|Sweet Dreams (Are Made of This)|p
+1987|Tom Waits|Franks Wild Years|r
+1985|Dire Straits|Brothers in Arms|r
+1980|Peter Gabriel|Peter Gabriel (Melt)|r
+1983|David Bowie|Let's Dance|r
+1980|David Bowie|Scary Monsters (And Super Creeps)|r
+1982|Elvis Costello & The Attractions|Imperial Bedroom|r
+1980|Elvis Costello & The Attractions|Get Happy!!|r
+1982|Roxy Music|Avalon|r
+1985|The Pogues|Rum Sodomy & the Lash|f
+1988|The Pogues|If I Should Fall from Grace with God|f
+1987|The Jesus and Mary Chain|Darklands|i
+1988|The Go-Betweens|16 Lovers Lane|i
+1985|The Fall|This Nation's Saving Grace|i
+1985|Prefab Sprout|Steve McQueen|p
+1986|XTC|Skylarking|r
+1982|XTC|English Settlement|r
+1988|Talk Talk|Spirit of Eden|i
+1986|Talk Talk|The Colour of Spring|i
+1984|The Blue Nile|A Walk Across the Rooftops|p
+1983|Aztec Camera|High Land, Hard Rain|i
+1981|The Psychedelic Furs|Talk Talk Talk|i
+1987|Hüsker Dü|Warehouse: Songs and Stories|m
+1989|Neil Young|Freedom|r
+1987|Bruce Springsteen|Tunnel of Love|r
+1980|Bruce Springsteen|The River|r
+1986|Steve Earle|Guitar Town|f
+1986|Dwight Yoakam|Guitars, Cadillacs, Etc., Etc.|f
+1987|Dolly Parton, Linda Ronstadt & Emmylou Harris|Trio|f
+1989|k.d. lang|Absolute Torch and Twang|f
+1986|Randy Travis|Storms of Life|f
+1988|Lyle Lovett|Pontiac|f
+1980|George Jones|I Am What I Am|f
+1982|Willie Nelson|Always on My Mind|f
+1980|Emmylou Harris|Roses in the Snow|f
+1988|Leonard Cohen|I'm Your Man|f
+1984|Leonard Cohen|Various Positions|f
+1989|Lou Reed|New York|r
+1989|Tears for Fears|The Seeds of Love|p
+1985|a-ha|Hunting High and Low|p
+1987|INXS|Kick|r
+1989|The B-52's|Cosmic Thing|p
+1988|Bobby Brown|Don't Be Cruel|s
+1983|King Sunny Adé|Synchro System|l
+1988|Gipsy Kings|Gipsy Kings|l
+1983|Black Uhuru|Anthem|l
+1986|Miles Davis|Tutu|j
+1986|Arthur Russell|World of Echo|e
+1989|808 State|Ninety|e
+1988|Cowboy Junkies|The Trinity Session|f
+1987|Suzanne Vega|Solitude Standing|f
+1988|Galaxie 500|Today|i
+1989|Galaxie 500|On Fire|i
+1988|The Sugarcubes|Life's Too Good|i
+1989|Faith No More|The Real Thing|m
+1989|Red Hot Chili Peppers|Mother's Milk|r
+1988|Living Colour|Vivid|m
+1990|A Tribe Called Quest|People's Instinctive Travels and the Paths of Rhythm|h
+1991|De La Soul|De La Soul Is Dead|h
+1992|Pete Rock & C.L. Smooth|Mecca and the Soul Brother|h
+1992|Arrested Development|3 Years, 5 Months and 2 Days in the Life Of...|h
+1993|Black Moon|Enta da Stage|h
+1993|Souls of Mischief|93 'til Infinity|h
+1993|De La Soul|Buhloone Mindstate|h
+1993|The Pharcyde|Bizarre Ride II the Pharcyde|h
+1993|Cypress Hill|Black Sunday|h
+1991|Cypress Hill|Cypress Hill|h
+1994|Gang Starr|Hard to Earn|h
+1998|Gang Starr|Moment of Truth|h
+1992|Gang Starr|Daily Operation|h
+1994|OutKast|Southernplayalisticadillacmuzik|h
+1996|OutKast|ATLiens|h
+1995|Raekwon|Only Built 4 Cuban Linx...|h
+1995|GZA|Liquid Swords|h
+1996|Ghostface Killah|Ironman|h
+1997|Wu-Tang Clan|Wu-Tang Forever|h
+1995|Mobb Deep|The Infamous|h
+1996|Nas|It Was Written|h
+1994|Common Sense|Resurrection|h
+2000|Common|Like Water for Chocolate|h
+1996|The Roots|Illadelph Halflife|h
+1999|The Roots|Things Fall Apart|h
+1996|A Tribe Called Quest|Beats, Rhymes and Life|h
+1998|Black Star|Mos Def & Talib Kweli Are Black Star|h
+1998|Big Pun|Capital Punishment|h
+1998|DMX|It's Dark and Hell Is Hot|h
+1997|Missy Elliott|Supa Dupa Fly|h
+1999|Missy Elliott|Da Real World|h
+1999|Dr. Dre|2001|h
+1996|Busta Rhymes|The Coming|h
+1999|Pharoahe Monch|Internal Affairs|h
+1997|Company Flow|Funcrusher Plus|h
+1996|Dr. Octagon|Dr. Octagonecologyst|h
+1991|Ice Cube|Death Certificate|h
+1992|Ice Cube|The Predator|h
+1991|2Pac|2Pacalypse Now|h
+1993|2Pac|Strictly 4 My N.I.G.G.A.Z...|h
+1996|Makaveli|The Don Killuminati: The 7 Day Theory|h
+1994|Warren G|Regulate... G Funk Era|h
+1997|Puff Daddy & The Family|No Way Out|h
+1999|JAY-Z|Vol. 3... Life and Times of S. Carter|h
+1998|JAY-Z|Vol. 2... Hard Knock Life|h
+1997|JAY-Z|In My Lifetime, Vol. 1|h
+1995|Bone Thugs-N-Harmony|E. 1999 Eternal|h
+1994|UGK|Super Tight...|h
+1996|UGK|Ridin' Dirty|h
+1990|Digital Underground|Sex Packets|h
+1990|Brand Nubian|One for All|h
+1991|Main Source|Breaking Atoms|h
+1991|Naughty by Nature|Naughty by Nature|h
+1992|Beastie Boys|Check Your Head|h
+1994|Beastie Boys|Ill Communication|h
+1998|Beastie Boys|Hello Nasty|h
+1995|Goodie Mob|Soul Food|h
+1994|Mary J. Blige|My Life|s
+1996|Maxwell|Maxwell's Urban Hang Suite|s
+1993|Toni Braxton|Toni Braxton|s
+1999|Destiny's Child|The Writing's on the Wall|s
+1994|Aaliyah|Age Ain't Nothing but a Number|s
+1996|Aaliyah|One in a Million|s
+1994|Boyz II Men|II|s
+1991|Boyz II Men|Cooleyhighharmony|s
+1993|Janet Jackson|janet.|s
+1997|Janet Jackson|The Velvet Rope|s
+1992|Whitney Houston|The Bodyguard|p
+1990|Mariah Carey|Mariah Carey|p
+1995|Mariah Carey|Daydream|p
+1991|Michael Jackson|Dangerous|p
+1996|Spice Girls|Spice|p
+1999|Britney Spears|...Baby One More Time|p
+1994|Sheryl Crow|Tuesday Night Music Club|p
+1993|Björk|Debut|e
+1994|Tori Amos|Under the Pink|p
+1992|Tori Amos|Little Earthquakes|p
+1999|Fiona Apple|When the Pawn...|p
+1992|k.d. lang|Ingénue|p
+1996|No Doubt|Tragic Kingdom|p
+1997|Portishead|Portishead|e
+1995|Tricky|Maxinquaye|e
+1994|Massive Attack|Protection|e
+1995|The Chemical Brothers|Exit Planet Dust|e
+1997|The Chemical Brothers|Dig Your Own Hole|e
+1999|The Chemical Brothers|Surrender|e
+1997|The Prodigy|The Fat of the Land|e
+1994|The Prodigy|Music for the Jilted Generation|e
+1993|Orbital|Orbital 2|e
+1996|Orbital|In Sides|e
+1994|Underworld|Dubnobasswithmyheadman|e
+1996|Underworld|Second Toughest in the Infants|e
+1995|Leftfield|Leftism|e
+1995|Goldie|Timeless|e
+1997|Roni Size & Reprazent|New Forms|e
+1991|The KLF|The White Room|e
+1990|The KLF|Chill Out|e
+1991|The Orb|The Orb's Adventures Beyond the Ultraworld|e
+1994|Aphex Twin|Selected Ambient Works Volume II|e
+1995|Aphex Twin|...I Care Because You Do|e
+1996|Aphex Twin|Richard D. James Album|e
+1994|Autechre|Amber|e
+1996|Squarepusher|Feed Me Weird Things|e
+1998|Fatboy Slim|You've Come a Long Way, Baby|e
+1999|Basement Jaxx|Remedy|e
+1993|Saint Etienne|So Tough|e
+1996|Everything but the Girl|Walking Wounded|e
+1997|Mogwai|Young Team|i
+1999|Mogwai|Come On Die Young|i
+1997|Godspeed You! Black Emperor|F♯ A♯ ∞|i
+1998|Mercury Rev|Deserter's Songs|i
+1997|Spiritualized|Ladies and Gentlemen We Are Floating in Space|i
+1995|Elliott Smith|Elliott Smith|f
+1998|Elliott Smith|XO|f
+1993|Low|I Could Live in Hope|i
+1997|Modest Mouse|The Lonesome Crowded West|i
+1997|Built to Spill|Perfect from Now On|i
+1999|Built to Spill|Keep It Like a Secret|i
+1994|Guided by Voices|Bee Thousand|i
+1997|Pavement|Brighten the Corners|i
+1995|Pavement|Wowee Zowee|i
+1996|Neutral Milk Hotel|On Avery Island|i
+1999|Magnetic Fields|69 Love Songs|i
+1998|Belle and Sebastian|The Boy with the Arab Strap|i
+1996|Belle and Sebastian|Tigermilk|i
+1993|Yo La Tengo|Painful|i
+1997|Yo La Tengo|I Can Hear the Heart Beating as One|i
+1990|Sonic Youth|Goo|i
+1992|Sonic Youth|Dirty|i
+1991|Teenage Fanclub|Bandwagonesque|i
+1990|Ride|Nowhere|i
+1994|Slowdive|Souvlaki|i
+1990|Cocteau Twins|Heaven or Las Vegas|i
+1990|The La's|The La's|i
+1993|Suede|Suede|i
+1994|Suede|Dog Man Star|i
+1997|Blur|Blur|i
+1993|Blur|Modern Life Is Rubbish|i
+1999|Blur|13|i
+1994|Manic Street Preachers|The Holy Bible|i
+1996|Manic Street Preachers|Everything Must Go|i
+1995|Supergrass|I Should Coco|i
+1999|Travis|The Man Who|i
+1993|Radiohead|Pablo Honey|i
+1998|Cat Power|Moon Pix|i
+1995|PJ Harvey|To Bring You My Love|r
+1993|PJ Harvey|Rid of Me|r
+1992|PJ Harvey|Dry|r
+1993|The Breeders|Last Splash|i
+1990|Pixies|Bossanova|i
+1991|Pixies|Trompe le Monde|i
+1992|Sugar|Copper Blue|i
+1993|Afghan Whigs|Gentlemen|i
+1993|Pearl Jam|Vs.|r
+1994|Pearl Jam|Vitalogy|r
+1991|Soundgarden|Badmotorfinger|m
+1995|Alice in Chains|Alice in Chains|m
+1992|Stone Temple Pilots|Core|r
+1994|Stone Temple Pilots|Purple|r
+1997|Foo Fighters|The Colour and the Shape|r
+1995|Foo Fighters|Foo Fighters|r
+1998|Queens of the Stone Age|Queens of the Stone Age|m
+2000|Queens of the Stone Age|Rated R|m
+1994|Kyuss|Welcome to Sky Valley|m
+1992|Kyuss|Blues for the Red Sun|m
+1992|Pantera|Vulgar Display of Power|m
+1990|Pantera|Cowboys from Hell|m
+1993|Tool|Undertow|m
+1997|Deftones|Around the Fur|m
+2000|Deftones|White Pony|m
+1994|Korn|Korn|m
+1999|Slipknot|Slipknot|m
+1998|System of a Down|System of a Down|m
+1999|Rage Against the Machine|The Battle of Los Angeles|m
+1996|Rage Against the Machine|Evil Empire|m
+1990|Jane's Addiction|Ritual de lo Habitual|m
+1999|Nine Inch Nails|The Fragile|e
+1996|Marilyn Manson|Antichrist Superstar|m
+1994|Emperor|In the Nightside Eclipse|m
+1993|Death|Individual Thought Patterns|m
+1995|Death|Symbolic|m
+1991|Death|Human|m
+1992|Darkthrone|A Blaze in the Northern Sky|m
+2001|Opeth|Blackwater Park|m
+2001|Converge|Jane Doe|m
+1991|Sepultura|Arise|m
+1996|Sepultura|Roots|m
+1993|Cynic|Focus|m
+2000|At the Drive-In|Relationship of Command|m
+1994|The Offspring|Smash|m
+1995|Rancid|...And Out Come the Wolves|m
+1997|Green Day|Nimrod|m
+1995|Jawbreaker|Dear You|m
+1999|Blink-182|Enema of the State|m
+1994|Sunny Day Real Estate|Diary|i
+1999|American Football|American Football|i
+1999|Jimmy Eat World|Clarity|i
+1992|The Black Crowes|The Southern Harmony and Musical Companion|r
+1990|Neil Young & Crazy Horse|Ragged Glory|r
+1992|Neil Young|Harvest Moon|f
+1997|Bob Dylan|Time Out of Mind|f
+1994|Johnny Cash|American Recordings|f
+1996|Johnny Cash|Unchained|f
+1996|Wilco|Being There|i
+1999|Wilco|Summerteeth|i
+1990|Uncle Tupelo|No Depression|f
+1993|Uncle Tupelo|Anodyne|f
+1995|Son Volt|Trace|f
+1995|Gillian Welch|Revival|f
+1998|Gillian Welch|Hell Among the Yearlings|f
+1990|Garth Brooks|No Fences|f
+1991|Garth Brooks|Ropin' the Wind|f
+1997|Shania Twain|Come On Over|f
+1995|Shania Twain|The Woman in Me|f
+1998|Dixie Chicks|Wide Open Spaces|f
+1999|Dixie Chicks|Fly|f
+1990|Alan Jackson|Here in the Real World|f
+1996|Steve Earle|I Feel Alright|f
+1995|Emmylou Harris|Wrecking Ball|f
+1990|Paul Simon|The Rhythm of the Saints|l
+1993|Cesária Évora|Miss Perfumado|l
+1994|Ali Farka Touré & Ry Cooder|Talking Timbuktu|l
+1994|Selena|Amor Prohibido|l
+1991|Luis Miguel|Romance|l
+1995|Shakira|Pies Descalzos|l
+1994|Café Tacvba|Re|l
+1998|Manu Chao|Clandestino|l
+1999|Ibrahim Ferrer|Buena Vista Social Club Presents Ibrahim Ferrer|l
+1999|Brad Mehldau|Art of the Trio 4: Back at the Vanguard|j
+1990|Deee-Lite|World Clique|e
+1990|Happy Mondays|Pills 'n' Thrills and Bellyaches|e
+1993|Pet Shop Boys|Very|e
+1992|Annie Lennox|Diva|p
+1990|George Michael|Listen Without Prejudice Vol. 1|p
+1999|Santana|Supernatural|l
+1993|Counting Crows|August and Everything After|r
+1999|Red Hot Chili Peppers|Californication|r
+1996|Sublime|Sublime|r
+1997|Ben Folds Five|Whatever and Ever Amen|p
+1993|Morphine|Cure for Pain|r
+1999|Beck|Midnite Vultures|i
+1998|Beck|Mutations|i
+1994|Beck|Mellow Gold|i
+1995|Garbage|Garbage|r
+1996|Eels|Beautiful Freak|i
+2000|Ghostface Killah|Supreme Clientele|h
+2001|Cannibal Ox|The Cold Vein|h
+2002|Nas|God's Son|h
+2001|Nas|Stillmatic|h
+2003|50 Cent|Get Rich or Die Tryin'|h
+2004|MF DOOM|MM..FOOD|h
+2004|The Streets|A Grand Don't Come for Free|h
+2002|The Streets|Original Pirate Material|h
+2003|Dizzee Rascal|Boy in da Corner|h
+2006|J Dilla|Donuts|h
+2002|Talib Kweli|Quality|h
+2001|Missy Elliott|Miss E... So Addictive|h
+2002|Missy Elliott|Under Construction|h
+2001|Aesop Rock|Labor Days|h
+2002|El-P|Fantastic Damage|h
+2006|Lupe Fiasco|Lupe Fiasco's Food & Liquor|h
+2007|UGK|Underground Kingz|h
+2006|The Roots|Game Theory|h
+2002|Clipse|Lord Willin'|h
+2006|T.I.|King|h
+2009|Kid Cudi|Man on the Moon: The End of Day|h
+2009|Raekwon|Only Built 4 Cuban Linx... Pt. II|h
+2008|The Roots|Rising Down|h
+2008|Q-Tip|The Renaissance|h
+2007|Common|Finding Forever|h
+2005|Common|Be|h
+2006|Gnarls Barkley|St. Elsewhere|s
+2008|Raphael Saadiq|The Way I See It|s
+2006|Justin Timberlake|FutureSex/LoveSounds|p
+2002|Justin Timberlake|Justified|p
+2001|Alicia Keys|Songs in A Minor|s
+2003|Alicia Keys|The Diary of Alicia Keys|s
+2006|Beyoncé|B'Day|s
+2008|Beyoncé|I Am... Sasha Fierce|s
+2001|Destiny's Child|Survivor|s
+2005|Mariah Carey|The Emancipation of Mimi|p
+2000|Erykah Badu|Mama's Gun|s
+2008|Erykah Badu|New Amerykah Part One (4th World War)|s
+2006|Lily Allen|Alright, Still|p
+2003|Amy Winehouse|Frank|s
+2008|Adele|19|p
+2004|Kelly Clarkson|Breakaway|p
+2001|Kylie Minogue|Fever|p
+2007|Britney Spears|Blackout|p
+2009|Lady Gaga|The Fame Monster|p
+2005|Robyn|Robyn|p
+2002|Avril Lavigne|Let Go|p
+2004|Gwen Stefani|Love. Angel. Music. Baby.|p
+2006|Nelly Furtado|Loose|p
+2000|Sade|Lovers Rock|s
+2000|Coldplay|Parachutes|p
+2008|Coldplay|Viva la Vida or Death and All His Friends|p
+2006|Muse|Black Holes and Revelations|r
+2003|Muse|Absolution|r
+2001|Muse|Origin of Symmetry|r
+2003|Radiohead|Hail to the Thief|i
+2001|Radiohead|Amnesiac|i
+2004|Wilco|A Ghost Is Born|i
+2007|Wilco|Sky Blue Sky|i
+2003|The Strokes|Room on Fire|i
+2005|The White Stripes|Get Behind Me Satan|r
+2000|The White Stripes|De Stijl|r
+2003|The Black Keys|Thickfreakness|r
+2006|The Hold Steady|Boys and Girls in America|r
+2005|The Hold Steady|Separation Sunday|r
+2008|Kings of Leon|Only by the Night|r
+2005|Bloc Party|Silent Alarm|i
+2004|The Libertines|The Libertines|i
+2002|The Libertines|Up the Bracket|i
+2007|Arctic Monkeys|Favourite Worst Nightmare|i
+2007|The National|Boxer|i
+2005|The National|Alligator|i
+2005|Wolf Parade|Apologies to the Queen Mary|i
+2005|Clap Your Hands Say Yeah|Clap Your Hands Say Yeah|i
+2007|Spoon|Ga Ga Ga Ga Ga|i
+2005|Spoon|Gimme Fiction|i
+2002|Spoon|Kill the Moonlight|i
+2003|The Shins|Chutes Too Narrow|i
+2001|The Shins|Oh, Inverted World|i
+2007|The Shins|Wincing the Night Away|i
+2004|Modest Mouse|Good News for People Who Love Bad News|i
+2005|Broken Social Scene|Broken Social Scene|i
+2002|Broken Social Scene|You Forgot It in People|i
+2005|The New Pornographers|Twin Cinema|i
+2003|Sufjan Stevens|Michigan|f
+2004|Sufjan Stevens|Seven Swans|f
+2003|Death Cab for Cutie|Transatlanticism|i
+2005|Death Cab for Cutie|Plans|i
+2005|Bright Eyes|I'm Wide Awake, It's Morning|f
+2002|Bright Eyes|Lifted or The Story Is in the Soil, Keep Your Ear to the Ground|f
+2004|Iron & Wine|Our Endless Numbered Days|f
+2007|Iron & Wine|The Shepherd's Dog|f
+2005|Antony and the Johnsons|I Am a Bird Now|i
+2008|TV on the Radio|Dear Science|i
+2007|Battles|Mirrored|i
+2008|Deerhunter|Microcastle|i
+2007|Deerhunter|Cryptograms|i
+2005|Animal Collective|Feels|i
+2004|Animal Collective|Sung Tongs|i
+2007|Animal Collective|Strawberry Jam|i
+2009|Dirty Projectors|Bitte Orca|i
+2006|Neko Case|Fox Confessor Brings the Flood|f
+2004|Joanna Newsom|The Milk-Eyed Mender|f
+2006|Cat Power|The Greatest|i
+2003|Cat Power|You Are Free|i
+2009|Yeah Yeah Yeahs|It's Blitz!|i
+2007|Feist|The Reminder|p
+2009|Florence + The Machine|Lungs|p
+2001|Gorillaz|Gorillaz|i
+2002|Beck|Sea Change|i
+2005|Beck|Guero|i
+2003|The Mars Volta|De-Loused in the Comatorium|r
+2004|Mastodon|Leviathan|m
+2006|Mastodon|Blood Mountain|m
+2009|Mastodon|Crack the Skye|m
+2004|Isis|Panopticon|m
+2002|Isis|Oceanic|m
+2004|Lamb of God|Ashes of the Wake|m
+2005|Gojira|From Mars to Sirius|m
+2009|Baroness|Blue Record|m
+2001|Tool|Lateralus|m
+2006|Tool|10,000 Days|m
+2001|Slipknot|Iowa|m
+2008|Metallica|Death Magnetic|m
+2000|Linkin Park|Hybrid Theory|m
+2003|Linkin Park|Meteora|m
+2004|My Chemical Romance|Three Cheers for Sweet Revenge|m
+2006|My Chemical Romance|The Black Parade|m
+2005|Fall Out Boy|From Under the Cork Tree|m
+2007|Paramore|Riot!|m
+2006|Brand New|The Devil and God Are Raging Inside Me|i
+2003|Brand New|Deja Entendu|i
+2008|Gaslight Anthem|The '59 Sound|r
+2001|Ryan Adams|Gold|f
+2000|Ryan Adams|Heartbreaker|f
+2001|Gillian Welch|Time (The Revelator)|f
+2007|Robert Plant & Alison Krauss|Raising Sand|f
+2005|Carrie Underwood|Some Hearts|f
+2009|Miranda Lambert|Revolution|f
+2002|Dixie Chicks|Home|f
+2006|Dixie Chicks|Taking the Long Way|f
+2004|Loretta Lynn|Van Lear Rose|f
+2006|Taylor Swift|Taylor Swift|f
+2004|Drive-By Truckers|The Dirty South|f
+2001|Drive-By Truckers|Southern Rock Opera|f
+2006|Bob Dylan|Modern Times|f
+2001|Bob Dylan|"Love and Theft"|f
+2005|Daft Punk|Human After All|e
+2007|Daft Punk|Alive 2007|e
+2002|Boards of Canada|Geogaddi|e
+2005|Boards of Canada|The Campfire Headphase|e
+2001|Aphex Twin|Drukqs|e
+2007|Caribou|Andorra|e
+2002|The Notwist|Neon Golden|e
+2001|Röyksopp|Melody A.M.|e
+2004|Annie|Anniemal|p
+2006|Hot Chip|The Warning|e
+2008|Hot Chip|Made in the Dark|e
+2006|Burial|Burial|e
+2003|Four Tet|Rounds|e
+2005|Four Tet|Everything Ecstatic|e
+2008|Flying Lotus|Los Angeles|e
+2001|Basement Jaxx|Rooty|e
+2002|Sigur Rós|( )|i
+2005|Sigur Rós|Takk...|i
+2004|Björk|Medúlla|e
+2007|Björk|Volta|e
+2000|U2|All That You Can't Leave Behind|r
+2002|Bruce Springsteen|The Rising|r
+2000|PJ Harvey|Stories from the City, Stories from the Sea|r
+2007|PJ Harvey|White Chalk|r
+2004|Nick Cave and the Bad Seeds|Abattoir Blues/The Lyre of Orpheus|r
+2008|Nick Cave and the Bad Seeds|Dig, Lazarus, Dig!!!|r
+2008|Elbow|The Seldom Seen Kid|i
+2000|Elliott Smith|Figure 8|f
+2004|Elliott Smith|From a Basement on the Hill|f
+2005|M.I.A.|Arular|e
+2005|Daddy Yankee|Barrio Fino|l
+2005|Shakira|Fijación Oral, Vol. 1|l
+2001|Shakira|Laundry Service|p
+2006|Amadou & Mariam|Dimanche à Bamako|l
+2004|Tinariwen|Amassakoul|l
+2009|Tinariwen|Imidiwan: Companions|l
+2006|Seu Jorge|The Life Aquatic Studio Sessions|l
+2001|Juanes|Un Día Normal|l
+2000|Bebel Gilberto|Tanto Tempo|l
+2001|Gotan Project|La Revancha del Tango|l
+2009|Vijay Iyer|Historicity|j
+2002|Wayne Shorter|Footprints Live!|j
+2007|Herbie Hancock|River: The Joni Letters|j
+2001|Diana Krall|The Look of Love|j
+2004|Madeleine Peyroux|Careless Love|j
+2010|Big Boi|Sir Lucious Left Foot: The Son of Chico Dusty|h
+2011|Tyler, The Creator|Goblin|h
+2012|Nas|Life Is Good|h
+2013|Chance the Rapper|Acid Rap|h
+2013|Danny Brown|Old|h
+2016|Danny Brown|Atrocity Exhibition|h
+2013|Run the Jewels|Run the Jewels|h
+2016|Run the Jewels|Run the Jewels 3|h
+2018|Pusha T|DAYTONA|h
+2015|Vince Staples|Summertime '06|h
+2017|Vince Staples|Big Fish Theory|h
+2014|Freddie Gibbs & Madlib|Piñata|h
+2019|Freddie Gibbs & Madlib|Bandana|h
+2018|Earl Sweatshirt|Some Rap Songs|h
+2013|Earl Sweatshirt|Doris|h
+2011|Kendrick Lamar|Section.80|h
+2016|Kendrick Lamar|untitled unmastered.|h
+2015|Drake|If You're Reading This It's Too Late|h
+2013|Drake|Nothing Was the Same|h
+2015|Future|DS2|h
+2014|Schoolboy Q|Oxymoron|h
+2014|J. Cole|2014 Forest Hills Drive|h
+2016|A Tribe Called Quest|We Got It from Here... Thank You 4 Your Service|h
+2012|Joey Bada$$|1999|h
+2013|A$AP Rocky|Long.Live.A$AP|h
+2017|Migos|Culture|h
+2018|Cardi B|Invasion of Privacy|h
+2018|Noname|Room 25|h
+2016|Noname|Telefone|h
+2017|Brockhampton|Saturation II|h
+2019|JPEGMAFIA|All My Heroes Are Cornballs|h
+2018|JPEGMAFIA|Veteran|h
+2019|Little Simz|GREY Area|h
+2018|Kanye West|ye|h
+2018|Kids See Ghosts|Kids See Ghosts|h
+2011|JAY-Z & Kanye West|Watch the Throne|h
+2017|JAY-Z|4:44|h
+2014|Nicki Minaj|The Pinkprint|h
+2010|Nicki Minaj|Pink Friday|h
+2018|Mac Miller|Swimming|h
+2020|Mac Miller|Circles|h
+2020|Playboi Carti|Whole Lotta Red|h
+2018|Anderson .Paak|Oxnard|s
+2017|Kelela|Take Me Apart|s
+2012|Miguel|Kaleidoscope Dream|s
+2016|Kaytranada|99.9%|e
+2019|Solange|When I Get Home|s
+2015|The Weeknd|Beauty Behind the Madness|s
+2016|The Weeknd|Starboy|s
+2011|Beyoncé|4|s
+2016|Blood Orange|Freetown Sound|s
+2018|Blood Orange|Negro Swan|s
+2013|Blood Orange|Cupid Deluxe|s
+2019|FKA twigs|MAGDALENE|s
+2010|Rihanna|Loud|p
+2015|Adele|25|p
+2012|Taylor Swift|Red|p
+2017|Taylor Swift|reputation|p
+2019|Taylor Swift|Lover|p
+2010|Taylor Swift|Speak Now|f
+2014|Lana Del Rey|Ultraviolence|p
+2015|Lana Del Rey|Honeymoon|p
+2016|Mitski|Puberty 2|i
+2014|Mitski|Bury Me at Makeout Creek|i
+2017|Harry Styles|Harry Styles|p
+2019|Harry Styles|Fine Line|p
+2017|Kesha|Rainbow|p
+2018|Ariana Grande|Sweetener|p
+2017|Charli XCX|Pop 2|p
+2019|Charli XCX|Charli|p
+2018|Robyn|Honey|p
+2012|Jessie Ware|Devotion|p
+2013|HAIM|Days Are Gone|i
+2013|CHVRCHES|The Bones of What You Believe|e
+2010|Sufjan Stevens|The Age of Adz|f
+2016|Angel Olsen|My Woman|i
+2014|Angel Olsen|Burn Your Fire for No Witness|i
+2019|Angel Olsen|All Mirrors|i
+2017|Phoebe Bridgers|Stranger in the Alps|i
+2018|boygenius|boygenius|i
+2018|Snail Mail|Lush|i
+2017|Big Thief|Capacity|i
+2019|Big Thief|U.F.O.F.|i
+2019|Big Thief|Two Hands|i
+2016|Big Thief|Masterpiece|i
+2018|Soccer Mommy|Clean|i
+2015|Courtney Barnett|Sometimes I Sit and Think, and Sometimes I Just Sit|i
+2015|Sleater-Kinney|No Cities to Love|i
+2015|Grimes|Art Angels|e
+2014|The War on Drugs|Lost in the Dream|i
+2017|The War on Drugs|A Deeper Understanding|i
+2017|LCD Soundsystem|American Dream|e
+2011|Destroyer|Kaputt|i
+2012|Japandroids|Celebration Rock|i
+2013|The National|Trouble Will Find Me|i
+2017|The National|Sleep Well Beast|i
+2010|Beach House|Teen Dream|i
+2012|Beach House|Bloom|i
+2015|Beach House|Depression Cherry|i
+2018|Beach House|7|i
+2015|Father John Misty|I Love You, Honeybear|f
+2017|Father John Misty|Pure Comedy|f
+2010|Deerhunter|Halcyon Digest|i
+2013|Kurt Vile|Wakin on a Pretty Daze|i
+2011|Kurt Vile|Smoke Ring for My Halo|i
+2014|Spoon|They Want My Soul|i
+2017|Spoon|Hot Thoughts|i
+2010|Vampire Weekend|Contra|i
+2019|Vampire Weekend|Father of the Bride|i
+2017|Fleet Foxes|Crack-Up|f
+2012|Alabama Shakes|Boys & Girls|r
+2015|Alabama Shakes|Sound & Color|r
+2015|Leon Bridges|Coming Home|s
+2013|Jason Isbell|Southeastern|f
+2015|Jason Isbell|Something More Than Free|f
+2017|Jason Isbell and the 400 Unit|The Nashville Sound|f
+2016|Sturgill Simpson|A Sailor's Guide to Earth|f
+2015|Chris Stapleton|Traveller|f
+2013|Kacey Musgraves|Same Trailer Different Park|f
+2015|Kacey Musgraves|Pageant Material|f
+2014|Miranda Lambert|Platinum|f
+2017|Tyler Childers|Purgatory|f
+2016|Margo Price|Midwest Farmer's Daughter|f
+2018|Brandi Carlile|By the Way, I Forgive You|f
+2019|The Highwomen|The Highwomen|f
+2010|Mumford & Sons|Sigh No More|f
+2013|Laura Marling|Once I Was an Eagle|f
+2014|Hozier|Hozier|r
+2013|Queens of the Stone Age|...Like Clockwork|m
+2011|Fucked Up|David Comes to Life|m
+2013|Deafheaven|Sunbather|m
+2016|Gojira|Magma|m
+2012|Gojira|L'Enfant Sauvage|m
+2015|Ghost|Meliora|m
+2014|Behemoth|The Satanist|m
+2016|Metallica|Hardwired... to Self-Destruct|m
+2017|Converge|The Dusk in Us|m
+2012|Converge|All We Love We Leave Behind|m
+2018|Sleep|The Sciences|m
+2019|Tool|Fear Inoculum|m
+2017|Power Trip|Nightmare Logic|m
+2018|IDLES|Joy as an Act of Resistance.|m
+2019|Fontaines D.C.|Dogrel|i
+2015|Bring Me the Horizon|That's the Spirit|m
+2018|Parquet Courts|Wide Awake!|i
+2014|Parquet Courts|Sunbathing Animal|i
+2010|Titus Andronicus|The Monitor|i
+2011|Radiohead|The King of Limbs|i
+2013|Arcade Fire|Reflektor|i
+2016|Nick Cave & The Bad Seeds|Skeleton Tree|r
+2013|Nick Cave & The Bad Seeds|Push the Sky Away|r
+2019|Nick Cave & The Bad Seeds|Ghosteen|r
+2013|David Bowie|The Next Day|r
+2012|Leonard Cohen|Old Ideas|f
+2016|Leonard Cohen|You Want It Darker|f
+2010|Gorillaz|Plastic Beach|i
+2010|Four Tet|There Is Love in You|e
+2013|Jon Hopkins|Immunity|e
+2018|Jon Hopkins|Singularity|e
+2014|Caribou|Our Love|e
+2010|Caribou|Swim|e
+2010|Flying Lotus|Cosmogramma|e
+2012|Flying Lotus|Until the Quiet Comes|e
+2014|Flying Lotus|You're Dead!|e
+2011|James Blake|James Blake|e
+2013|James Blake|Overgrown|e
+2014|Aphex Twin|Syro|e
+2018|SOPHIE|Oil of Every Pearl's Un-Insides|e
+2017|Bicep|Bicep|e
+2015|Floating Points|Elaenia|e
+2018|The 1975|A Brief Inquiry into Online Relationships|p
+2018|Arctic Monkeys|Tranquility Base Hotel & Casino|i
+2016|Frank Ocean|Endless|s
+2010|Erykah Badu|New Amerykah Part Two (Return of the Ankh)|s
+2013|Janelle Monáe|The Electric Lady|s
+2010|Esperanza Spalding|Chamber Music Society|j
+2018|Kamasi Washington|Heaven and Earth|j
+2017|Thundercat|Drunk|s
+2017|Bonobo|Migration|e
+2013|Bonobo|The North Borders|e
+2016|Christine and the Queens|Chaleur Humaine|p
+2018|Christine and the Queens|Chris|p
+2017|Sampha|Process|s
+2019|Stormzy|Heavy Is the Head|h
+2016|Skepta|Konnichiwa|h
+2016|Kano|Made in the Manor|h
+2018|J Balvin|Vibras|l
+2015|Natalia Lafourcade|Hasta la Raíz|l
+2019|Bad Bunny & J Balvin|Oasis|l
+2010|Calle 13|Entren Los Que Quieran|l
+2019|Burna Boy|African Giant|l
+2018|Burna Boy|Outside|l
+2015|Hiatus Kaiyote|Choose Your Weapon|s
+2012|Robert Glasper Experiment|Black Radio|j
+2019|Lizzo|Cuz I Love You|p
+2014|Sia|1000 Forms of Fear|p
+2015|Justin Bieber|Purpose|p
+2018|Troye Sivan|Bloom|p
+2019|Sharon Van Etten|Remind Me Tomorrow|i
+2014|Sharon Van Etten|Are We There|i
+2012|Sharon Van Etten|Tramp|i
+2010|Joanna Newsom|Have One on Me|f
+2020|Perfume Genius|Set My Heart on Fire Immediately|i
+2020|Adrianne Lenker|songs|f
+2020|Sault|Untitled (Black Is)|s
+2020|Sault|Untitled (Rise)|s
+2021|Sault|NINE|s
+2020|Lil Baby|My Turn|h
+2020|Megan Thee Stallion|Good News|h
+2020|Freddie Gibbs & The Alchemist|Alfredo|h
+2020|Moses Sumney|græ|s
+2020|Rina Sawayama|SAWAYAMA|p
+2020|Lady Gaga|Chromatica|p
+2020|Bad Bunny|YHLQMDLG|l
+2020|Bad Bunny|El Último Tour Del Mundo|l
+2020|Fontaines D.C.|A Hero's Death|i
+2020|Yves Tumor|Heaven to a Tortured Mind|i
+2020|Kelly Lee Owens|Inner Song|e
+2020|Jay Electronica|A Written Testimony|h
+2020|Sufjan Stevens|The Ascension|f
+2020|Jason Isbell and the 400 Unit|Reunions|f
+2020|Chris Stapleton|Starting Over|f
+2020|Tame Impala|The Slow Rush|i
+2020|Ariana Grande|Positions|p
+2021|Billie Eilish|Happier Than Ever|p
+2021|Lorde|Solar Power|p
+2021|Lana Del Rey|Chemtrails over the Country Club|p
+2021|Lana Del Rey|Blue Banisters|p
+2021|Taylor Swift|Red (Taylor's Version)|p
+2021|Kanye West|Donda|h
+2021|Drake|Certified Lover Boy|h
+2021|J. Cole|The Off-Season|h
+2021|Mach-Hommy|Pray for Haiti|h
+2021|Black Country, New Road|For the First Time|i
+2022|Black Country, New Road|Ants from Up There|i
+2021|black midi|Cavalcade|i
+2021|Squid|Bright Green Field|i
+2021|Wolf Alice|Blue Weekend|i
+2021|Arlo Parks|Collapsed in Sunbeams|i
+2021|Mdou Moctar|Afrique Victime|l
+2021|Floating Points, Pharoah Sanders & The London Symphony Orchestra|Promises|j
+2021|Jazmine Sullivan|Heaux Tales|s
+2021|Cleo Sol|Mother|s
+2021|Lingua Ignota|Sinner Get Ready|m
+2021|Low|HEY WHAT|i
+2021|Self Esteem|Prioritise Pleasure|p
+2021|Snail Mail|Valentine|i
+2021|Dry Cleaning|New Long Leg|i
+2021|Kacey Musgraves|star-crossed|f
+2022|Pusha T|It's Almost Dry|h
+2022|Denzel Curry|Melt My Eyez See Your Future|h
+2022|JID|The Forever Story|h
+2022|Future|I Never Liked You|h
+2022|Steve Lacy|Gemini Rights|s
+2022|Ethel Cain|Preacher's Daughter|i
+2022|Alvvays|Blue Rev|i
+2022|Weyes Blood|And in the Darkness, Hearts Aglow|i
+2022|Florence + The Machine|Dance Fever|p
+2022|Zach Bryan|American Heartbreak|f
+2022|Angel Olsen|Big Time|f
+2022|Fontaines D.C.|Skinty Fia|i
+2022|Arctic Monkeys|The Car|i
+2022|The Smile|A Light for Attracting Attention|i
+2022|Burna Boy|Love, Damini|l
+2022|Sudan Archives|Natural Brown Prom Queen|s
+2022|Danger Mouse & Black Thought|Cheat Codes|h
+2022|Billy Woods|Aethiopes|h
+2023|Lana Del Rey|Did You Know That There's a Tunnel Under Ocean Blvd|p
+2023|Jessie Ware|That! Feels Good!|p
+2023|Kelela|Raven|s
+2023|Victoria Monét|JAGUAR II|s
+2023|Janelle Monáe|The Age of Pleasure|s
+2023|Sampha|Lahai|s
+2023|Wednesday|Rat Saw God|i
+2023|Paramore|This Is Why|i
+2023|Killer Mike|MICHAEL|h
+2023|Travis Scott|UTOPIA|h
+2023|Doja Cat|Scarlet|h
+2023|Little Simz|NO THANK YOU|h
+2023|Jason Isbell and the 400 Unit|Weathervanes|f
+2023|Tyler Childers|Rustin' in the Rain|f
+2023|Zach Bryan|Zach Bryan|f
+2023|Noname|Sundial|h
+2023|Blur|The Ballad of Darren|i
+2023|PJ Harvey|I Inside the Old Year Dying|r
+2023|André 3000|New Blue Sun|j
+2023|Peso Pluma|GÉNESIS|l
+2023|Karol G|MAÑANA SERÁ BONITO|l
+2023|Troye Sivan|Something to Give Each Other|p
+2023|Slowdive|everything is alive|i
+2023|The National|First Two Pages of Frankenstein|i
+2024|Taylor Swift|THE TORTURED POETS DEPARTMENT|p
+2024|Ariana Grande|eternal sunshine|p
+2024|Dua Lipa|Radical Optimism|p
+2024|Clairo|Charm|i
+2024|Waxahatchee|Tigers Blood|f
+2024|Mk.gee|Two Star & the Dream Police|i
+2024|MJ Lenderman|Manning Fireworks|i
+2024|Magdalena Bay|Imaginal Disk|p
+2024|Jamie xx|In Waves|e
+2024|Mustafa|Dunya|f
+2024|Doechii|Alligator Bites Never Heal|h
+2024|Future & Metro Boomin|WE DON'T TRUST YOU|h
+2024|Vince Staples|Dark Times|h
+2024|Kim Gordon|The Collective|i
+2024|Nilüfer Yanya|My Method Actor|i
+2024|Shaboozey|Where I've Been, Isn't Where I'm Going|f
+2024|Zach Bryan|The Great American Bar Scene|f
+2024|English Teacher|This Could Be Texas|i
+2024|The Cure|Songs of a Lost World|i
+2024|Nick Cave & The Bad Seeds|Wild God|r
+2024|Tems|Born in the Wild|s
+2024|Kali Uchis|ORQUÍDEAS|l
+2024|Beth Gibbons|Lives Outgrown|i
+2024|Jack White|No Name|r
+2024|Father John Misty|Mahashmashana|f
+2025|Lady Gaga|MAYHEM|p
+2025|Clipse|Let God Sort Em Out|h
+2025|Sabrina Carpenter|Man's Best Friend|p
+2025|Turnstile|NEVER ENOUGH|m
+2025|Wet Leg|moisturizer|i
+2025|Addison Rae|Addison|p`.split('\n').map(l=>{const [y,a,t,g]=l.split('|');return[+y,a,t,g]});
 const BRGA=[['r','Rock'],['i','Indie and alternative'],['p','Pop'],['h','Hip hop'],['s','R&B and soul'],['e','Electronic'],['f','Folk and country'],['m','Metal and punk'],['j','Jazz'],['l','Latin and world']];
 const brGL=(t,l)=>t==='album'&&l==='classic'?BRGA:BRG[t];
 /* all decades: take the top of each decade in turn, so the list mixes eras the way a best-of list does */
 function brMix(l){const by={};l.forEach(a=>{const d=Math.floor(a[0]/10);(by[d]=by[d]||[]).push(a)});const ks=Object.keys(by).sort(),o=[];for(let i=0;o.length<l.length;i++)ks.forEach(k=>{if(by[k][i])o.push(by[k][i])});return o}
-const BCOV=(()=>{try{localStorage.removeItem('checkit.bcov');return JSON.parse(localStorage.getItem('checkit.bcov2'))||{}}catch(e){return{}}})();
-const bcSave=()=>{try{localStorage.setItem('checkit.bcov2',JSON.stringify(BCOV))}catch(e){}};
+const BCOV=(()=>{try{['checkit.bcov','checkit.bcov2'].forEach(k=>localStorage.removeItem(k));return JSON.parse(localStorage.getItem('checkit.bcov3'))||{}}catch(e){return{}}})();
+const bcSave=()=>{try{localStorage.setItem('checkit.bcov3',JSON.stringify(BCOV))}catch(e){}};
 const brF=(t,l)=>t==='album'?(l==='classic'?'gd':'g'):l==='trend'?'':l==='new'?'g':'gd';
 const brDec=f=>{const a=[];for(let y=2020;y>=f;y-=10)a.push(y);return a};
 const BRC={};let brIx=new Map(),bcBusy=0;
@@ -1743,7 +3006,7 @@ async function brFetch(t,l,g,d,p){const now=new Date(),iso=x=>x.toISOString().sl
     return{more:p<Math.min(j.total_pages||1,10),items:(j.results||[]).map(r=>{const y=yr(tv?r.first_air_date:r.release_date),pp=r.poster_path;
       return{type:t,title:tv?(r.name||r.original_name):(r.title||r.original_title),creator:'',art:pp?`https://image.tmdb.org/t/p/w500${pp}`:'',thumb:pp?`https://image.tmdb.org/t/p/w342${pp}`:'',url:`https://www.themoviedb.org/${k}/${r.id}`,extra:tv?{year:y}:{year:y,tmdbId:r.id},tmdbId:tv?r.id:0,sub:y,score:r.vote_count>=20&&r.vote_average?r.vote_average.toFixed(1):''}})}}
   if(t==='album'){
-    if(l==='classic'){const all=BRA.filter(a=>(!d||(a[0]>=d&&a[0]<d+10))&&(!g||a[3]===g)),pick=d?all:brMix(all),n=48;return{more:p*n<pick.length,items:pick.slice((p-1)*n,p*n).map(([y,a,ti])=>{const c=BCOV[a+'|'+ti];return{type:'album',title:ti,creator:a,art:c?.a||'',thumb:c?.t||'',url:c?.u||'',extra:{year:String(y)},sub:`${a}, ${y}`,need:!c}})}}
+    if(l==='classic'){const all=BRA.filter(a=>(!d||(a[0]>=d&&a[0]<d+10))&&(!g||a[3]===g)),pick=d?all:brMix(all),n=48;return{more:p*n<pick.length,items:pick.slice((p-1)*n,p*n).map(([y,a,ti])=>{const c0=BCOV[a+'|'+ti],c=c0?.miss&&Date.now()-c0.miss>3*864e5?null:c0;return{type:'album',title:ti,creator:a,art:c?.a||'',thumb:c?.t||'',url:c?.u||'',extra:{year:String(y)},sub:`${a}, ${y}`,need:!c}})}}
     const s=l==='songs',j=await jsonp(`https://api.deezer.com/chart/${g||0}/${s?'tracks':'albums'}?limit=50&index=${(p-1)*50}&output=jsonp`);if(j.error)throw 0;const dd=j.data||[];
     return{more:dd.length===50&&p<2,items:dd.map(r=>s?{type:'song',title:r.title,creator:r.artist?.name||'',art:r.album?.cover_xl||r.album?.cover_medium||'',thumb:r.album?.cover_big||'',url:r.link,extra:{},sub:r.artist?.name||''}
       :{type:'album',title:r.title,creator:r.artist?.name||'',art:r.cover_xl||r.cover_medium||'',thumb:r.cover_big||'',url:r.link,extra:{},sub:r.artist?.name||''})}}
@@ -1775,15 +3038,25 @@ function brFoot(){const f=$('#bfoot'),c=BRC[$('#view').dataset.bk];if(!f)return;
    :c.err?`<div class="bf">${c.items.length?'Couldn’t load more.':'Couldn’t load this list.'}<br><button class="btn" type="button" data-bretry>Try again</button></div>`
    :!c.items.length?`<div class="bf">Nothing here. Try another genre or decade.</div>`:c.more?`<div class="bf"><button class="btn" type="button" data-bmore>Show more</button></div>`:''}
 function brPaint(){const c=BRC[$('#view').dataset.bk];if(!c)return;brIndex();document.querySelectorAll('#bgrid .bt').forEach(el=>{const r=c.items[+el.dataset.bi];if(r)el.querySelector('.ba').innerHTML=brAct(r)})}
+/* last resort for covers: MusicBrainz + Cover Art Archive, one lookup a second as MusicBrainz asks */
+let mbQ=Promise.resolve();
+function brMB(r){const run=async()=>{const q=`releasegroup:"${r.title.replace(/"/g,'')}" AND artist:"${r.creator.replace(/"/g,'')}" AND primarytype:album`;
+    const j=await getJSON(`https://musicbrainz.org/ws/2/release-group/?query=${encodeURIComponent(q)}&fmt=json&limit=5`),l=j['release-groups']||[];
+    const m=l.find(x=>brN(x.title).startsWith(brN(r.title).slice(0,8)));if(!m)return null;
+    return{a:`https://coverartarchive.org/release-group/${m.id}/front-500`,t:`https://coverartarchive.org/release-group/${m.id}/front-250`,u:''}};
+  const p=mbQ.then(run);mbQ=p.catch(()=>{}).then(()=>new Promise(z=>setTimeout(z,1100)));return p}
 async function brCover(r){const id=r.creator+'|'+r.title,wait=ms=>new Promise(z=>setTimeout(z,ms));let res=null,asked=0;
   const same=x=>brN(x)===brN(r.creator)||brN(x).startsWith(brN(r.creator))||brN(r.creator).startsWith(brN(x)),tt=brN(r.title).slice(0,8);
-  const pick=(l,an,tn)=>l.find(x=>same(an(x))&&brN(tn(x)).startsWith(tt))||l.find(x=>same(an(x))&&brN(tn(x)).includes(tt))||null;
+  const junk=/tribute|karaoke|cover|made famous|instrumental|lullaby|piano|string quartet|in the style|8-?bit|vitamin|rendition|salute|homage/i,ok=x=>!junk.test(x)||junk.test(r.title);
+  const pick=(l,an,tn)=>{l=l.filter(x=>ok(an(x)||'')&&ok(tn(x)||''));const ex=x=>brN(an(x))===brN(r.creator);
+    return l.find(x=>ex(x)&&brN(tn(x)).startsWith(tt))||l.find(x=>ex(x)&&brN(tn(x)).includes(tt))||l.find(x=>same(an(x))&&brN(tn(x)).startsWith(tt))||null};
   const dz=async q=>{for(let n=0;n<3;n++){const j=await jsonp(`https://api.deezer.com/search/album?q=${encodeURIComponent(q)}&limit=15&output=jsonp`);if(j.error){if(j.error.code===4){await wait(1500);continue}throw 0}asked=1;return j.data||[]}throw 0};
   try{const an=x=>x.artist?.name,tn=x=>x.title;let m=pick(await dz(`artist:"${r.creator}" album:"${r.title}"`),an,tn);if(!m)m=pick(await dz(`${r.creator} ${r.title}`),an,tn);
     if(m)res={a:m.cover_xl||m.cover_big||'',t:m.cover_big||m.cover_medium||'',u:m.link||''}}catch(e){}
   if(!res)try{const j=await jsonp(`https://itunes.apple.com/search?term=${encodeURIComponent(r.creator+' '+r.title)}&media=music&entity=album&limit=15`);asked=1;
     const m=pick(j.results||[],x=>x.artistName,x=>x.collectionName);if(m?.artworkUrl100)res={a:big(m.artworkUrl100),t:m.artworkUrl100.replace(/\/\d+x\d+bb\./,'/300x300bb.'),u:m.collectionViewUrl||''}}catch(e){}
-  if(res||asked){BCOV[id]=res||{};bcSave()}
+  if(!res)try{res=await brMB(r)}catch(e){}
+  if(res||asked){BCOV[id]=res||{miss:Date.now()};bcSave()}
   r.need=0;const b=BCOV[id];if(b?.a){r.art=b.a;r.thumb=b.t;r.url=b.u}
   const c=BRC[$('#view').dataset.bk],i=c?c.items.indexOf(r):-1,el=i<0?null:document.querySelector(`#bgrid [data-bi="${i}"]`);if(el){el.querySelector('.bp').innerHTML=brImg(r);brIndex();el.querySelector('.ba').innerHTML=brAct(r)}}
 async function brCovers(){if(bcBusy)return;bcBusy=1;try{for(;;){if(st.view!=='browse')break;const c=BRC[$('#view').dataset.bk],todo=(c?.items||[]).filter(r=>r.need).slice(0,5);if(!todo.length)break;await Promise.all(todo.map(brCover))}}finally{bcBusy=0}}
