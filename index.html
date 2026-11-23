@@ -561,6 +561,8 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
 .ba button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .bp,.bm{cursor:pointer}.bp img{transition:opacity .15s}.bp:hover img{opacity:.88}
 .dr .bpa{margin-top:0;padding-top:0;gap:8px}.dr .bpa button{height:42px;font-size:14px}.dr .bpa button span{display:inline}
+.bt.sk .bp{animation:bsk 1.2s ease-in-out infinite alternate}.bt.sk b,.bt.sk small{background:var(--soft);border-radius:3px;width:70%;color:transparent}.bt.sk small{width:40%;margin-top:4px}
+@keyframes bsk{to{opacity:.45}}
 .bf{text-align:center;color:var(--mut);padding:28px 0 8px}
 .bf .btn{margin:10px 4px 0}
 @media(max-width:760px){.tabs{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -1246,95 +1248,462 @@ function showTrend(){if($('#q').value.trim())return;const k=st.tmdb+'|'+st.rawg;
   const sc=$('#res').scrollTop;showRes(g,note);$('#res').classList.add('on');$('#res').scrollTop=sc}
 /* browse: quick lists of top films, TV, music and games, one tap to Up next or Done */
 const BRT=[['movie','Films'],['show','TV'],['album','Music'],['game','Games']];
-const BRL={movie:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],show:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],album:[['classic','Essential albums'],['chart','Charts now'],['songs','Top songs']],game:[['top','Top rated'],['pop','Popular'],['new','New']]};
+const BRL={movie:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],show:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],album:[['classic','Top rated'],['chart','Charts now'],['songs','Top songs']],game:[['top','Top rated'],['pop','Popular'],['new','New']]};
 const BRG={movie:[[28,'Action'],[12,'Adventure'],[16,'Animation'],[35,'Comedy'],[80,'Crime'],[99,'Documentary'],[18,'Drama'],[10751,'Family'],[14,'Fantasy'],[36,'History'],[27,'Horror'],[10402,'Music'],[9648,'Mystery'],[10749,'Romance'],[878,'Science fiction'],[53,'Thriller'],[10752,'War'],[37,'Western']],
  show:[[10759,'Action and adventure'],[16,'Animation'],[35,'Comedy'],[80,'Crime'],[99,'Documentary'],[18,'Drama'],[10751,'Family'],[10762,'Kids'],[9648,'Mystery'],[10765,'Sci-fi and fantasy'],[10768,'War and politics'],[37,'Western']],
  album:[[132,'Pop'],[116,'Hip hop'],[152,'Rock'],[165,'R&B'],[85,'Alternative'],[113,'Dance'],[106,'Electronic'],[84,'Country'],[197,'Latin'],[464,'Metal'],[169,'Soul and funk'],[129,'Jazz'],[98,'Classical'],[144,'Reggae'],[466,'Folk'],[153,'Blues']],
  game:[['action','Action'],['adventure','Adventure'],['role-playing-games-rpg','RPG'],['shooter','Shooter'],['strategy','Strategy'],['platformer','Platformer'],['puzzle','Puzzle'],['racing','Racing'],['sports','Sports'],['fighting','Fighting'],['simulation','Simulation'],['indie','Indie']]};
-/* essential albums: a short canon by decade (year|artist|title); covers come from Deezer */
-const BRA=`1965|John Coltrane|A Love Supreme
-1965|Bob Dylan|Highway 61 Revisited
-1966|The Beach Boys|Pet Sounds
-1966|The Beatles|Revolver
-1967|The Velvet Underground|The Velvet Underground & Nico
-1967|The Jimi Hendrix Experience|Are You Experienced
-1967|Aretha Franklin|I Never Loved a Man the Way I Love You
-1967|The Doors|The Doors
-1969|The Rolling Stones|Let It Bleed
-1969|The Beatles|Abbey Road
-1971|Marvin Gaye|What's Going On
-1971|Joni Mitchell|Blue
-1971|Carole King|Tapestry
-1971|Led Zeppelin|Led Zeppelin IV
-1972|David Bowie|The Rise and Fall of Ziggy Stardust and the Spiders from Mars
-1973|Pink Floyd|The Dark Side of the Moon
-1975|Bruce Springsteen|Born to Run
-1976|Stevie Wonder|Songs in the Key of Life
-1977|Fleetwood Mac|Rumours
-1977|Bob Marley & The Wailers|Exodus
-1977|Television|Marquee Moon
-1979|The Clash|London Calling
-1980|Talking Heads|Remain in Light
-1982|Michael Jackson|Thriller
-1984|Prince|Purple Rain
-1985|Kate Bush|Hounds of Love
-1986|The Smiths|The Queen Is Dead
-1986|Paul Simon|Graceland
-1987|U2|The Joshua Tree
-1987|Guns N' Roses|Appetite for Destruction
-1988|Public Enemy|It Takes a Nation of Millions to Hold Us Back
-1989|Pixies|Doolittle
-1991|Nirvana|Nevermind
-1991|A Tribe Called Quest|The Low End Theory
-1991|My Bloody Valentine|Loveless
-1992|Dr. Dre|The Chronic
-1994|Nas|Illmatic
-1994|Jeff Buckley|Grace
-1994|The Notorious B.I.G.|Ready to Die
-1995|Oasis|(What's the Story) Morning Glory?
-1997|Radiohead|OK Computer
-1997|Daft Punk|Homework
-1998|Massive Attack|Mezzanine
-1998|Lauryn Hill|The Miseducation of Lauryn Hill
-2000|Radiohead|Kid A
-2000|OutKast|Stankonia
-2001|The Strokes|Is This It
-2001|JAY-Z|The Blueprint
-2001|Daft Punk|Discovery
-2003|The White Stripes|Elephant
-2004|Kanye West|The College Dropout
-2004|Arcade Fire|Funeral
-2006|Amy Winehouse|Back to Black
-2007|LCD Soundsystem|Sound of Silver
-2008|Bon Iver|For Emma, Forever Ago
-2010|Kanye West|My Beautiful Dark Twisted Fantasy
-2011|Adele|21
-2012|Frank Ocean|channel ORANGE
-2012|Kendrick Lamar|good kid, m.A.A.d city
-2013|Vampire Weekend|Modern Vampires of the City
-2014|Taylor Swift|1989
-2015|Kendrick Lamar|To Pimp a Butterfly
-2015|Tame Impala|Currents
-2016|Beyoncé|Lemonade
-2016|Frank Ocean|Blonde
-2016|Solange|A Seat at the Table
-2017|Lorde|Melodrama
-2020|Fiona Apple|Fetch the Bolt Cutters
-2020|Taylor Swift|folklore
-2020|Phoebe Bridgers|Punisher
-2021|Olivia Rodrigo|SOUR
-2022|Bad Bunny|Un Verano Sin Ti
-2022|Beyoncé|RENAISSANCE
-2022|SZA|SOS
-2022|Kendrick Lamar|Mr. Morale & The Big Steppers
-2024|Charli xcx|BRAT
-2024|Billie Eilish|HIT ME HARD AND SOFT`.split('\n').map(l=>{const [y,a,t]=l.split('|');return[+y,a,t]});
-const BCOV=(()=>{try{return JSON.parse(localStorage.getItem('checkit.bcov'))||{}}catch(e){return{}}})();
-const brF=(t,l)=>t==='album'?(l==='classic'?'d':'g'):l==='trend'?'':l==='new'?'g':'gd';
+/* top rated albums: a hand-picked critics' canon (year|artist|title|genre), written in rough order of acclaim within each decade; covers come from Deezer, then Apple Music */
+const BRA=`1959|Miles Davis|Kind of Blue|j
+1959|Dave Brubeck Quartet|Time Out|j
+1959|Charles Mingus|Mingus Ah Um|j
+1959|Ornette Coleman|The Shape of Jazz to Come|j
+1956|Sonny Rollins|Saxophone Colossus|j
+1958|Cannonball Adderley|Somethin' Else|j
+1957|John Coltrane|Blue Train|j
+1956|Elvis Presley|Elvis Presley|r
+1955|Frank Sinatra|In the Wee Small Hours|p
+1956|Ella Fitzgerald & Louis Armstrong|Ella and Louis|j
+1957|Thelonious Monk|Brilliant Corners|j
+1959|Ray Charles|The Genius of Ray Charles|s
+1966|The Beach Boys|Pet Sounds|p
+1966|The Beatles|Revolver|r
+1969|The Beatles|Abbey Road|r
+1967|The Beatles|Sgt. Pepper's Lonely Hearts Club Band|r
+1965|Bob Dylan|Highway 61 Revisited|f
+1967|The Velvet Underground|The Velvet Underground & Nico|i
+1965|John Coltrane|A Love Supreme|j
+1965|The Beatles|Rubber Soul|r
+1968|The Beatles|The Beatles|r
+1966|Bob Dylan|Blonde on Blonde|f
+1967|The Jimi Hendrix Experience|Are You Experienced|r
+1967|Aretha Franklin|I Never Loved a Man the Way I Love You|s
+1969|The Rolling Stones|Let It Bleed|r
+1968|Van Morrison|Astral Weeks|f
+1968|The Jimi Hendrix Experience|Electric Ladyland|r
+1968|The Rolling Stones|Beggars Banquet|r
+1967|The Doors|The Doors|r
+1969|King Crimson|In the Court of the Crimson King|r
+1969|Led Zeppelin|Led Zeppelin II|r
+1967|Love|Forever Changes|r
+1965|Otis Redding|Otis Blue: Otis Redding Sings Soul|s
+1968|The Kinks|The Kinks Are the Village Green Preservation Society|r
+1969|Led Zeppelin|Led Zeppelin|r
+1969|The Band|The Band|f
+1968|The Band|Music from Big Pink|f
+1969|Nick Drake|Five Leaves Left|f
+1964|Stan Getz & João Gilberto|Getz/Gilberto|j
+1963|James Brown|Live at the Apollo|s
+1968|Johnny Cash|At Folsom Prison|f
+1965|Bob Dylan|Bringing It All Back Home|f
+1969|The Who|Tommy|r
+1968|Simon & Garfunkel|Bookends|f
+1969|Miles Davis|In a Silent Way|j
+1969|Dusty Springfield|Dusty in Memphis|s
+1963|Charles Mingus|The Black Saint and the Sinner Lady|j
+1964|Eric Dolphy|Out to Lunch!|j
+1967|Pink Floyd|The Piper at the Gates of Dawn|r
+1969|Captain Beefheart & His Magic Band|Trout Mask Replica|r
+1967|Leonard Cohen|Songs of Leonard Cohen|f
+1969|The Stooges|The Stooges|m
+1969|Creedence Clearwater Revival|Green River|r
+1969|The Velvet Underground|The Velvet Underground|i
+1964|The Beatles|A Hard Day's Night|r
+1967|Jefferson Airplane|Surrealistic Pillow|r
+1967|Cream|Disraeli Gears|r
+1969|Sly & The Family Stone|Stand!|s
+1962|Ray Charles|Modern Sounds in Country and Western Music|s
+1966|Simon & Garfunkel|Parsley, Sage, Rosemary and Thyme|f
+1969|Johnny Cash|At San Quentin|f
+1971|Marvin Gaye|What's Going On|s
+1973|Pink Floyd|The Dark Side of the Moon|r
+1977|Fleetwood Mac|Rumours|r
+1971|Joni Mitchell|Blue|f
+1976|Stevie Wonder|Songs in the Key of Life|s
+1972|David Bowie|The Rise and Fall of Ziggy Stardust and the Spiders from Mars|r
+1971|Led Zeppelin|Led Zeppelin IV|r
+1975|Bruce Springsteen|Born to Run|r
+1979|The Clash|London Calling|m
+1972|The Rolling Stones|Exile on Main St.|r
+1975|Bob Dylan|Blood on the Tracks|f
+1975|Pink Floyd|Wish You Were Here|r
+1977|Television|Marquee Moon|i
+1975|Patti Smith|Horses|i
+1973|Stevie Wonder|Innervisions|s
+1977|Sex Pistols|Never Mind the Bollocks, Here's the Sex Pistols|m
+1976|Ramones|Ramones|m
+1971|Carole King|Tapestry|p
+1977|Bob Marley & The Wailers|Exodus|l
+1970|Black Sabbath|Paranoid|m
+1970|Miles Davis|Bitches Brew|j
+1971|David Bowie|Hunky Dory|r
+1977|David Bowie|Low|r
+1971|The Who|Who's Next|r
+1970|Simon & Garfunkel|Bridge over Troubled Water|f
+1972|Neil Young|Harvest|f
+1970|Neil Young|After the Gold Rush|f
+1979|Joy Division|Unknown Pleasures|i
+1971|The Rolling Stones|Sticky Fingers|r
+1975|Led Zeppelin|Physical Graffiti|r
+1972|Stevie Wonder|Talking Book|s
+1977|Steely Dan|Aja|r
+1979|Pink Floyd|The Wall|r
+1970|Derek & The Dominos|Layla and Other Assorted Love Songs|r
+1972|Nick Drake|Pink Moon|f
+1973|Herbie Hancock|Head Hunters|j
+1975|Keith Jarrett|The Köln Concert|j
+1971|Funkadelic|Maggot Brain|s
+1971|Sly & The Family Stone|There's a Riot Goin' On|s
+1972|Curtis Mayfield|Super Fly|s
+1979|Michael Jackson|Off the Wall|p
+1977|Kraftwerk|Trans-Europe Express|e
+1974|Kraftwerk|Autobahn|e
+1975|Queen|A Night at the Opera|r
+1976|Eagles|Hotel California|r
+1973|Elton John|Goodbye Yellow Brick Road|p
+1979|Talking Heads|Fear of Music|i
+1978|Talking Heads|More Songs About Buildings and Food|i
+1978|Elvis Costello & The Attractions|This Year's Model|r
+1977|Elvis Costello|My Aim Is True|r
+1972|Lou Reed|Transformer|r
+1973|The Stooges|Raw Power|m
+1975|Parliament|Mothership Connection|s
+1972|Al Green|I'm Still in Love with You|s
+1978|Blondie|Parallel Lines|p
+1975|Brian Eno|Another Green World|e
+1978|Brian Eno|Ambient 1: Music for Airports|e
+1972|Big Star|#1 Record|i
+1977|Wire|Pink Flag|m
+1978|Van Halen|Van Halen|m
+1979|AC/DC|Highway to Hell|m
+1970|Creedence Clearwater Revival|Cosmo's Factory|r
+1976|The Modern Lovers|The Modern Lovers|i
+1978|Chic|C'est Chic|s
+1971|Gil Scott-Heron|Pieces of a Man|s
+1975|Willie Nelson|Red Headed Stranger|f
+1974|Dolly Parton|Jolene|f
+1978|Kate Bush|The Kick Inside|p
+1976|ABBA|Arrival|p
+1970|The Velvet Underground|Loaded|i
+1982|Michael Jackson|Thriller|p
+1984|Prince|Purple Rain|p
+1980|Talking Heads|Remain in Light|i
+1985|Kate Bush|Hounds of Love|p
+1986|The Smiths|The Queen Is Dead|i
+1988|Public Enemy|It Takes a Nation of Millions to Hold Us Back|h
+1986|Paul Simon|Graceland|p
+1987|U2|The Joshua Tree|r
+1989|Pixies|Doolittle|i
+1987|Prince|Sign o' the Times|p
+1980|Joy Division|Closer|i
+1988|Sonic Youth|Daydream Nation|i
+1987|Guns N' Roses|Appetite for Destruction|m
+1986|Metallica|Master of Puppets|m
+1989|De La Soul|3 Feet High and Rising|h
+1983|R.E.M.|Murmur|i
+1989|The Stone Roses|The Stone Roses|i
+1989|Beastie Boys|Paul's Boutique|h
+1988|Pixies|Surfer Rosa|i
+1982|Bruce Springsteen|Nebraska|f
+1984|Bruce Springsteen|Born in the U.S.A.|r
+1989|The Cure|Disintegration|i
+1980|AC/DC|Back in Black|m
+1986|Run-D.M.C.|Raising Hell|h
+1987|Eric B. & Rakim|Paid in Full|h
+1988|N.W.A.|Straight Outta Compton|h
+1985|The Jesus and Mary Chain|Psychocandy|i
+1984|The Replacements|Let It Be|i
+1984|Hüsker Dü|Zen Arcade|m
+1983|New Order|Power, Corruption & Lies|e
+1985|Tom Waits|Rain Dogs|r
+1984|Metallica|Ride the Lightning|m
+1986|Beastie Boys|Licensed to Ill|h
+1987|Michael Jackson|Bad|p
+1986|Janet Jackson|Control|s
+1989|Madonna|Like a Prayer|p
+1984|Sade|Diamond Life|s
+1981|Kraftwerk|Computer World|e
+1985|Tears for Fears|Songs from the Big Chair|p
+1986|Peter Gabriel|So|p
+1981|Grace Jones|Nightclubbing|s
+1980|Prince|Dirty Mind|s
+1984|Minutemen|Double Nickels on the Dime|m
+1986|Slayer|Reign in Blood|m
+1982|Iron Maiden|The Number of the Beast|m
+1980|Dead Kennedys|Fresh Fruit for Rotting Vegetables|m
+1988|Tracy Chapman|Tracy Chapman|f
+1983|The Police|Synchronicity|r
+1983|Tom Waits|Swordfishtrombones|r
+1984|Cocteau Twins|Treasure|i
+1987|Dinosaur Jr.|You're Living All Over Me|i
+1988|Jane's Addiction|Nothing's Shocking|m
+1989|Nine Inch Nails|Pretty Hate Machine|e
+1984|Madonna|Like a Virgin|p
+1987|George Michael|Faith|p
+1983|Cyndi Lauper|She's So Unusual|p
+1989|Janet Jackson|Rhythm Nation 1814|s
+1984|The Smiths|The Smiths|i
+1991|Nirvana|Nevermind|r
+1997|Radiohead|OK Computer|i
+1998|Lauryn Hill|The Miseducation of Lauryn Hill|h
+1994|Nas|Illmatic|h
+1991|My Bloody Valentine|Loveless|i
+1991|A Tribe Called Quest|The Low End Theory|h
+1993|Wu-Tang Clan|Enter the Wu-Tang (36 Chambers)|h
+1992|Dr. Dre|The Chronic|h
+1994|The Notorious B.I.G.|Ready to Die|h
+1998|Neutral Milk Hotel|In the Aeroplane Over the Sea|i
+1996|DJ Shadow|Endtroducing.....|e
+1998|Massive Attack|Mezzanine|e
+1994|Portishead|Dummy|e
+1993|Nirvana|In Utero|r
+1995|Radiohead|The Bends|i
+1994|Jeff Buckley|Grace|r
+1998|OutKast|Aquemini|h
+1996|JAY-Z|Reasonable Doubt|h
+1993|A Tribe Called Quest|Midnight Marauders|h
+1991|Massive Attack|Blue Lines|e
+1991|U2|Achtung Baby|r
+1992|R.E.M.|Automatic for the People|i
+1991|Pearl Jam|Ten|r
+1994|Pavement|Crooked Rain, Crooked Rain|i
+1991|Slint|Spiderland|i
+1995|Oasis|(What's the Story) Morning Glory?|r
+1994|Oasis|Definitely Maybe|r
+1997|Daft Punk|Homework|e
+1992|Aphex Twin|Selected Ambient Works 85-92|e
+1997|Björk|Homogenic|e
+1996|Weezer|Pinkerton|i
+1994|Weezer|Weezer|i
+1994|Nirvana|MTV Unplugged in New York|r
+1994|Blur|Parklife|i
+1993|The Smashing Pumpkins|Siamese Dream|i
+1992|Rage Against the Machine|Rage Against the Machine|m
+1991|Red Hot Chili Peppers|Blood Sugar Sex Magik|r
+1999|The Flaming Lips|The Soft Bulletin|i
+1997|Elliott Smith|Either/Or|f
+1995|D'Angelo|Brown Sugar|s
+1997|Erykah Badu|Baduizm|s
+1996|Fugees|The Score|h
+1990|Public Enemy|Fear of a Black Planet|h
+1997|The Notorious B.I.G.|Life After Death|h
+1995|2Pac|Me Against the World|h
+1996|2Pac|All Eyez on Me|h
+1999|Mos Def|Black on Both Sides|h
+1993|Snoop Doggy Dogg|Doggystyle|h
+1999|Eminem|The Slim Shady LP|h
+1996|Beck|Odelay|i
+1993|Liz Phair|Exile in Guyville|i
+1994|Hole|Live Through This|i
+1995|Alanis Morissette|Jagged Little Pill|p
+1994|Green Day|Dookie|m
+1991|Primal Scream|Screamadelica|e
+1998|Air|Moon Safari|e
+1999|Moby|Play|e
+1990|Depeche Mode|Violator|e
+1994|Nine Inch Nails|The Downward Spiral|e
+1998|Boards of Canada|Music Has the Right to Children|e
+1995|Björk|Post|e
+1997|The Verve|Urban Hymns|r
+1995|The Smashing Pumpkins|Mellon Collie and the Infinite Sadness|i
+1992|Pavement|Slanted and Enchanted|i
+1999|Sigur Rós|Ágætis byrjun|i
+1996|Belle and Sebastian|If You're Feeling Sinister|i
+1995|Pulp|Different Class|i
+1994|Soundgarden|Superunknown|m
+1992|Alice in Chains|Dirt|m
+1991|Metallica|Metallica|m
+1996|Tool|Ænima|m
+1994|TLC|CrazySexyCool|s
+1999|TLC|FanMail|s
+1997|Buena Vista Social Club|Buena Vista Social Club|l
+1998|Madonna|Ray of Light|p
+1998|Lucinda Williams|Car Wheels on a Gravel Road|f
+1996|Fiona Apple|Tidal|p
+1990|Sinéad O'Connor|I Do Not Want What I Haven't Got|p
+1990|Ice Cube|AmeriKKKa's Most Wanted|h
+1991|R.E.M.|Out of Time|i
+2000|Radiohead|Kid A|i
+2000|OutKast|Stankonia|h
+2001|The Strokes|Is This It|i
+2004|Kanye West|The College Dropout|h
+2004|Arcade Fire|Funeral|i
+2001|JAY-Z|The Blueprint|h
+2007|Radiohead|In Rainbows|i
+2006|Amy Winehouse|Back to Black|s
+2002|Wilco|Yankee Hotel Foxtrot|i
+2001|Daft Punk|Discovery|e
+2003|The White Stripes|Elephant|r
+2007|LCD Soundsystem|Sound of Silver|e
+2004|Madvillain|Madvillainy|h
+2000|D'Angelo|Voodoo|s
+2005|Kanye West|Late Registration|h
+2008|Bon Iver|For Emma, Forever Ago|f
+2005|Sufjan Stevens|Illinois|f
+2009|Animal Collective|Merriweather Post Pavilion|i
+2003|OutKast|Speakerboxxx/The Love Below|h
+2000|Eminem|The Marshall Mathers LP|h
+2001|The White Stripes|White Blood Cells|r
+2002|Interpol|Turn On the Bright Lights|i
+2003|Yeah Yeah Yeahs|Fever to Tell|i
+2007|Burial|Untrue|e
+2000|The Avalanches|Since I Left You|e
+2008|Kanye West|808s & Heartbreak|h
+2007|Kanye West|Graduation|h
+2008|Fleet Foxes|Fleet Foxes|f
+2005|LCD Soundsystem|LCD Soundsystem|e
+2002|Queens of the Stone Age|Songs for the Deaf|m
+2006|Arctic Monkeys|Whatever People Say I Am, That's What I'm Not|i
+2008|Vampire Weekend|Vampire Weekend|i
+2005|Gorillaz|Demon Days|i
+2008|Lil Wayne|Tha Carter III|h
+2003|JAY-Z|The Black Album|h
+2007|Panda Bear|Person Pitch|e
+2006|TV on the Radio|Return to Cookie Mountain|i
+2003|The Postal Service|Give Up|e
+2009|The xx|xx|i
+2008|Portishead|Third|e
+2001|Björk|Vespertine|e
+2006|Joanna Newsom|Ys|f
+2002|Johnny Cash|American IV: The Man Comes Around|f
+2000|Godspeed You! Black Emperor|Lift Your Skinny Fists Like Antennas to Heaven|i
+2006|Clipse|Hell Hath No Fury|h
+2003|Beyoncé|Dangerously in Love|s
+2004|Usher|Confessions|s
+2002|Eminem|The Eminem Show|h
+2004|Green Day|American Idiot|m
+2004|The Killers|Hot Fuss|i
+2008|MGMT|Oracular Spectacular|i
+2002|Coldplay|A Rush of Blood to the Head|p
+2007|Arcade Fire|Neon Bible|i
+2006|Ghostface Killah|Fishscale|h
+2007|M.I.A.|Kala|e
+2004|Franz Ferdinand|Franz Ferdinand|i
+2009|Phoenix|Wolfgang Amadeus Phoenix|i
+2009|Grizzly Bear|Veckatimest|i
+2006|The Knife|Silent Shout|e
+2000|Modest Mouse|The Moon & Antarctica|i
+2001|System of a Down|Toxicity|m
+2007|Rihanna|Good Girl Gone Bad|p
+2008|Taylor Swift|Fearless|p
+2008|Lady Gaga|The Fame|p
+2002|Norah Jones|Come Away with Me|j
+2010|Kanye West|My Beautiful Dark Twisted Fantasy|h
+2015|Kendrick Lamar|To Pimp a Butterfly|h
+2016|Frank Ocean|Blonde|s
+2012|Kendrick Lamar|good kid, m.A.A.d city|h
+2016|Beyoncé|Lemonade|s
+2012|Frank Ocean|channel ORANGE|s
+2017|Kendrick Lamar|DAMN.|h
+2013|Vampire Weekend|Modern Vampires of the City|i
+2017|Lorde|Melodrama|p
+2016|Solange|A Seat at the Table|s
+2015|Tame Impala|Currents|i
+2016|David Bowie|Blackstar|r
+2013|Daft Punk|Random Access Memories|e
+2015|Sufjan Stevens|Carrie & Lowell|f
+2011|Adele|21|p
+2014|Taylor Swift|1989|p
+2010|Arcade Fire|The Suburbs|i
+2013|Kanye West|Yeezus|h
+2019|Lana Del Rey|Norman Fucking Rockwell!|p
+2011|Bon Iver|Bon Iver, Bon Iver|f
+2018|Mitski|Be the Cowboy|i
+2017|SZA|Ctrl|s
+2012|Tame Impala|Lonerism|i
+2010|LCD Soundsystem|This Is Happening|e
+2011|PJ Harvey|Let England Shake|r
+2016|Radiohead|A Moon Shaped Pool|i
+2018|Janelle Monáe|Dirty Computer|s
+2019|Tyler, The Creator|IGOR|h
+2018|Kacey Musgraves|Golden Hour|f
+2013|Lorde|Pure Heroine|p
+2013|Arctic Monkeys|AM|i
+2014|Run the Jewels|Run the Jewels 2|h
+2015|Kamasi Washington|The Epic|j
+2014|D'Angelo and The Vanguard|Black Messiah|s
+2013|Beyoncé|BEYONCÉ|s
+2015|Carly Rae Jepsen|E•MO•TION|p
+2019|Billie Eilish|WHEN WE ALL FALL ASLEEP, WHERE DO WE GO?|p
+2011|The Weeknd|House of Balloons|s
+2017|Tyler, The Creator|Flower Boy|h
+2016|Car Seat Headrest|Teens of Denial|i
+2014|FKA twigs|LP1|s
+2015|Jamie xx|In Colour|e
+2010|Robyn|Body Talk|p
+2016|Bon Iver|22, A Million|f
+2016|Rihanna|ANTI|p
+2016|Kanye West|The Life of Pablo|h
+2011|Drake|Take Care|h
+2018|Travis Scott|ASTROWORLD|h
+2016|Chance the Rapper|Coloring Book|h
+2010|The National|High Violet|i
+2011|Fleet Foxes|Helplessness Blues|f
+2010|Janelle Monáe|The ArchAndroid|s
+2016|Anderson .Paak|Malibu|s
+2018|Rosalía|El Mal Querer|l
+2018|Bad Bunny|X 100PRE|l
+2016|Childish Gambino|"Awaken, My Love!"|s
+2019|Weyes Blood|Titanic Rising|i
+2014|St. Vincent|St. Vincent|i
+2012|Grimes|Visions|e
+2013|Disclosure|Settle|e
+2014|Sturgill Simpson|Metamodern Sounds in Country Music|f
+2019|Ariana Grande|thank u, next|p
+2012|Lana Del Rey|Born to Die|p
+2010|Deftones|Diamond Eyes|m
+2020|Fiona Apple|Fetch the Bolt Cutters|p
+2022|Kendrick Lamar|Mr. Morale & The Big Steppers|h
+2022|Beyoncé|RENAISSANCE|s
+2020|Taylor Swift|folklore|p
+2022|SZA|SOS|s
+2020|Phoebe Bridgers|Punisher|i
+2024|Charli xcx|BRAT|p
+2022|Bad Bunny|Un Verano Sin Ti|l
+2021|Little Simz|Sometimes I Might Be Introvert|h
+2021|Olivia Rodrigo|SOUR|p
+2022|Rosalía|MOTOMAMI|l
+2023|boygenius|the record|i
+2024|Kendrick Lamar|GNX|h
+2020|Dua Lipa|Future Nostalgia|p
+2020|Run the Jewels|RTJ4|h
+2022|Big Thief|Dragon New Mountain I Believe in You|f
+2024|Beyoncé|COWBOY CARTER|f
+2020|The Weeknd|After Hours|s
+2021|Tyler, The Creator|CALL ME IF YOU GET LOST|h
+2024|Billie Eilish|HIT ME HARD AND SOFT|p
+2020|Taylor Swift|evermore|p
+2021|Japanese Breakfast|Jubilee|i
+2023|Caroline Polachek|Desire, I Want to Turn Into You|p
+2020|Bob Dylan|Rough and Rowdy Ways|f
+2023|Mitski|The Land Is Inhospitable and So Are We|i
+2021|Turnstile|GLOW ON|m
+2020|HAIM|Women in Music Pt. III|i
+2020|Waxahatchee|Saint Cloud|f
+2023|Olivia Rodrigo|GUTS|p
+2024|Sabrina Carpenter|Short n' Sweet|p
+2023|Chappell Roan|The Rise and Fall of a Midwest Princess|p
+2025|Bad Bunny|DeBÍ TiRAR MáS FOToS|l
+2024|Tyler, The Creator|CHROMAKOPIA|h
+2022|Taylor Swift|Midnights|p
+2022|Harry Styles|Harry's House|p
+2021|Silk Sonic|An Evening with Silk Sonic|s
+2021|Adele|30|p
+2022|Wet Leg|Wet Leg|i
+2023|Sufjan Stevens|Javelin|f
+2024|Vampire Weekend|Only God Was Above Us|i
+2024|Fontaines D.C.|Romance|i`.split('\n').map(l=>{const [y,a,t,g]=l.split('|');return[+y,a,t,g]});
+const BRGA=[['r','Rock'],['i','Indie and alternative'],['p','Pop'],['h','Hip hop'],['s','R&B and soul'],['e','Electronic'],['f','Folk and country'],['m','Metal and punk'],['j','Jazz'],['l','Latin and world']];
+const brGL=(t,l)=>t==='album'&&l==='classic'?BRGA:BRG[t];
+/* all decades: take the top of each decade in turn, so the list mixes eras the way a best-of list does */
+function brMix(l){const by={};l.forEach(a=>{const d=Math.floor(a[0]/10);(by[d]=by[d]||[]).push(a)});const ks=Object.keys(by).sort(),o=[];for(let i=0;o.length<l.length;i++)ks.forEach(k=>{if(by[k][i])o.push(by[k][i])});return o}
+const BCOV=(()=>{try{localStorage.removeItem('checkit.bcov');return JSON.parse(localStorage.getItem('checkit.bcov2'))||{}}catch(e){return{}}})();
+const bcSave=()=>{try{localStorage.setItem('checkit.bcov2',JSON.stringify(BCOV))}catch(e){}};
+const brF=(t,l)=>t==='album'?(l==='classic'?'gd':'g'):l==='trend'?'':l==='new'?'g':'gd';
 const brDec=f=>{const a=[];for(let y=2020;y>=f;y-=10)a.push(y);return a};
 const BRC={};let brIx=new Map(),bcBusy=0;
 function brState(){if(!st.br||!BRL[st.br.t])st.br={t:'movie'};const t=st.br.t,s=st.br[t]||(st.br[t]={l:BRL[t][0][0],g:'',d:''});if(!BRL[t].some(x=>x[0]===s.l))s.l=BRL[t][0][0];return[t,s]}
-function brKey(){const[t,s]=brState(),f=brF(t,s.l);return[t,s.l,f.includes('g')?s.g:'',f.includes('d')?s.d:'',st.tmdb?1:0,st.rawg?1:0].join('|')}
+function brKey(){const[t,s]=brState(),f=brF(t,s.l),g=f.includes('g')&&brGL(t,s.l).some(x=>String(x[0])===String(s.g))?s.g:'';return[t,s.l,g,f.includes('d')?s.d:'',st.tmdb?1:0,st.rawg?1:0].join('|')}
 const brN=s=>(s||'').toLowerCase().replace(/\(.*?\)|\[.*?\]/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,'');
 const brK=(type,title,by)=>type+'|'+brN(title)+(type==='album'||type==='song'?'|'+brN(by):'');
 function brIndex(){brIx=new Map();for(const i of st.items){if(i.url)brIx.set('u'+i.url,i);brIx.set(brK(i.type,i.title,i.creator),i)}}
@@ -1352,42 +1721,54 @@ async function brFetch(t,l,g,d,p){const now=new Date(),iso=x=>x.toISOString().sl
     return{more:p<Math.min(j.total_pages||1,10),items:(j.results||[]).map(r=>{const y=yr(tv?r.first_air_date:r.release_date),pp=r.poster_path;
       return{type:t,title:tv?(r.name||r.original_name):(r.title||r.original_title),creator:'',art:pp?`https://image.tmdb.org/t/p/w500${pp}`:'',thumb:pp?`https://image.tmdb.org/t/p/w342${pp}`:'',url:`https://www.themoviedb.org/${k}/${r.id}`,extra:tv?{year:y}:{year:y,tmdbId:r.id},tmdbId:tv?r.id:0,sub:y,score:r.vote_count>=20&&r.vote_average?r.vote_average.toFixed(1):''}})}}
   if(t==='album'){
-    if(l==='classic')return{more:false,items:BRA.filter(a=>!d||(a[0]>=d&&a[0]<d+10)).map(([y,a,ti])=>{const c=BCOV[a+'|'+ti];return{type:'album',title:ti,creator:a,art:c?.a||'',thumb:c?.t||'',url:c?.u||'',extra:{},sub:`${a}, ${y}`,need:!c}})};
+    if(l==='classic'){const all=BRA.filter(a=>(!d||(a[0]>=d&&a[0]<d+10))&&(!g||a[3]===g)),pick=d?all:brMix(all),n=48;return{more:p*n<pick.length,items:pick.slice((p-1)*n,p*n).map(([y,a,ti])=>{const c=BCOV[a+'|'+ti];return{type:'album',title:ti,creator:a,art:c?.a||'',thumb:c?.t||'',url:c?.u||'',extra:{year:String(y)},sub:`${a}, ${y}`,need:!c}})}}
     const s=l==='songs',j=await jsonp(`https://api.deezer.com/chart/${g||0}/${s?'tracks':'albums'}?limit=50&index=${(p-1)*50}&output=jsonp`);if(j.error)throw 0;const dd=j.data||[];
     return{more:dd.length===50&&p<2,items:dd.map(r=>s?{type:'song',title:r.title,creator:r.artist?.name||'',art:r.album?.cover_xl||r.album?.cover_medium||'',thumb:r.album?.cover_big||'',url:r.link,extra:{},sub:r.artist?.name||''}
       :{type:'album',title:r.title,creator:r.artist?.name||'',art:r.cover_xl||r.cover_medium||'',thumb:r.cover_big||'',url:r.link,extra:{},sub:r.artist?.name||''})}}
-  if(!st.rawg)throw'rawg';const q=[`key=${encodeURIComponent(st.rawg)}`,`page=${p}`,'page_size=40','exclude_additions=true'];
+  if(!st.rawg)throw'rawg';const q=[`key=${encodeURIComponent(st.rawg)}`,`page=${p}`,'page_size=20','exclude_additions=true'];
   q.push(l==='top'?'ordering=-metacritic&metacritic=75,100':'ordering=-added');if(g)q.push('genres='+g);
   if(l==='new')q.push(`dates=${ago(90)},${iso(now)}`);else if(d)q.push(`dates=${d}-01-01,${d+9}-12-31`);
   const j=await getJSON(`https://api.rawg.io/api/games?${q.join('&')}`);
-  return{more:!!j.next&&p<8,items:(j.results||[]).map(r=>{const pl=(r.parent_platforms||r.platforms||[]).map(x=>x.platform.name).slice(0,3).join(', '),y=yr(r.released),im=r.background_image||'';
-    return{type:'game',title:r.name,creator:'',art:im,thumb:im.replace('/media/games/','/media/resize/640/-/games/'),url:`https://rawg.io/games/${r.slug}`,extra:{year:y,platforms:pl,mins:r.playtime?r.playtime*60:''},sub:[y,pl].filter(Boolean).join(', '),score:r.metacritic||''}})}}
-async function brLoad(k,more){let c=BRC[k];if(c?.busy)return;if(!c)c=BRC[k]={items:[],p:0,more:true};else if(!c.more)return;c.busy=1;c.err=0;brFoot();
+  return{more:!!j.next&&p<16,items:(j.results||[]).map(r=>{const pl=(r.parent_platforms||r.platforms||[]).map(x=>x.platform.name).slice(0,3).join(', '),y=yr(r.released),im=r.background_image||'';
+    return{type:'game',title:r.name,creator:'',art:im,thumb:im.replace('/media/games/','/media/resize/420/-/games/'),url:`https://rawg.io/games/${r.slug}`,extra:{year:y,platforms:pl,mins:r.playtime?r.playtime*60:''},sub:[y,pl].filter(Boolean).join(', '),score:r.metacritic||''}})}}
+/* first page of each list is kept for 6 hours, so going back to a list shows it at once without asking the server again */
+const BLS='checkit.brc',brLS=()=>{try{return JSON.parse(localStorage.getItem(BLS))||{}}catch(e){return{}}};
+function brLSput(k,c){const o=brLS();o[k]={at:Date.now(),items:c.items,more:c.more};const ks=Object.keys(o).sort((a,b)=>o[b].at-o[a].at);ks.slice(16).forEach(x=>delete o[x]);try{localStorage.setItem(BLS,JSON.stringify(o))}catch(e){}}
+async function brLoad(k,more){let c=BRC[k];if(c?.busy)return;
+  if(!c&&!k.includes('|classic|')){const h=brLS()[k];if(h&&Date.now()-h.at<6*36e5&&h.items?.length){BRC[k]={items:h.items,p:1,more:h.more};if($('#view').dataset.bk===k){brGrid();brFoot()}return}}
+  if(!c)c=BRC[k]={items:[],p:0,more:true};else if(!c.more)return;c.busy=1;c.err=0;brFoot();if(!c.items.length)brSkel();
   const [t,l,g,d]=k.split('|');
-  try{const r=await brFetch(t,l,g,d?+d:0,c.p+1),seen=new Set(c.items.map(x=>x.url).filter(Boolean));c.items.push(...r.items.filter(x=>x.title&&!(x.url&&seen.has(x.url))));c.p++;c.more=r.more}
+  try{const r=await brFetch(t,l,g,d?+d:0,c.p+1),seen=new Set(c.items.map(x=>x.url).filter(Boolean));c.items.push(...r.items.filter(x=>x.title&&!(x.url&&seen.has(x.url))));c.p++;c.more=r.more;if(c.p===1&&l!=='classic')brLSput(k,c)}
   catch(e){c.err=e==='tmdb'||e==='rawg'?e:1}
   c.busy=0;if(st.view==='browse'&&$('#view').dataset.bk===k){brGrid();brFoot();brCovers()}}
 const brAct=r=>{const h=brHave(r),nx=!!h&&h.status!=='done',dn=!!h&&(h.status==='done'||h.status==='again'),v={movie:'seen',show:'seen',game:'played'}[r.type]||'heard';
   return`<button type="button" data-ba="next" aria-pressed="${nx}" aria-label="${nx?'In Up next, open it':'Add to Up next'}" title="${nx?'In Up next':'Add to Up next'}">${nx?'✓':'+'}<span> Up next</span></button><button type="button" data-ba="done" aria-pressed="${dn}" aria-label="${dn?'Done, open it':'Already '+v+' it, mark done'}" title="${dn?'Done':'Already '+v+' it'}">✓<span> Done</span></button>`};
 const brImg=r=>{const im=r.thumb||r.art;return(im?`<img src="${esc(im)}" alt="" loading="lazy" decoding="async">`:`<span class="ph">${esc(r.title)}</span>`)+(r.score?`<span class="rk">${esc(r.score)}</span>`:'')};
 const brTile=(r,i)=>`<div class="bt" data-bi="${i}"><div class="bp">${brImg(r)}</div><div class="bm"><b>${esc(r.title)}</b><small>${esc(r.sub||'')}</small></div><div class="ba">${brAct(r)}</div></div>`;
-function brGrid(){const g=$('#bgrid'),c=BRC[$('#view').dataset.bk];if(!g||!c)return;brIndex();const n=g.children.length;if(c.items.length>n)g.insertAdjacentHTML('beforeend',c.items.slice(n).map((r,i)=>brTile(r,n+i)).join(''))}
+function brSkel(){const g=$('#bgrid');if(g&&!g.children.length)g.innerHTML='<div class="bt sk"><div class="bp"></div><div class="bm"><b>&nbsp;</b><small>&nbsp;</small></div></div>'.repeat(12)}
+function brGrid(){const g=$('#bgrid'),c=BRC[$('#view').dataset.bk];if(!g||!c)return;g.querySelectorAll('.sk').forEach(x=>x.remove());brIndex();const n=g.children.length;if(c.items.length>n)g.insertAdjacentHTML('beforeend',c.items.slice(n).map((r,i)=>brTile(r,n+i)).join(''))}
 function brFoot(){const f=$('#bfoot'),c=BRC[$('#view').dataset.bk];if(!f)return;
-  f.innerHTML=!c||c.busy?`<div class="bf">Loading…</div>`:c.err==='tmdb'?`<div class="bf">Add a free TMDB key to browse films and TV.<br><button class="btn" type="button" data-bset>Open settings</button></div>`
+  f.innerHTML=!c||c.busy?(c?.items.length?`<div class="bf">Loading…</div>`:''):c.err==='tmdb'?`<div class="bf">Add a free TMDB key to browse films and TV.<br><button class="btn" type="button" data-bset>Open settings</button></div>`
    :c.err==='rawg'?`<div class="bf">Add a free RAWG key to browse games.<br><button class="btn" type="button" data-bset>Open settings</button></div>`
    :c.err?`<div class="bf">${c.items.length?'Couldn’t load more.':'Couldn’t load this list.'}<br><button class="btn" type="button" data-bretry>Try again</button></div>`
    :!c.items.length?`<div class="bf">Nothing here. Try another genre or decade.</div>`:c.more?`<div class="bf"><button class="btn" type="button" data-bmore>Show more</button></div>`:''}
 function brPaint(){const c=BRC[$('#view').dataset.bk];if(!c)return;brIndex();document.querySelectorAll('#bgrid .bt').forEach(el=>{const r=c.items[+el.dataset.bi];if(r)el.querySelector('.ba').innerHTML=brAct(r)})}
-async function brCover(r){const id=r.creator+'|'+r.title;
-  try{const j=await jsonp(`https://api.deezer.com/search/album?q=${encodeURIComponent(`artist:"${r.creator}" album:"${r.title}"`)}&limit=5&output=jsonp`),l=j.data||[],m=l.find(a=>brN(a.artist?.name)===brN(r.creator))||l[0];
-    BCOV[id]=m?{a:m.cover_xl||m.cover_big||'',t:m.cover_big||'',u:m.link||''}:{};try{localStorage.setItem('checkit.bcov',JSON.stringify(BCOV))}catch(e){}}catch(e){}
+async function brCover(r){const id=r.creator+'|'+r.title,wait=ms=>new Promise(z=>setTimeout(z,ms));let res=null,asked=0;
+  const same=x=>brN(x)===brN(r.creator)||brN(x).startsWith(brN(r.creator))||brN(r.creator).startsWith(brN(x)),tt=brN(r.title).slice(0,8);
+  const pick=(l,an,tn)=>l.find(x=>same(an(x))&&brN(tn(x)).startsWith(tt))||l.find(x=>same(an(x))&&brN(tn(x)).includes(tt))||null;
+  const dz=async q=>{for(let n=0;n<3;n++){const j=await jsonp(`https://api.deezer.com/search/album?q=${encodeURIComponent(q)}&limit=15&output=jsonp`);if(j.error){if(j.error.code===4){await wait(1500);continue}throw 0}asked=1;return j.data||[]}throw 0};
+  try{const an=x=>x.artist?.name,tn=x=>x.title;let m=pick(await dz(`artist:"${r.creator}" album:"${r.title}"`),an,tn);if(!m)m=pick(await dz(`${r.creator} ${r.title}`),an,tn);
+    if(m)res={a:m.cover_xl||m.cover_big||'',t:m.cover_big||m.cover_medium||'',u:m.link||''}}catch(e){}
+  if(!res)try{const j=await jsonp(`https://itunes.apple.com/search?term=${encodeURIComponent(r.creator+' '+r.title)}&media=music&entity=album&limit=15`);asked=1;
+    const m=pick(j.results||[],x=>x.artistName,x=>x.collectionName);if(m?.artworkUrl100)res={a:big(m.artworkUrl100),t:m.artworkUrl100.replace(/\/\d+x\d+bb\./,'/300x300bb.'),u:m.collectionViewUrl||''}}catch(e){}
+  if(res||asked){BCOV[id]=res||{};bcSave()}
   r.need=0;const b=BCOV[id];if(b?.a){r.art=b.a;r.thumb=b.t;r.url=b.u}
   const c=BRC[$('#view').dataset.bk],i=c?c.items.indexOf(r):-1,el=i<0?null:document.querySelector(`#bgrid [data-bi="${i}"]`);if(el){el.querySelector('.bp').innerHTML=brImg(r);brIndex();el.querySelector('.ba').innerHTML=brAct(r)}}
-async function brCovers(){if(bcBusy)return;bcBusy=1;try{for(;;){if(st.view!=='browse')break;const c=BRC[$('#view').dataset.bk],todo=(c?.items||[]).filter(r=>r.need).slice(0,4);if(!todo.length)break;await Promise.all(todo.map(brCover))}}finally{bcBusy=0}}
+async function brCovers(){if(bcBusy)return;bcBusy=1;try{for(;;){if(st.view!=='browse')break;const c=BRC[$('#view').dataset.bk],todo=(c?.items||[]).filter(r=>r.need).slice(0,5);if(!todo.length)break;await Promise.all(todo.map(brCover))}}finally{bcBusy=0}}
 function drawBrowse(){const v=$('#view'),k=brKey();if(v.dataset.bk===k&&v.querySelector('.bw')){brPaint();return}
   v.dataset.bk=k;const[t,s]=brState(),f=brF(t,s.l),vb={movie:'seen',show:'seen',game:'played'}[t]||'heard';
   v.innerHTML=`<div class="bw"><div class="bty" role="group" aria-label="Browse">${BRT.map(([x,n])=>`<button type="button" data-bt="${x}" aria-pressed="${x===t}">${n}</button>`).join('')}</div>
-  <div class="bct"><div class="bch" role="group" aria-label="List">${BRL[t].map(([x,n])=>`<button type="button" data-bl="${x}" aria-pressed="${x===s.l}">${n}</button>`).join('')}</div>${f?`<div class="bsel">${f.includes('g')?`<select data-bf="g" aria-label="Genre"><option value="">All genres</option>${BRG[t].map(([id,n])=>`<option value="${id}"${String(s.g)===String(id)?' selected':''}>${n}</option>`).join('')}</select>`:''}${f.includes('d')?`<select data-bf="d" aria-label="Decade"><option value="">${t==='album'?'All decades':'All time'}</option>${brDec(t==='game'?1980:t==='album'?1960:1950).map(y=>`<option value="${y}"${+s.d===y?' selected':''}>${y}s</option>`).join('')}</select>`:''}</div>`:''}</div>
+  <div class="bct"><div class="bch" role="group" aria-label="List">${BRL[t].map(([x,n])=>`<button type="button" data-bl="${x}" aria-pressed="${x===s.l}">${n}</button>`).join('')}</div>${f?`<div class="bsel">${f.includes('g')?`<select data-bf="g" aria-label="Genre"><option value="">All genres</option>${brGL(t,s.l).map(([id,n])=>`<option value="${id}"${String(s.g)===String(id)?' selected':''}>${n}</option>`).join('')}</select>`:''}${f.includes('d')?`<select data-bf="d" aria-label="Decade"><option value="">${t==='album'?'All decades':'All time'}</option>${brDec(t==='game'?1980:1950).map(y=>`<option value="${y}"${+s.d===y?' selected':''}>${y}s</option>`).join('')}</select>`:''}</div>`:''}</div>
   <p class="bh">+ adds it to Up next. ✓ marks it done if you’ve already ${vb} it.</p><div class="bg${t==='album'?' sq':t==='game'?' w':''}" id="bgrid"></div><div id="bfoot"></div></div>`;
   if(BRC[k]?.items.length||BRC[k]?.busy){brGrid();brFoot();brCovers()}else brLoad(k)}
 function brObj(r){const o={type:r.type,title:r.title,creator:r.creator||'',art:r.art||'',url:r.url||'',extra:{...(r.extra||{})}};if(r.tmdbId)o.tmdbId=r.tmdbId;
