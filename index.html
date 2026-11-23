@@ -517,6 +517,8 @@ const OLD={index:['library','list'],wall:['library','covers'],notes:['library','
 const setSt=(it,s)=>{it.status=s;it.touched=new Date().toISOString();if((s==='done'||s==='again')&&!it.doneAt)it.doneAt=it.touched};
 const route=h=>{if(VIEWS.includes(h))st.view=h;else if(OLD[h]){st.view=OLD[h][0];if(OLD[h][1])st.layout=OLD[h][1]}};
 if(!VIEWS.includes(st.view))route(st.view);
+const applySetup=()=>{const h=location.hash;if(!h.startsWith('#setup='))return false;try{const j=JSON.parse(decodeURIComponent(h.slice(7)));if(typeof j.t==='string')st.tmdb=j.t;if(typeof j.r==='string'&&j.r)st.region=j.r.toUpperCase();if(typeof j.g==='string')st.rawg=j.g;save();setTimeout(()=>toast('Keys added from your setup link'),400)}catch(e){setTimeout(()=>toast('That setup link didn’t work'),400)}history.replaceState(null,'',location.pathname+location.search);return true};
+applySetup();
 route(location.hash.slice(1));
 
 const hash=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)};
@@ -816,7 +818,7 @@ document.addEventListener('keydown',e=>{const typing=/INPUT|TEXTAREA|SELECT/.tes
   if(['1','2','3'].includes(e.key)){st.view=VIEWS[+e.key-1];save();render()}
   if(st.view==='next'&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){e.preventDefault();crateGo(e.key==='ArrowRight'?1:-1)}
   if(e.key==='Enter'&&document.activeElement.dataset.id)openItem(document.activeElement.dataset.id)});
-addEventListener('hashchange',()=>{route(location.hash.slice(1));render()});
+addEventListener('hashchange',()=>{if(!applySetup())route(location.hash.slice(1));render()});
 
 /* swipe rows on touch */
 let sw=null,swiped=0;
@@ -947,7 +949,8 @@ function menu(k){
   if(k==='share')copyBox('Share this list','A read-only page of the items that match your current filters, with notes but without ratings. Send the file or host it anywhere.',shareHtml(),'check-this-out-list.html','text/html');
   if(k==='import')$('#file').click();
   if(k==='poster')posterDlg();
-  if(k==='settings'){dlg(`<h3>Settings</h3><p>Free API keys turn on extra lookups. They stay in this browser. TMDB powers where to watch (themoviedb.org, Settings, API). RAWG powers game search.</p><label for="tk" style="font-size:13px;color:var(--mut)">TMDB API key</label><input id="tk" value="${esc(st.tmdb)}" autocomplete="off"><label for="rg" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Country</label><input id="rg" value="${esc(st.region)}" maxlength="2" style="width:80px;text-transform:uppercase"><label for="rk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">RAWG API key, for game search (free at rawg.io/apidocs)</label><input id="rk" value="${esc(st.rawg||'')}" autocomplete="off"><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn pri" id="ts">Save</button></div>`);
+  if(k==='settings'){dlg(`<h3>Settings</h3><p>Free API keys turn on extra lookups. They stay in this browser. TMDB powers where to watch (themoviedb.org, Settings, API). RAWG powers game search.</p><label for="tk" style="font-size:13px;color:var(--mut)">TMDB API key</label><input id="tk" value="${esc(st.tmdb)}" autocomplete="off"><label for="rg" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Country</label><input id="rg" value="${esc(st.region)}" maxlength="2" style="width:80px;text-transform:uppercase"><label for="rk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">RAWG API key, for game search (free at rawg.io/apidocs)</label><input id="rk" value="${esc(st.rawg||'')}" autocomplete="off"><p style="font-size:13px;color:var(--mut);margin-top:16px">Setting up another device? Copy a setup link, send it to yourself, and open it there. It holds your keys, so keep it private.</p><button class="btn" id="tl" type="button">Copy setup link</button><input id="tlo" readonly style="display:none;margin-top:8px"><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn pri" id="ts">Save</button></div>`);
+    $('#tl').onclick=async()=>{const u=location.origin+location.pathname+'#setup='+encodeURIComponent(JSON.stringify({t:$('#tk').value.trim(),r:($('#rg').value.trim()||'US').toUpperCase(),g:$('#rk').value.trim()}));const o=$('#tlo');o.value=u;o.style.display='block';o.select();try{await navigator.clipboard.writeText(u);toast('Setup link copied')}catch(e){toast('Copy the link shown below')}};
     $('#ts').onclick=()=>{st.tmdb=$('#tk').value.trim();st.region=($('#rg').value.trim()||'US').toUpperCase();st.rawg=$('#rk').value.trim();save();$('#dlg').close();toast('Settings saved');if(cur){loadWatch(cur,true);drawItem()}}}
 }
 $('#file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());const inc=(j.items||[]).filter(i=>i.id&&i.title&&T[i.type]);const have=new Set(st.items.map(i=>i.id));
