@@ -841,7 +841,7 @@ document.addEventListener('touchend',()=>{if(!sw)return;const{tr,dx,on}=sw;sw=nu
   if(Math.abs(dx)>90){const it=st.items.find(i=>i.id===tr.dataset.id),ns=dx>0?'done':'again';if(it)upd(()=>{setSt(it,ns)},`Marked ${S[ns].toLowerCase()}`)}});
 /* full-screen search on phones */
 const phone=()=>matchMedia('(max-width:760px)').matches;
-$('#q').addEventListener('focus',()=>{if(phone())$('.add').classList.add('full');if(!$('#q').value.trim()){hi=-1;exp.clear();showTrend()}});
+$('#q').addEventListener('focus',()=>{if(phone())$('.add').classList.add('full');if(!$('#q').value.trim()&&!$('#res').classList.contains('on')){hi=-1;exp.clear();showTrend()}});
 $('#qc').addEventListener('click',()=>{$('#q').value='';$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()});
 /* quick add card */
 let qt;
