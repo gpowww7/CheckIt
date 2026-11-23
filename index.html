@@ -205,6 +205,17 @@ table.ix{width:100%;border-collapse:collapse}
 .pv{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .pv img{border-radius:5px}
 .wn{margin:4px 0 0;color:var(--mut);font-size:13px}
+.info{padding:4px 0 2px}
+.trk{display:block;margin:8px 0 4px}.trk summary{display:list-item;cursor:pointer;font-size:14px;font-weight:600;padding:6px 0}
+.trk ol{list-style:none;margin:4px 0 0;padding:0;font-size:14px;counter-reset:t}
+.trk li{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--rule);counter-increment:t}
+.trk li::before{content:counter(t);min-width:18px;color:var(--mut);font-size:12.5px;font-variant-numeric:tabular-nums}
+.trk li span{flex:1;min-width:0}.trk li i{font-style:normal;color:var(--mut);font-variant-numeric:tabular-nums}.trk small{color:var(--mut)}
+
+.info .wr div{display:block}
+.tg{margin:0 0 6px;font-family:Newsreader,Georgia,serif;font-style:italic;font-size:17px}
+.syn{margin:0 0 10px;font-size:15px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.syn.open{-webkit-line-clamp:unset;display:block}
 .del{color:#c4321f;font-size:14px;justify-self:start;padding:8px 0}
 .shade{position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:35;display:none}
 .shade.on{display:block}
@@ -579,13 +590,64 @@ const svcs=it=>(it.watch?.stream||[]).map(p=>p.name);
 async function loadWatch(it,force){if(!VID.includes(it.type)||!st.tmdb)return;
   if(!force&&it.watch&&Date.now()-it.watch.at<7*864e5&&it.watch.region===st.region)return;
   const kind=it.type==='show'?'tv':'movie';
-  try{let id=it.tmdbId||(kind==='movie'&&it.extra?.tmdbId);
-    if(!id){const y=(it.extra?.year)||'';const j=await tmdbGet(`search/${kind}?query=${encodeURIComponent(it.title)}${y?`&${kind==='tv'?'first_air_date_year':'year'}=${y}`:''}`);id=j.results?.[0]?.id;if(!id)return;}it.tmdbId=id;
+  try{const id=await tmdbIdFor(it);if(!id)return;
     const j=await tmdbGet(`${kind}/${id}/watch/providers`);const r=j.results?.[st.region]||{};
     const m=a=>(a||[]).sort((x,y)=>x.display_priority-y.display_priority).map(p=>({name:p.provider_name,logo:p.logo_path}));
     const seen=new Set();const dedupe=a=>a.filter(p=>!seen.has(p.name)&&seen.add(p.name));
     it.watch={at:Date.now(),region:st.region,link:r.link||'',stream:dedupe(m([...(r.flatrate||[]),...(r.free||[]),...(r.ads||[])])),rent:dedupe(m([...(r.rent||[]),...(r.buy||[])]))};
     save();render();if(cur===it)drawItem()}catch(e){it.watch={at:0,region:st.region,err:1,stream:[],rent:[]};if(cur===it)drawItem()}}
+async function tmdbIdFor(it){const kind=it.type==='show'?'tv':'movie';let id=it.tmdbId||(kind==='movie'&&it.extra?.tmdbId);
+  if(!id){const y=(it.extra?.year)||'';let j=await tmdbGet(`search/${kind}?query=${encodeURIComponent(it.title)}${y?`&${kind==='tv'?'first_air_date_year':'year'}=${y}`:''}`);
+    if(!j.results?.length&&y)j=await tmdbGet(`search/${kind}?query=${encodeURIComponent(it.title)}`);id=j.results?.[0]?.id}
+  if(id)it.tmdbId=id;return id}
+async function deezerId(it,k){const m=(it.url||'').match(new RegExp('deezer\\.com/(?:\\w+/)?'+k+'/(\\d+)'));if(m)return m[1];
+  const j=await jsonp(`https://api.deezer.com/search/${k}?q=${encodeURIComponent((it.title+' '+(it.creator||'')).trim())}&limit=5&output=jsonp`);
+  const t=simp(it.title),c=simp(it.creator),l=j.data||[];const r=l.find(r=>simp(r.title)===t&&(!c||c.includes(simp(r.artist?.name))||simp(r.artist?.name).includes(c.split(' ')[0])))||l.find(r=>simp(r.title).startsWith(t));return r?.id}
+const mmss=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+const fdate=d=>{if(!d||d.length<10)return d||'';const x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})};
+async function loadInfo(it){if(it.info&&Date.now()-it.info.at<30*864e5)return;
+  if(it.type==='album'||it.type==='song')return loadMusicInfo(it);if(it.type==='game')return loadGameInfo(it);
+  if(!VID.includes(it.type)||!st.tmdb)return;
+  const kind=it.type==='show'?'tv':'movie';
+  try{const id=await tmdbIdFor(it);if(!id){it.info={at:Date.now(),none:1};save();if(cur===it)drawItem();return}
+    const d=await tmdbGet(`${kind}/${id}?append_to_response=credits`),cr=d.credits||{};
+    const by=kind==='movie'?(cr.crew||[]).filter(c=>c.job==='Director').map(c=>c.name):(d.created_by||[]).map(c=>c.name);
+    const mins=kind==='movie'?d.runtime:(d.episode_run_time||[])[0];
+    it.info={at:Date.now(),overview:d.overview||'',tagline:d.tagline||'',genres:(d.genres||[]).map(g=>g.name).slice(0,4),by:by.slice(0,3),cast:(cr.cast||[]).slice(0,6).map(c=>c.name),mins:mins||0,seasons:d.number_of_seasons||0,eps:d.number_of_episodes||0,status:kind==='tv'?d.status||'':'',net:kind==='tv'?(d.networks||[])[0]?.name||'':'',year:yr(d.release_date||d.first_air_date),score:d.vote_count>20?Math.round(d.vote_average*10)/10:0,link:`https://www.themoviedb.org/${kind}/${id}`};
+    if(!it.creator)it.creator=kind==='movie'?by[0]||'':it.info.net||by[0]||'';
+    it.extra={...it.extra};if(!it.extra.year&&it.info.year)it.extra.year=it.info.year;if(!it.extra.mins&&mins)it.extra.mins=kind==='tv'&&it.info.eps?mins*it.info.eps:mins;
+    if(!it.art&&d.poster_path)it.art=`https://image.tmdb.org/t/p/w500${d.poster_path}`;
+    save();render();if(cur===it)drawItem()}catch(e){}}
+async function loadMusicInfo(it){const al=it.type==='album';
+  try{const id=await deezerId(it,al?'album':'track');if(!id){it.info={at:Date.now(),none:1};save();if(cur===it)drawItem();return}
+    const d=await jsonp(`https://api.deezer.com/${al?'album':'track'}/${id}?output=jsonp`);if(d.error)throw 0;
+    it.info=al?{at:Date.now(),date:d.release_date||'',secs:d.duration||0,label:d.label||'',genres:(d.genres?.data||[]).map(g=>g.name).slice(0,3),kind:d.record_type||'',n:d.nb_tracks||0,tracks:(d.tracks?.data||[]).map(t=>({t:t.title,s:t.duration,a:t.artist?.name||''})),link:d.link||''}
+      :{at:Date.now(),date:d.release_date||'',secs:d.duration||0,album:d.album?.title||'',bpm:d.bpm||0,who:(d.contributors||[]).map(c=>c.name).slice(0,4),link:d.link||''};
+    if(!it.url)it.url=d.link||'';if(!it.creator&&d.artist?.name)it.creator=d.artist.name;if(!it.art)it.art=al?(d.cover_xl||''):(d.album?.cover_xl||'');
+    it.extra={...it.extra};if(!it.extra.mins&&d.duration)it.extra.mins=Math.max(1,Math.round(d.duration/60));if(!it.extra.year&&d.release_date)it.extra.year=yr(d.release_date);
+    save();render();if(cur===it)drawItem();findSpotify(it,true)}catch(e){}}
+async function loadGameInfo(it){if(!st.rawg)return;const k='key='+encodeURIComponent(st.rawg);
+  try{let slug=(it.url||'').match(/rawg\.io\/games\/([\w-]+)/)?.[1];
+    if(!slug){const j=await getJSON(`https://api.rawg.io/api/games?${k}&search=${encodeURIComponent(it.title)}&page_size=1`);slug=j.results?.[0]?.slug}
+    if(!slug){it.info={at:Date.now(),none:1};save();if(cur===it)drawItem();return}
+    const d=await getJSON(`https://api.rawg.io/api/games/${slug}?${k}`);const nm=a=>(a||[]).map(x=>x.name||x.platform?.name).filter(Boolean);
+    it.info={at:Date.now(),overview:(d.description_raw||'').split('\n').filter(Boolean).slice(0,3).join('\n\n'),dev:nm(d.developers).slice(0,2),pub:nm(d.publishers).slice(0,2),plat:nm(d.platforms).slice(0,6),genres:nm(d.genres).slice(0,4),date:d.released||'',meta:d.metacritic||0,hours:d.playtime||0,link:`https://rawg.io/games/${slug}`};
+    if(!it.creator&&it.info.dev[0])it.creator=it.info.dev[0];if(!it.art&&d.background_image)it.art=d.background_image;
+    save();render();if(cur===it)drawItem()}catch(e){}}
+const hm=m=>m>=60?`${Math.floor(m/60)} h${m%60?' '+m%60+' min':''}`:`${m} min`;
+function infoBlock(it){const f=it.info,row=(l,v)=>v?`<div class="wr"><span>${l}</span><div>${v}</div></div>`:'';
+  if(it.type==='album'||it.type==='song'){if(!f)return`<div class="info"><p class="wn">Loading details…</p></div>`;if(f.none)return'';
+    const tl=it.type==='album'&&f.tracks?.length?`<details class="trk"><summary>Tracklist, ${f.n||f.tracks.length} tracks</summary><ol>${f.tracks.map(t=>`<li><span>${esc(t.t)}${t.a&&simp(t.a)!==simp(it.creator)?` <small>${esc(t.a)}</small>`:''}</span><i>${mmss(t.s)}</i></li>`).join('')}</ol></details>`:'';
+    return `<div class="info">${row('Released',esc(fdate(f.date)))}${row(it.type==='album'?'Runtime':'Length',f.secs?(it.type==='album'?esc(hm(Math.round(f.secs/60))):mmss(f.secs)):'')}${it.type==='album'?row('Type',esc(f.kind==='ep'?'EP':f.kind?f.kind[0].toUpperCase()+f.kind.slice(1):''))+row('Label',esc(f.label))+row('Genre',esc(f.genres.join(', '))):row('Album',esc(f.album))+row('Credits',esc(f.who.join(', ')))+row('BPM',f.bpm?Math.round(f.bpm):'')}${tl}</div>`}
+  if(it.type==='game'){if(!st.rawg)return'';if(!f)return`<div class="info"><p class="wn">Loading details…</p></div>`;if(f.none)return'';
+    return `<div class="info">${f.overview?`<p class="syn" tabindex="0">${esc(f.overview)}</p>`:''}${row('Developer',esc(f.dev.join(', ')))}${row('Publisher',esc(f.pub.join(', ')))}${row('Released',esc(fdate(f.date)))}${row('Platforms',esc(f.plat.join(', ')))}${row('Genres',esc(f.genres.join(', ')))}${row('Average play',f.hours?`${f.hours} hours`:'')}${row('Metacritic',f.meta||'')}
+    <p class="wn"><a class="sp" href="${esc(f.link)}" target="_blank" rel="noopener">More on RAWG</a></p></div>`}
+  if(!VID.includes(it.type)||!st.tmdb)return'';
+  if(!f)return`<div class="info"><p class="wn">Loading details…</p></div>`;if(f.none)return'';
+  const len=it.type==='movie'?(f.mins?hm(f.mins):''):[f.seasons?`${f.seasons} season${f.seasons>1?'s':''}`:'',f.eps?`${f.eps} episodes`:'',f.mins?`about ${f.mins} min each`:''].filter(Boolean).join(', ');
+  return `<div class="info">${f.tagline?`<p class="tg">${esc(f.tagline)}</p>`:''}${f.overview?`<p class="syn" tabindex="0">${esc(f.overview)}</p>`:''}
+    ${row(it.type==='movie'?'Director':'Created by',esc(f.by.join(', ')))}${row('Cast',esc(f.cast.join(', ')))}${row(it.type==='movie'?'Runtime':'Length',esc(len))}${it.type==='show'?row('Network',esc([f.net,f.status==='Ended'||f.status==='Canceled'?f.status.toLowerCase():f.status?'still running':''].filter(Boolean).join(', '))):''}${row('Genres',esc(f.genres.join(', ')))}${row('TMDB score',f.score?`${f.score} / 10`:'')}
+    <p class="wn"><a class="sp" href="${esc(f.link)}" target="_blank" rel="noopener">More on TMDB</a></p></div>`}
 function watchBlock(it){if(!VID.includes(it.type))return'';
   const w=it.watch,row=(l,a)=>a?.length?`<div class="wr"><span>${l}</span><div>${a.map(p=>`<span class="pv">${logo(p)}${esc(p.name)}</span>`).join('')}</div></div>`:'';
   const body=!st.tmdb?`<p class="wn">Add a free TMDB key in Library, Settings to show services here.</p>`:!w?`<p class="wn">Checking…</p>`:w.err?`<p class="wn">Couldn’t reach the streaming data. Check the TMDB key in Settings.</p>`:(w.stream.length||w.rent.length)?row('Stream',w.stream)+row('Rent or buy',w.rent):`<p class="wn">Not streaming in ${esc(w.region)} right now.</p>`;
@@ -752,7 +814,7 @@ function sizeWall(){const w=$('#wall');if(!w)return;
 
 /* drawer */
 let cur=null;
-function openItem(id){cur=st.items.find(i=>i.id===id);if(!cur)return;drawItem();loadWatch(cur);findSpotify(cur,true);$('#dr').classList.add('on');$('#shade').classList.add('on')}
+function openItem(id){cur=st.items.find(i=>i.id===id);if(!cur)return;drawItem();loadWatch(cur);loadInfo(cur);findSpotify(cur,true);$('#dr').classList.add('on');$('#shade').classList.add('on')}
 function closeItem(){cur=null;$('#dr').classList.remove('on');$('#shade').classList.remove('on')}
 const HN={youtube:'YouTube','youtu':'YouTube',soundcloud:'SoundCloud',mixcloud:'Mixcloud',twitch:'Twitch',vimeo:'Vimeo',bandcamp:'Bandcamp',apple:'Apple TV',tvmaze:'TVmaze',imdb:'IMDb',letterboxd:'Letterboxd',themoviedb:'TMDB',musicbrainz:'MusicBrainz'};
 const hostName=h=>{const k=h.split('.').slice(-2,-1)[0]||h;return HN[k]||k[0].toUpperCase()+k.slice(1)};
@@ -768,6 +830,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
    <div class="hero">${cover(it,'big ini'+(sh==='p'?' pp':sh==='w'?' ww':''))}
     <div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)||'Untitled'}</h2>${it.creator?`<p>${esc(it.creator)}</p>`:''}</div></div>
    ${links?`<div class="lks">${links}</div>`:''}
+   ${infoBlock(it)}
    <div class="seg" role="group" aria-label="Status">${Object.entries(S).map(([k,l])=>`<button type="button" data-st="${k}" aria-pressed="${it.status===k}">${l}</button>`).join('')}</div>
    <div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${n<=it.rating?'on':''}" aria-label="${n} stars">★</button>`).join('')}<span>${it.rating?'':'Rate it'}</span></div>
    <div class="rv"><div class="rvb" role="group" aria-label="Revisit meter">${[1,2,3,4,5].map(n=>`<button type="button" data-rv="${n}" class="${n<=(it.rv||0)?'on':''}" style="height:${8+n*4}px" aria-label="${RV[n-1]}" title="${RV[n-1]}"></button>`).join('')}</div><span class="rvt">${it.rv?RV[it.rv-1]:'How much would you go back to it?'}</span></div>
@@ -790,7 +853,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
   if($('#dr').dataset.more===it.id)$('#dr .more').open=true}
 $('#dr').addEventListener('toggle',e=>{if(e.target.classList?.contains('more'))$('#dr').dataset.more=e.target.open&&cur?cur.id:''},true);
 const upd=(fn,msg)=>{const before=JSON.stringify(st.items);fn();if(cur)delete cur.sample;save();render();if(msg)toast(msg,()=>{st.items=JSON.parse(before);save();render();if(cur){cur=st.items.find(i=>i.id===cur.id);cur?drawItem():closeItem()}})};
-$('#dr').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!cur)return;
+$('#dr').addEventListener('click',e=>{const sy=e.target.closest('.syn');if(sy){sy.classList.toggle('open');return}const b=e.target.closest('button');if(!b||!cur)return;
   if(b.id==='dx')closeItem();
   else if(b.dataset.st){upd(()=>{setSt(cur,b.dataset.st)},`Marked ${S[b.dataset.st].toLowerCase()}`);drawItem()}
   else if(b.dataset.rv){const n=+b.dataset.rv;upd(()=>{cur.rv=cur.rv===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
