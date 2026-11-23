@@ -39,6 +39,9 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px s
 .res.on{display:block}
 .res hr{border:0;border-top:1px solid var(--rule);margin:6px 0}
 .res button.more div div{color:var(--acc);font-weight:500}
+.res .sf{position:sticky;top:0;z-index:1;display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:var(--bg);border-bottom:1px solid var(--rule);scrollbar-width:none}
+.res .sf button{display:inline-flex;width:auto;min-height:32px;padding:0 12px;border:1px solid var(--rule);border-radius:16px;font-size:13px;color:var(--mut);white-space:nowrap;flex:none}
+.res .sf button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .res h6{margin:0;padding:10px 12px 4px;font-size:12px;font-weight:500;color:var(--mut)}
 .res button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:7px 12px;min-height:44px}
 .res button:hover,.res button.hi{background:var(--soft)}
@@ -884,13 +887,16 @@ async function addUrl(u){const d=fromUrl(u);const it=addItem({type:d.type,title:
   const m=await meta(u);it.title=m?.title||(d.src+' link');if(m?.creator)it.creator=m.creator;if(m?.art)it.art=m.art;
   save();render();if(cur===it)drawItem();if($('#qa').dataset.id===it.id&&$('#qa').classList.contains('on'))quick(it)}
 
-let rs=[],hi=0,timer,seq=0,exp=new Set();
-function showRes(groups,note){const r=$('#res');rs=[];let html='';
+let rs=[],hi=0,timer,seq=0,exp=new Set(),sf='all';
+let lastNote='';
+function showRes(groups,note){lastNote=note||'';const r=$('#res');rs=[];let html='';
   for(const [h,items] of groups){if(!items.length)continue;html+=h?`<h6>${h}</h6>`:'<hr>';
     for(const x of items){rs.push(x);html+=`<button type="button" data-i="${rs.length-1}" class="${rs.length-1===hi?'hi':''}${x.more?' more':''}">${x.it?cover(x.it,'mini'):''}<div><div>${esc(x.label)}</div><small>${esc(x.sub||'')}</small></div></button>`}}
-  r.innerHTML=(note?`<div class="note">${note}</div>`:'')+html;r.classList.toggle('on',!!html)}
-$('#res').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(!b)return;const x=rs[+b.dataset.i];if(x?.more){e.preventDefault();setTimeout(()=>more(x),0);return}pick(x)});
-function more(x){const i=rs.indexOf(x);exp.add(x.more);const sc=$('#res').scrollTop;hi=i;showRes(localGroups($('#q').value.trim()));$('#res').scrollTop=sc;$('#q').focus()}
+  const ch=groups.chips?`<div class="sf" role="group" aria-label="Search in">${G.map(([k,l])=>`<button type="button" data-sf="${k}" aria-pressed="${sf===k}">${l}</button>`).join('')}</div>`:'';
+  r.innerHTML=ch+(note?`<div class="note">${note}</div>`:'')+html;r.classList.toggle('on',!!html)}
+$('#res').addEventListener('click',e=>{const f=e.target.closest('[data-sf]');if(f){setTimeout(()=>{sf=f.dataset.sf;hi=0;showRes(localGroups($('#q').value.trim()),lastNote);$('#res').scrollTop=0;$('#q').focus()},0);return}
+  const b=e.target.closest('[data-i]');if(!b)return;const x=rs[+b.dataset.i];if(x?.more){e.preventDefault();setTimeout(()=>more(x),0);return}pick(x)});
+function more(x){const i=rs.indexOf(x);exp.add(x.more);const sc=$('#res').scrollTop;hi=i;showRes(localGroups($('#q').value.trim()),lastNote);$('#res').scrollTop=sc;$('#q').focus()}
 function pick(x){if(!x)return;if(x.more)return more(x);if(x.open){openItem(x.open);$('#res').classList.remove('on');$('#q').value=''}else if(x.url)addUrl(x.url);else{const it=addItem(x.add,!x.it);findSpotify(it)}}
 async function findSpotify(it){if(!['album','song'].includes(it.type)||it.spotify||!/deezer\.com/.test(it.url))return;
   try{const j=await getJSON('https://api.song.link/v1-alpha.1/links?userCountry=US&url='+encodeURIComponent(it.url));const u=j.linksByPlatform?.spotify?.url;
@@ -914,16 +920,17 @@ const SRC=[
  ['Games',q=>st.rawg?getJSON(`https://api.rawg.io/api/games?key=${encodeURIComponent(st.rawg)}&search=${q}&page_size=12`).then(j=>(j.results||[]).map(r=>{const pl=(r.parent_platforms||r.platforms||[]).map(x=>x.platform.name).slice(0,3).join(', ');return{type:'game',title:r.name,creator:'',art:r.background_image||'',url:`https://rawg.io/games/${r.slug}`,sub:`Game${yr(r.released)?', '+yr(r.released):''}${pl?', '+pl:''}`,extra:{year:yr(r.released),platforms:pl,mins:r.playtime?r.playtime*60:''}}})):Promise.resolve([])],
  ['Live sets and mixes',q=>jsonp(`https://api.mixcloud.com/search/?q=${q}&type=cloudcast&limit=10`).then(j=>(j.data||[]).map(r=>({type:'set',title:r.name,creator:r.user?.name||'',art:r.pictures?.extra_large||r.pictures?.large||'',url:r.url,sub:`Mixcloud, ${r.user?.name||''}${r.audio_length?', '+Math.round(r.audio_length/60)+' min':''}`,extra:{event:'Mixcloud',date:yr(r.created_time),mins:r.audio_length?Math.round(r.audio_length/60):''}})))]];
 function localGroups(q){const ql=q.toLowerCase();
-  const mine=st.items.filter(i=>(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${S[i.status].toLowerCase()}`,open:i.id,it:i}));
+  const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${S[i.status].toLowerCase()}`,open:i.id,it:i}));
   const have=new Set(st.items.map(i=>i.url).filter(Boolean));
   const g=[['In your list',mine]];
-  if(online){const all=online.flatMap(([,l])=>l).filter(r=>!have.has(r.url));
+  g.chips=1;
+  if(online){const on=online.map(([h,l])=>[h,l.filter(r=>inGrp(r,sf))]),all=on.flatMap(([,l])=>l).filter(r=>!have.has(r.url));
     const sc=r=>{const t=r.title.toLowerCase();return(t===ql?4:t.startsWith(ql)?2:t.includes(ql)?1:0)+({artist:.6,show:.5,movie:.4,game:.4,album:.3,song:.1,set:0}[r.type]||0)+Math.min(1,(r.pop||0)/5e6)};
     let top=all.length?all.reduce((a,b)=>sc(b)>sc(a)?b:a):null;if(top&&sc(top)<1)top=null;
     const mk=r=>({label:r.title,sub:r.sub,add:{type:r.type,title:r.title,creator:r.creator,art:r.art||'',url:r.url||'',extra:r.extra||{}},it:{type:r.type,title:r.title,art:r.art}});
     if(top)g.push(['Top result',[mk(top)]]);
-    for(const [h,l] of online){const v=l.filter(r=>r!==top&&!have.has(r.url)).map(mk),n=exp.has(h)?v.length:3;g.push([h,v.length>n+1?[...v.slice(0,n),{more:h,label:`Show ${v.length-n} more`,sub:''}]:v])}}
-  g.push(['',[{label:`Add “${q}” by hand`,sub:'Fill in the details yourself',add:{type:'album',title:q}}]]);
+    for(const [h,l] of on){const v=l.filter(r=>r!==top&&!have.has(r.url)).map(mk),n=exp.has(h)||sf!=='all'?v.length:3;g.push([h,v.length>n+1?[...v.slice(0,n),{more:h,label:`Show ${v.length-n} more`,sub:''}]:v])}}
+  g.push(['',[{label:`Add “${q}” by hand`,sub:'Fill in the details yourself',add:{type:(G.find(a=>a[0]===sf)[2]||['album'])[0],title:q}}]]);
   return g}
 $('#q').addEventListener('input',e=>{const q=e.target.value.trim();hi=0;online=null;exp.clear();clearTimeout(timer);
   if(!q){$('#res').classList.remove('on');return}
