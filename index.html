@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Check This Out</title>
+<title>Checkit</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Crect width=%2224%22 height=%2224%22 rx=%225%22 fill=%22%23111214%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%227.5%22 fill=%22none%22 stroke=%22white%22 stroke-width=%221.6%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%223%22 fill=%22%232b4bff%22/%3E%3C/svg%3E">
+<meta name="apple-mobile-web-app-title" content="Checkit">
+<meta name="application-name" content="Checkit">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -450,7 +452,7 @@ main{padding-bottom:110px}
 <body>
 <header>
   <div class="wrap bar">
-    <div class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="var(--bg)"/></svg>Check this out</div>
+    <div class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="var(--bg)"/></svg>Checkit</div>
     <div class="add">
       <svg viewBox="0 0 16 16" fill="none" stroke-width="1.6"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
       <input id="q" type="text" autocomplete="off" placeholder="Search music, films, TV, games, sets" aria-label="Add an item">
@@ -702,7 +704,7 @@ function drawStubs(){const l=st.items.filter(i=>(i.status==='done'||i.status==='
      <div class="sm">${it.rating?`<span class="stars">${stars(it.rating)}</span>`:''}${rvMini(it.rv)}${it.status==='again'?'<em>Revisit</em>':''}</div>${it.note?`<p>${esc(it.note)}</p>`:''}</div></button>`}).join('')}</div></section>`).join('')}</div>`}
 /* poster */
 const PPAL=[['Ink','#111214','#ffffff','#8396ff'],['Cobalt','#2b4bff','#ffffff','#ffd84a'],['Sun','#f2c230','#111214','#c4321f'],['Rose','#e85a71','#111214','#ffffff'],['Paper','#ffffff','#111214','#2b4bff']];
-const pst={pal:0,title:'Check This Out Fest'};
+const pst={pal:0,title:'Checkit Fest'};
 function shareDlg(){dlg(`<h3>Share</h3><p>${st.view==='diary'?'Your finished list':'The items that match your current filters'}, two ways.</p><div class="shr"><button type="button" id="shp"><b>Festival poster</b><span>An image to post anywhere. Favorites headline.</span></button><button type="button" id="shl"><b>List page</b><span>A read-only page with your notes, to send as a file or host.</span></button></div><div class="dbtn"><button class="btn" data-close>Close</button></div>`);
   $('#shp').onclick=()=>{$('#dlg').close();posterDlg()};$('#shl').onclick=()=>{$('#dlg').close();menu('share')}}
 function posterItems(){const match=st.view==='diary'?i=>(i.status==='done'||i.status==='again')&&inGrp(i,st.grp):i=>inGrp(i,st.grp)&&inStat(i,st.stat);const sc=i=>(i.rv||0)*2+(i.rating||0)+(i.status==='prog'?3:i.status==='again'?2:0)+Math.max(0,3-ageDays(i)/30);
@@ -711,7 +713,7 @@ function posterHtml(){const l=posterItems(),[,bg,ink,acc]=PPAL[pst.pal],t1=l.sli
   const cnt=G.slice(1).map(([k,lb,ts])=>[lb,l.filter(i=>ts.includes(i.type)).length]).filter(x=>x[1]);
   const j=a=>a.map(i=>`<span>${esc(i.title)}</span>`).join('<i>✶</i>');
   return `<div class="poster" id="poster" style="--pb:${bg};--pi:${ink};--pa:${acc}"><div class="pin">
-   <div class="pp-top">Check This Out presents</div><div class="pp-title" id="ptitle" contenteditable="true" spellcheck="false">${esc(pst.title)}</div>
+   <div class="pp-top">Checkit presents</div><div class="pp-title" id="ptitle" contenteditable="true" spellcheck="false">${esc(pst.title)}</div>
    <div class="pp-sub">${l.length} ${st.view==='diary'?'things I got to':'things I still want to get to'}, ${new Date().toLocaleDateString(undefined,{month:'long',year:'numeric'})}</div>
    <div class="pp-l1">${j(t1)}</div>${t2.length?`<div class="pp-l2">${j(t2)}</div>`:''}${t3.length?`<div class="pp-l3">${j(t3)}${more>0?`<i>✶</i><span>and ${more} more</span>`:''}</div>`:''}
    <div class="pp-foot">${cnt.map(([lb,c])=>`<span>${lb} ${c}</span>`).join('')}</div></div></div>`}
@@ -726,7 +728,7 @@ function posterDlg(){dlg(`<h3>Make a poster</h3><p>Your current list as a festiv
   $('#dlg').onclick=async e=>{const b=e.target.closest('button');if(!b)return;
     if(b.dataset.pp){pst.title=$('#ptitle').textContent.trim()||pst.title;pst.pal=+b.dataset.pp;$('#pwrap').innerHTML=posterHtml();$('.pal').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));fitPoster()}
     if(b.id==='pdl'||b.id==='pcopy'){const msg=$('#pmsg');msg.textContent='Rendering…';
-      try{const blob=await posterPng();if(b.id==='pdl'){download('check-this-out-poster.png',blob,'image/png');msg.textContent='Saved. If nothing downloaded, this page can’t save files; open the app file in your browser.'}
+      try{const blob=await posterPng();if(b.id==='pdl'){download('checkit-poster.png',blob,'image/png');msg.textContent='Saved. If nothing downloaded, this page can’t save files; open the app file in your browser.'}
         else{await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);msg.textContent='Copied. Paste it anywhere.'}}catch(x){msg.textContent='That didn’t work on this page. Open the app file in your browser to save images.'}}};
   $('#dlg').oninput=e=>{if(e.target.id==='ptitle'){pst.title=e.target.textContent.trim();fitPoster()}}}
 function loadH2C(){return window.html2canvas?Promise.resolve():new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)})}
@@ -955,10 +957,10 @@ function copyBox(title,desc,text,name,type){dlg(`<h3>${title}</h3><p>${desc}</p>
   $('#dl').onclick=()=>download(name,text,type)}
 function shareHtml(){const list=st.view==='diary'?posterItems():sorted(st.items.filter(i=>inGrp(i,st.grp)&&inStat(i,st.stat)));const name=G.find(g=>g[0]===st.grp)[1];
   const rows=list.map(it=>`<article><p class="k">${T[it.type]}${it.extra?.event?', '+esc(it.extra.event):''}</p><h2>${(spot(it)||it.url)?`<a href="${esc(spot(it)||it.url)}">${esc(it.title)}</a>`:esc(it.title)}</h2>${it.creator?`<p class="by">${esc(it.creator)}</p>`:''}${it.note?`<blockquote>${esc(it.note)}</blockquote>`:''}</article>`).join('');
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Check this out: ${esc(name)}</title><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400&display=swap" rel="stylesheet"><style>body{margin:0;background:#fff;color:#111214;font:16px/1.5 "Inter Tight",sans-serif}main{max-width:720px;margin:0 auto;padding:48px 20px}h1{font-size:40px;letter-spacing:-.02em;line-height:1.05;margin:0 0 8px}main>p{color:#686b73;margin:0 0 24px}article{padding:32px 0;border-top:1px solid #e7e8eb;font-family:Newsreader,Georgia,serif}.k{font:13px "Inter Tight",sans-serif;color:#686b73;margin:0}h2{font-weight:500;font-size:34px;line-height:1.08;letter-spacing:-.02em;margin:8px 0 4px}h2 a{color:inherit;text-decoration-thickness:1px;text-underline-offset:5px}.by{color:#686b73;font-size:18px;margin:0}blockquote{margin:16px 0 0;font-size:19px;font-style:italic}@media(prefers-color-scheme:dark){body{background:#0f1013;color:#ececee}article{border-color:#25272c}}</style></head><body><main><h1>Check this out</h1><p>${list.length} picks: ${esc(name.toLowerCase())}, shared ${new Date().toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})}</p>${rows}</main></body></html>`}
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Checkit: ${esc(name)}</title><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400&display=swap" rel="stylesheet"><style>body{margin:0;background:#fff;color:#111214;font:16px/1.5 "Inter Tight",sans-serif}main{max-width:720px;margin:0 auto;padding:48px 20px}h1{font-size:40px;letter-spacing:-.02em;line-height:1.05;margin:0 0 8px}main>p{color:#686b73;margin:0 0 24px}article{padding:32px 0;border-top:1px solid #e7e8eb;font-family:Newsreader,Georgia,serif}.k{font:13px "Inter Tight",sans-serif;color:#686b73;margin:0}h2{font-weight:500;font-size:34px;line-height:1.08;letter-spacing:-.02em;margin:8px 0 4px}h2 a{color:inherit;text-decoration-thickness:1px;text-underline-offset:5px}.by{color:#686b73;font-size:18px;margin:0}blockquote{margin:16px 0 0;font-size:19px;font-style:italic}@media(prefers-color-scheme:dark){body{background:#0f1013;color:#ececee}article{border-color:#25272c}}</style></head><body><main><h1>Checkit</h1><p>${list.length} picks: ${esc(name.toLowerCase())}, shared ${new Date().toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})}</p>${rows}</main></body></html>`}
 function menu(k){
-  if(k==='export')copyBox('Export backup','Everything you have saved, as JSON. Keep it somewhere safe, or import it on another device.',JSON.stringify({items:st.items},null,1),'check-this-out-backup.json','application/json');
-  if(k==='share')copyBox('Share this list','A read-only page of the items that match your current filters, with notes but without ratings. Send the file or host it anywhere.',shareHtml(),'check-this-out-list.html','text/html');
+  if(k==='export')copyBox('Export backup','Everything you have saved, as JSON. Keep it somewhere safe, or import it on another device.',JSON.stringify({items:st.items},null,1),'checkit-backup.json','application/json');
+  if(k==='share')copyBox('Share this list','A read-only page of the items that match your current filters, with notes but without ratings. Send the file or host it anywhere.',shareHtml(),'checkit-list.html','text/html');
   if(k==='import')$('#file').click();
   if(k==='poster')posterDlg();
   if(k==='settings'){dlg(`<h3>Settings</h3><p>Free API keys turn on extra lookups. They stay in this browser. TMDB powers film search and where to watch (themoviedb.org, Settings, API). RAWG powers game search.</p><label for="tk" style="font-size:13px;color:var(--mut)">TMDB API key</label><input id="tk" value="${esc(st.tmdb)}" autocomplete="off"><label for="rg" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Country</label><input id="rg" value="${esc(st.region)}" maxlength="2" style="width:80px;text-transform:uppercase"><label for="rk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">RAWG API key, for game search (free at rawg.io/apidocs)</label><input id="rk" value="${esc(st.rawg||'')}" autocomplete="off"><p style="font-size:13px;color:var(--mut);margin-top:16px">Setting up another device? Copy a setup link, send it to yourself, and open it there. It holds your keys, so keep it private.</p><button class="btn" id="tl" type="button">Copy setup link</button><input id="tlo" readonly style="display:none;margin-top:8px"><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn pri" id="ts">Save</button></div>`);
