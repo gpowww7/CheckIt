@@ -38,6 +38,7 @@ header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px s
 .res{position:absolute;left:0;right:0;top:46px;background:var(--bg);border:1px solid var(--rule);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.08);max-height:min(72vh,600px);overflow:auto;display:none}
 .res.on{display:block}
 .res hr{border:0;border-top:1px solid var(--rule);margin:6px 0}
+.res button.more div div{color:var(--acc);font-weight:500}
 .res h6{margin:0;padding:10px 12px 4px;font-size:12px;font-weight:500;color:var(--mut)}
 .res button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:7px 12px;min-height:44px}
 .res button:hover,.res button.hi{background:var(--soft)}
@@ -883,13 +884,14 @@ async function addUrl(u){const d=fromUrl(u);const it=addItem({type:d.type,title:
   const m=await meta(u);it.title=m?.title||(d.src+' link');if(m?.creator)it.creator=m.creator;if(m?.art)it.art=m.art;
   save();render();if(cur===it)drawItem();if($('#qa').dataset.id===it.id&&$('#qa').classList.contains('on'))quick(it)}
 
-let rs=[],hi=0,timer,seq=0;
+let rs=[],hi=0,timer,seq=0,exp=new Set();
 function showRes(groups,note){const r=$('#res');rs=[];let html='';
   for(const [h,items] of groups){if(!items.length)continue;html+=h?`<h6>${h}</h6>`:'<hr>';
-    for(const x of items){rs.push(x);html+=`<button type="button" data-i="${rs.length-1}" class="${rs.length-1===hi?'hi':''}">${x.it?cover(x.it,'mini'):''}<div><div>${esc(x.label)}</div><small>${esc(x.sub||'')}</small></div></button>`}}
+    for(const x of items){rs.push(x);html+=`<button type="button" data-i="${rs.length-1}" class="${rs.length-1===hi?'hi':''}${x.more?' more':''}">${x.it?cover(x.it,'mini'):''}<div><div>${esc(x.label)}</div><small>${esc(x.sub||'')}</small></div></button>`}}
   r.innerHTML=(note?`<div class="note">${note}</div>`:'')+html;r.classList.toggle('on',!!html)}
-$('#res').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)pick(rs[+b.dataset.i])});
-function pick(x){if(!x)return;if(x.open){openItem(x.open);$('#res').classList.remove('on');$('#q').value=''}else if(x.url)addUrl(x.url);else{const it=addItem(x.add,!x.it);findSpotify(it)}}
+$('#res').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(!b)return;const x=rs[+b.dataset.i];if(x?.more){e.preventDefault();setTimeout(()=>more(x),0);return}pick(x)});
+function more(x){const i=rs.indexOf(x);exp.add(x.more);const sc=$('#res').scrollTop;hi=i;showRes(localGroups($('#q').value.trim()));$('#res').scrollTop=sc;$('#q').focus()}
+function pick(x){if(!x)return;if(x.more)return more(x);if(x.open){openItem(x.open);$('#res').classList.remove('on');$('#q').value=''}else if(x.url)addUrl(x.url);else{const it=addItem(x.add,!x.it);findSpotify(it)}}
 async function findSpotify(it){if(!['album','song'].includes(it.type)||it.spotify||!/deezer\.com/.test(it.url))return;
   try{const j=await getJSON('https://api.song.link/v1-alpha.1/links?userCountry=US&url='+encodeURIComponent(it.url));const u=j.linksByPlatform?.spotify?.url;
     if(u){it.spotify=u;save();render();if(cur===it)drawItem()}}catch(e){}}
@@ -901,16 +903,16 @@ function jsonp(u,ms=7000){return new Promise((res,rej)=>{const cb='cb'+uid(),s=d
 const yr=d=>(d||'').slice(0,4);
 const big=u=>(u||'').replace(/\/\d+x\d+bb\./,'/600x600bb.');
 const tmdbGet=p=>{const k=st.tmdb||'',v4=k.length>40;return fetch(`https://api.themoviedb.org/3/${p}${v4?'':(p.includes('?')?'&':'?')+'api_key='+encodeURIComponent(k)}`,v4?{headers:{Authorization:'Bearer '+k}}:{}).then(r=>{if(!r.ok)throw 0;return r.json()})};
-const tmdbMovies=q=>tmdbGet(`search/movie?query=${q}&include_adult=false`).then(j=>(j.results||[]).slice(0,4).map(r=>({type:'movie',title:r.title||r.original_title,creator:'',art:r.poster_path?`https://image.tmdb.org/t/p/w500${r.poster_path}`:'',url:`https://www.themoviedb.org/movie/${r.id}`,pop:(r.popularity||0)*2e4,extra:{year:yr(r.release_date),tmdbId:r.id},sub:`Film${yr(r.release_date)?', '+yr(r.release_date):''}`})));
-const itunesMovies=q=>jsonp(`https://itunes.apple.com/search?term=${q}&media=movie&entity=movie&limit=4`).then(j=>(j.results||[]).map(r=>({type:'movie',title:r.trackName,creator:r.artistName||'',art:big(r.artworkUrl100),url:r.trackViewUrl,extra:{year:yr(r.releaseDate),mins:r.trackTimeMillis?Math.round(r.trackTimeMillis/6e4):''},sub:`Film${yr(r.releaseDate)?', '+yr(r.releaseDate):''}${r.artistName?', '+r.artistName:''}`})));
+const tmdbMovies=q=>tmdbGet(`search/movie?query=${q}&include_adult=false`).then(j=>(j.results||[]).slice(0,12).map(r=>({type:'movie',title:r.title||r.original_title,creator:'',art:r.poster_path?`https://image.tmdb.org/t/p/w500${r.poster_path}`:'',url:`https://www.themoviedb.org/movie/${r.id}`,pop:(r.popularity||0)*2e4,extra:{year:yr(r.release_date),tmdbId:r.id},sub:`Film${yr(r.release_date)?', '+yr(r.release_date):''}`})));
+const itunesMovies=q=>jsonp(`https://itunes.apple.com/search?term=${q}&media=movie&entity=movie&limit=12`).then(j=>(j.results||[]).map(r=>({type:'movie',title:r.trackName,creator:r.artistName||'',art:big(r.artworkUrl100),url:r.trackViewUrl,extra:{year:yr(r.releaseDate),mins:r.trackTimeMillis?Math.round(r.trackTimeMillis/6e4):''},sub:`Film${yr(r.releaseDate)?', '+yr(r.releaseDate):''}${r.artistName?', '+r.artistName:''}`})));
 const SRC=[
- ['Artists',q=>jsonp(`https://api.deezer.com/search/artist?q=${q}&limit=3&output=jsonp`).then(j=>(j.data||[]).map(r=>({type:'artist',title:r.name,creator:'',art:r.picture_xl||r.picture_medium,url:r.link,sub:`Artist, ${(r.nb_fan||0).toLocaleString()} fans`,pop:r.nb_fan})))],
- ['Albums',q=>jsonp(`https://api.deezer.com/search/album?q=${q}&limit=4&output=jsonp`).then(j=>(j.data||[]).map(r=>({type:'album',title:r.title,creator:r.artist?.name||'',art:r.cover_xl||r.cover_medium,url:r.link,sub:`${r.record_type==='single'?'Single':r.record_type==='ep'?'EP':'Album'}, ${r.artist?.name||''}`})))],
- ['Songs',q=>jsonp(`https://api.deezer.com/search/track?q=${q}&limit=3&output=jsonp`).then(j=>(j.data||[]).map(r=>({type:'song',title:r.title,creator:r.artist?.name||'',art:r.album?.cover_xl||r.album?.cover_medium,url:r.link,sub:`Song, ${r.artist?.name||''}${r.album?.title?', from '+r.album.title:''}`})))],
+ ['Artists',q=>jsonp(`https://api.deezer.com/search/artist?q=${q}&limit=10&output=jsonp`).then(j=>(j.data||[]).map(r=>({type:'artist',title:r.name,creator:'',art:r.picture_xl||r.picture_medium,url:r.link,sub:`Artist, ${(r.nb_fan||0).toLocaleString()} fans`,pop:r.nb_fan})))],
+ ['Albums',q=>jsonp(`https://api.deezer.com/search/album?q=${q}&limit=12&output=jsonp`).then(j=>(j.data||[]).map(r=>({type:'album',title:r.title,creator:r.artist?.name||'',art:r.cover_xl||r.cover_medium,url:r.link,sub:`${r.record_type==='single'?'Single':r.record_type==='ep'?'EP':'Album'}, ${r.artist?.name||''}`})))],
+ ['Songs',q=>jsonp(`https://api.deezer.com/search/track?q=${q}&limit=12&output=jsonp`).then(j=>(j.data||[]).map(r=>({type:'song',title:r.title,creator:r.artist?.name||'',art:r.album?.cover_xl||r.album?.cover_medium,url:r.link,sub:`Song, ${r.artist?.name||''}${r.album?.title?', from '+r.album.title:''}`})))],
  ['Films',q=>(st.tmdb?tmdbMovies(q).catch(()=>itunesMovies(q)):itunesMovies(q))],
- ['TV',q=>getJSON(`https://api.tvmaze.com/search/shows?q=${q}`).then(j=>(j||[]).slice(0,3).map(({show:r})=>({type:'show',title:r.name,creator:r.network?.name||r.webChannel?.name||'',art:r.image?.original||r.image?.medium||'',url:r.officialSite||r.url,extra:{year:yr(r.premiered)},sub:`TV${yr(r.premiered)?', '+yr(r.premiered):''}${r.network?.name||r.webChannel?.name?', '+(r.network?.name||r.webChannel?.name):''}`})))],
- ['Games',q=>st.rawg?getJSON(`https://api.rawg.io/api/games?key=${encodeURIComponent(st.rawg)}&search=${q}&page_size=4`).then(j=>(j.results||[]).map(r=>{const pl=(r.parent_platforms||r.platforms||[]).map(x=>x.platform.name).slice(0,3).join(', ');return{type:'game',title:r.name,creator:'',art:r.background_image||'',url:`https://rawg.io/games/${r.slug}`,sub:`Game${yr(r.released)?', '+yr(r.released):''}${pl?', '+pl:''}`,extra:{year:yr(r.released),platforms:pl,mins:r.playtime?r.playtime*60:''}}})):Promise.resolve([])],
- ['Live sets and mixes',q=>jsonp(`https://api.mixcloud.com/search/?q=${q}&type=cloudcast&limit=3`).then(j=>(j.data||[]).map(r=>({type:'set',title:r.name,creator:r.user?.name||'',art:r.pictures?.extra_large||r.pictures?.large||'',url:r.url,sub:`Mixcloud, ${r.user?.name||''}${r.audio_length?', '+Math.round(r.audio_length/60)+' min':''}`,extra:{event:'Mixcloud',date:yr(r.created_time),mins:r.audio_length?Math.round(r.audio_length/60):''}})))]];
+ ['TV',q=>getJSON(`https://api.tvmaze.com/search/shows?q=${q}`).then(j=>(j||[]).slice(0,10).map(({show:r})=>({type:'show',title:r.name,creator:r.network?.name||r.webChannel?.name||'',art:r.image?.original||r.image?.medium||'',url:r.officialSite||r.url,extra:{year:yr(r.premiered)},sub:`TV${yr(r.premiered)?', '+yr(r.premiered):''}${r.network?.name||r.webChannel?.name?', '+(r.network?.name||r.webChannel?.name):''}`})))],
+ ['Games',q=>st.rawg?getJSON(`https://api.rawg.io/api/games?key=${encodeURIComponent(st.rawg)}&search=${q}&page_size=12`).then(j=>(j.results||[]).map(r=>{const pl=(r.parent_platforms||r.platforms||[]).map(x=>x.platform.name).slice(0,3).join(', ');return{type:'game',title:r.name,creator:'',art:r.background_image||'',url:`https://rawg.io/games/${r.slug}`,sub:`Game${yr(r.released)?', '+yr(r.released):''}${pl?', '+pl:''}`,extra:{year:yr(r.released),platforms:pl,mins:r.playtime?r.playtime*60:''}}})):Promise.resolve([])],
+ ['Live sets and mixes',q=>jsonp(`https://api.mixcloud.com/search/?q=${q}&type=cloudcast&limit=10`).then(j=>(j.data||[]).map(r=>({type:'set',title:r.name,creator:r.user?.name||'',art:r.pictures?.extra_large||r.pictures?.large||'',url:r.url,sub:`Mixcloud, ${r.user?.name||''}${r.audio_length?', '+Math.round(r.audio_length/60)+' min':''}`,extra:{event:'Mixcloud',date:yr(r.created_time),mins:r.audio_length?Math.round(r.audio_length/60):''}})))]];
 function localGroups(q){const ql=q.toLowerCase();
   const mine=st.items.filter(i=>(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${S[i.status].toLowerCase()}`,open:i.id,it:i}));
   const have=new Set(st.items.map(i=>i.url).filter(Boolean));
@@ -920,10 +922,10 @@ function localGroups(q){const ql=q.toLowerCase();
     let top=all.length?all.reduce((a,b)=>sc(b)>sc(a)?b:a):null;if(top&&sc(top)<1)top=null;
     const mk=r=>({label:r.title,sub:r.sub,add:{type:r.type,title:r.title,creator:r.creator,art:r.art||'',url:r.url||'',extra:r.extra||{}},it:{type:r.type,title:r.title,art:r.art}});
     if(top)g.push(['Top result',[mk(top)]]);
-    for(const [h,l] of online)g.push([h,l.filter(r=>r!==top&&!have.has(r.url)).map(mk)])}
+    for(const [h,l] of online){const v=l.filter(r=>r!==top&&!have.has(r.url)).map(mk),n=exp.has(h)?v.length:3;g.push([h,v.length>n+1?[...v.slice(0,n),{more:h,label:`Show ${v.length-n} more`,sub:''}]:v])}}
   g.push(['',[{label:`Add “${q}” by hand`,sub:'Fill in the details yourself',add:{type:'album',title:q}}]]);
   return g}
-$('#q').addEventListener('input',e=>{const q=e.target.value.trim();hi=0;online=null;clearTimeout(timer);
+$('#q').addEventListener('input',e=>{const q=e.target.value.trim();hi=0;online=null;exp.clear();clearTimeout(timer);
   if(!q){$('#res').classList.remove('on');return}
   if(isUrl(q)){const d=fromUrl(q);showRes([['Add link',[{label:`Add ${d.src} link as ${T[d.type].toLowerCase()}`,sub:q,url:q}]]]);return}
   showRes(localGroups(q),q.length>1?'Searching music, film, TV, games and Mixcloud…':'');if(q.length<2)return;
