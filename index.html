@@ -64,6 +64,7 @@ header,.tabs{background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-bac
 .menu summary::-webkit-details-marker{display:none}
 .menu div{position:absolute;z-index:25;right:0;top:56px;background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:6px;width:180px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
 .menu div button{display:block;width:100%;text-align:left;padding:9px 10px;border-radius:4px}
+.menu div button[hidden]{display:none}
 .menu div button:hover{background:var(--soft)}
 .filters{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;padding-block:14px}
 .filters button{color:var(--mut);padding:4px 0}
@@ -469,7 +470,7 @@ main{padding-bottom:110px}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button>
+      <button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button>
     </div></details>
   </div>
 </header>
@@ -525,7 +526,9 @@ const SAMPLE=[
 let st={items:SAMPLE,view:'next',layout:'covers',v2:1,grp:'all',stat:'open',sort:'color',tmdb:'',region:'US'};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.items))st={...st,...s}}catch(e){}
 if(!st.v2){st.v2=1;st.layout='covers';st.sort='color'}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const saveLocal=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+let onSave=()=>{};
+const save=()=>{saveLocal();onSave()};
 const VIEWS=['next','library','diary'];
 const OLD={index:['library','list'],wall:['library','covers'],notes:['library','list'],shelf:['library','shelf'],crate:['next'],stubs:['diary']};
 const setSt=(it,s)=>{it.status=s;it.touched=new Date().toISOString();if((s==='done'||s==='again')&&!it.doneAt)it.doneAt=it.touched};
@@ -994,6 +997,7 @@ function menu(k){
   if(k==='share')copyBox('Share this list','A read-only page of the items that match your current filters, with notes but without ratings. Send the file or host it anywhere.',shareHtml(),'checkit-list.html','text/html');
   if(k==='import')$('#file').click();
   if(k==='poster')posterDlg();
+  if(k==='account')accountDlg();
   if(k==='settings'){dlg(`<h3>Settings</h3><p>Free API keys turn on extra lookups. They stay in this browser. TMDB powers film search and where to watch (themoviedb.org, Settings, API). RAWG powers game search.</p><label for="tk" style="font-size:13px;color:var(--mut)">TMDB API key</label><input id="tk" value="${esc(st.tmdb)}" autocomplete="off"><label for="rg" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Country</label><input id="rg" value="${esc(st.region)}" maxlength="2" style="width:80px;text-transform:uppercase"><label for="rk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">RAWG API key, for game search (free at rawg.io/apidocs)</label><input id="rk" value="${esc(st.rawg||'')}" autocomplete="off"><p style="font-size:13px;color:var(--mut);margin-top:16px">Setting up another device? Copy a setup link, send it to yourself, and open it there. It holds your keys, so keep it private.</p><button class="btn" id="tl" type="button">Copy setup link</button><input id="tlo" readonly style="display:none;margin-top:8px"><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn pri" id="ts">Save</button></div>`);
     $('#tl').onclick=async()=>{const u=location.origin+location.pathname+'#setup='+encodeURIComponent(JSON.stringify({t:$('#tk').value.trim(),r:($('#rg').value.trim()||'US').toUpperCase(),g:$('#rk').value.trim()}));const o=$('#tlo');o.value=u;o.style.display='block';o.select();try{await navigator.clipboard.writeText(u);toast('Setup link copied')}catch(e){toast('Copy the link shown below')}};
     $('#ts').onclick=()=>{st.tmdb=$('#tk').value.trim();st.region=($('#rg').value.trim()||'US').toUpperCase();st.rawg=$('#rk').value.trim();save();$('#dlg').close();toast('Settings saved');if(cur){loadWatch(cur,true);drawItem()}}}
@@ -1002,6 +1006,77 @@ $('#file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)r
   upd(()=>st.items=[...inc.filter(i=>!have.has(i.id)),...st.items],`Imported ${inc.filter(i=>!have.has(i.id)).length} items`)}catch(x){toast('That file isn’t a backup from this app')}e.target.value=''});
 
 document.addEventListener('error',e=>{const t=e.target;if(t.tagName==='IMG'&&t.parentNode?.classList.contains('cv')){t.parentNode.classList.remove('hasimg');t.remove()}},true);
+// ---- Account and sync (Supabase). Local-first: the app works without signing in; signed in, items sync across devices.
+const SB_URL='',SB_KEY='';// Project URL and publishable/anon key. Safe to ship: row-level security keeps each account's rows private.
+const SYNC_KEY='checkit.sync';
+let sb=null,sbUser=null,syncing=false,syncAgain=false,syncTimer=0,lastSyncAt=0,syncErr='';
+let ss={uid:'',last:'',base:{},mt:{}};
+try{const j=JSON.parse(localStorage.getItem(SYNC_KEY));if(j&&j.base)ss={...ss,...j}}catch(e){}
+const saveSS=()=>{try{localStorage.setItem(SYNC_KEY,JSON.stringify(ss))}catch(e){}};
+const sbOn=()=>!!(SB_URL&&SB_KEY);
+const hasSession=()=>{try{return Object.keys(localStorage).some(k=>/^sb-.*-auth-token$/.test(k))}catch(e){return false}};
+async function sbLoad(){if(sb)return sb;if(!sbOn())return null;
+  const m=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  sb=m.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  sb.auth.onAuthStateChange((ev,s)=>{const u=s?.user||null;const was=sbUser?.id;sbUser=u;menuLabel();if(u&&u.id!==was)syncSoon(0)});
+  const {data}=await sb.auth.getSession();sbUser=data.session?.user||null;menuLabel();return sb}
+const pack=it=>{const o={...it};delete o.colTry;return JSON.stringify(o)};
+function menuLabel(){const b=document.querySelector('[data-m="account"]');if(!b)return;b.hidden=!sbOn();b.textContent=sbUser?'Account and sync':'Sign in to sync'}
+onSave=()=>{if(sbUser)syncSoon(1500)};
+function syncSoon(ms){clearTimeout(syncTimer);syncTimer=setTimeout(sync,ms)}
+async function sync(){if(!sbUser||!sb)return;if(syncing){syncAgain=true;return}syncing=true;syncErr='';
+  try{const uid=sbUser.id;
+    if(ss.uid!==uid){ss={uid,last:'',base:{},mt:{}};}
+    const first=!ss.last;
+    // Note local changes since the last sync, with when they were first seen (used to settle conflicts).
+    const now=new Date().toISOString(),real=st.items.filter(i=>!i.sample),ids=new Set(real.map(i=>i.id));
+    for(const it of real){if(ss.base[it.id]!==pack(it)&&!ss.mt[it.id])ss.mt[it.id]=now}
+    for(const id in ss.base)if(!ids.has(id)&&!ss.mt[id])ss.mt[id]=now;
+    // Pull what changed on the server.
+    let q=sb.from('items').select('id,data,deleted,updated_at').order('updated_at');
+    if(ss.last)q=q.gt('updated_at',new Date(Date.parse(ss.last)-10000).toISOString());
+    const {data:rows,error}=await q;if(error)throw error;
+    let changed=false,maxT=ss.last;
+    for(const r of rows){if(!maxT||r.updated_at>maxT)maxT=r.updated_at;
+      const lm=ss.mt[r.id];if(lm&&Date.parse(lm)>Date.parse(r.updated_at))continue;// local edit is newer: keep it and push below
+      delete ss.mt[r.id];const k=st.items.findIndex(i=>i.id===r.id);
+      if(r.deleted){delete ss.base[r.id];if(k>=0){st.items.splice(k,1);changed=true}continue}
+      ss.base[r.id]=pack(r.data);
+      if(k<0){st.items.unshift(r.data);changed=true}else if(pack(st.items[k])!==ss.base[r.id]){st.items[k]=r.data;changed=true}}
+    // Sample items go once the account has real items.
+    if(first&&rows.some(r=>!r.deleted)&&st.items.some(i=>i.sample)){st.items=st.items.filter(i=>!i.sample);changed=true}
+    // Push local changes.
+    const live=new Map(st.items.filter(i=>!i.sample).map(i=>[i.id,i])),up=[];
+    for(const id in ss.mt){const it=live.get(id);up.push(it?{id,data:JSON.parse(pack(it)),deleted:false}:{id,data:null,deleted:true})}
+    for(let i=0;i<up.length;i+=200){const {error:e}=await sb.from('items').upsert(up.slice(i,i+200),{onConflict:'user_id,id'});if(e)throw e}
+    for(const u of up){if(u.deleted)delete ss.base[u.id];else ss.base[u.id]=JSON.stringify(u.data);delete ss.mt[u.id]}
+    ss.last=maxT||ss.last||new Date(0).toISOString();saveSS();lastSyncAt=Date.now();
+    if(changed){saveLocal();if(cur)cur=st.items.find(i=>i.id===cur.id)||null;if(!cur)closeItem();else drawItem();render()}
+    if(first&&(up.length||rows.length))toast(up.length?`Synced. ${up.length} item${up.length===1?'':'s'} from this device added to your account`:'Synced with your account')
+  }catch(e){syncErr=e?.message||'Sync failed';saveSS()}
+  finally{syncing=false;if(syncAgain){syncAgain=false;syncSoon(500)}}}
+async function accountDlg(){
+  try{await sbLoad()}catch(e){dlg(`<h3>Sign in to sync</h3><p>Couldn’t reach the sign-in service. Check your connection and try again.</p><div class="dbtn"><button class="btn pri" data-close>OK</button></div>`);return}
+  if(sbUser){const t=lastSyncAt?new Date(lastSyncAt).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):'';
+    dlg(`<h3>Account and sync</h3><p>Signed in as <b>${esc(sbUser.email||'')}</b>. Your items sync with every device where you sign in.</p><p style="font-size:13px;color:var(--mut)">${syncErr?'Last sync failed: '+esc(syncErr):t?'Last synced at '+t+'.':'Not synced yet.'} API keys in Settings stay on this device.</p><div class="dbtn"><button class="btn" id="so">Sign out</button><button class="btn" data-close>Close</button><button class="btn pri" id="sn">Sync now</button></div>`);
+    $('#sn').onclick=async()=>{$('#sn').disabled=true;$('#sn').textContent='Syncing…';await sync();$('#dlg').close();toast(syncErr?'Sync failed. Try again in a bit':'Synced')};
+    $('#so').onclick=async()=>{await sync();await sb.auth.signOut();sbUser=null;ss={uid:'',last:'',base:{},mt:{}};saveSS();menuLabel();$('#dlg').close();toast('Signed out. Your items stay on this device')};return}
+  dlg(`<h3>Sign in to sync</h3><p>Use your email to keep your list in sync on your phone and computer. We’ll email you a code. Everything already on this device is added to your account.</p><label for="em" style="font-size:13px;color:var(--mut)">Email</label><input id="em" type="email" autocomplete="email" inputmode="email"><div id="cw" hidden><label for="oc" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Code from the email</label><input id="oc" inputmode="numeric" autocomplete="one-time-code" maxlength="10"></div><p id="am" style="font-size:13px;color:var(--mut);min-height:1em"></p><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn pri" id="ag">Send code</button></div>`);
+  let sent=false;const msg=t=>$('#am').textContent=t;
+  $('#ag').onclick=async()=>{const email=$('#em').value.trim(),b=$('#ag');if(!/^\S+@\S+\.\S+$/.test(email)){msg('Enter your email address.');return}
+    b.disabled=true;
+    if(!sent){msg('Sending…');const {error}=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:true}});b.disabled=false;
+      if(error){msg(/rate|limit|seconds/i.test(error.message)?'Too many emails just now. Wait a minute and try again.':error.message);return}
+      sent=true;$('#cw').hidden=false;$('#em').readOnly=true;b.textContent='Sign in';msg('Check your email for the code.');$('#oc').focus();return}
+    const token=$('#oc').value.replace(/\D/g,'');if(token.length<6){b.disabled=false;msg('Enter the code from the email.');return}
+    msg('Signing in…');const {data,error}=await sb.auth.verifyOtp({email,token,type:'email'});b.disabled=false;
+    if(error){msg('That code didn’t work. Check it, or wait and send a new one.');return}
+    sbUser=data.user;menuLabel();$('#dlg').close();toast('Signed in. Syncing…');sync()}}
+menuLabel();
+if(sbOn()&&hasSession())sbLoad().catch(()=>{});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&sbUser)syncSoon(300)});
+addEventListener('online',()=>{if(sbUser)syncSoon(300)});
+setInterval(()=>{if(sbUser&&document.visibilityState==='visible')sync()},120000);
 render();
 }
 </script>
