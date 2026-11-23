@@ -819,8 +819,26 @@ function sizeWall(){const w=$('#wall');if(!w)return;
 
 /* drawer */
 let cur=null;
-function openItem(id){cur=st.items.find(i=>i.id===id);if(!cur)return;drawItem();loadWatch(cur);loadInfo(cur);findSpotify(cur,true);$('#dr').classList.add('on');$('#shade').classList.add('on')}
-function closeItem(){cur=null;$('#dr').classList.remove('on');$('#shade').classList.remove('on')}
+function openItem(id){const was=!!cur&&$('#dr').classList.contains('on');cur=st.items.find(i=>i.id===id);if(!cur)return;if(!was)layer('item');drawItem();loadWatch(cur);loadInfo(cur);findSpotify(cur,true);$('#dr').classList.add('on');$('#shade').classList.add('on')}
+function closeItem(){cur=null;$('#dr').classList.remove('on');$('#shade').classList.remove('on');unlayer('item')}
+$('#dlg').addEventListener('close',()=>unlayer('dlg'));
+/* back gesture: each open panel, dialog or search is a history step, and a guard step keeps a stray swipe from leaving the app */
+const LS=[];let warnAt=0;
+function layer(k){LS.push({k});try{history.pushState({ck:LS.length},'')}catch(e){}}
+function unlayer(k){for(let i=LS.length-1;i>=0;i--)if(LS[i].k===k&&!LS[i].dead){LS[i].dead=1;break}}
+function closeSearch(){$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()}
+addEventListener('popstate',()=>{if(location.hash.startsWith('#setup='))return;
+  if(LS.length){const t=LS.pop();if(t.dead){history.back();return}
+    if(t.k==='item'){t.dead=1;cur=null;$('#dr').classList.remove('on');$('#shade').classList.remove('on')}
+    else if(t.k==='dlg'){t.dead=1;$('#dlg').open&&$('#dlg').close()}
+    else if(t.k==='search')closeSearch();return}
+  if(st.view!=='next'){st.view='next';try{history.replaceState(null,'','#next')}catch(e){}save();render();window.scrollTo(0,0)}
+  else if(Date.now()-warnAt>2500){warnAt=Date.now();toast('Swipe back again to leave Checkit')}
+  else{history.back();return}
+  try{history.pushState({ck:0},'')}catch(e){}});
+try{history.pushState({ck:0},'')}catch(e){}
+new MutationObserver(()=>{const open=$('#res').classList.contains('on')||$('.add').classList.contains('full');const top=LS[LS.length-1];
+  if(open&&!(top&&top.k==='search'&&!top.dead)&&!LS.some(x=>x.k==='search'&&!x.dead))layer('search');else if(!open)unlayer('search')}).observe($('#res'),{attributes:true,attributeFilter:['class']});
 const HN={youtube:'YouTube','youtu':'YouTube',soundcloud:'SoundCloud',mixcloud:'Mixcloud',twitch:'Twitch',vimeo:'Vimeo',bandcamp:'Bandcamp',apple:'Apple TV',tvmaze:'TVmaze',imdb:'IMDb',letterboxd:'Letterboxd',themoviedb:'TMDB',musicbrainz:'MusicBrainz'};
 const hostName=h=>{const k=h.split('.').slice(-2,-1)[0]||h;return HN[k]||k[0].toUpperCase()+k.slice(1)};
 function drawItem(){const it=cur,sh=shape(it.type);
@@ -907,7 +925,7 @@ addEventListener('hashchange',()=>{if(!applySetup())route(location.hash.slice(1)
 
 /* swipe rows on touch */
 let sw=null,swiped=0;
-document.addEventListener('touchstart',e=>{const tr=e.target.closest('.ix tr.row');sw=tr?{tr,x:e.touches[0].clientX,y:e.touches[0].clientY,dx:0,on:false}:null},{passive:true});
+document.addEventListener('touchstart',e=>{const ex=e.touches[0].clientX,edge=ex<28||ex>innerWidth-28;const tr=edge?null:e.target.closest('.ix tr.row');sw=tr?{tr,x:e.touches[0].clientX,y:e.touches[0].clientY,dx:0,on:false}:null},{passive:true});
 document.addEventListener('touchmove',e=>{if(!sw)return;const dx=e.touches[0].clientX-sw.x,dy=e.touches[0].clientY-sw.y;
   if(!sw.on){if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.5)sw.on=true;else if(Math.abs(dy)>12){sw=null;return}else return}
   sw.dx=dx;sw.tr.classList.add('swp');sw.tr.dataset.sw=dx>0?'Done':'Revisit';sw.tr.style.setProperty('--swc',dx>0?'var(--ink)':'var(--acc)');
@@ -932,7 +950,7 @@ $('#qa').addEventListener('focusin',()=>clearTimeout(qt));
 $('#qa').addEventListener('focusout',()=>{clearTimeout(qt);qt=setTimeout(()=>$('#qa').classList.remove('on'),6000)});
 /* swipe crate stage */
 let cx0=null;
-document.addEventListener('touchstart',e=>{cx0=e.target.closest('#stage')?e.touches[0].clientX:null},{passive:true});
+document.addEventListener('touchstart',e=>{const ex=e.touches[0].clientX;cx0=e.target.closest('#stage')&&ex>=28&&ex<=innerWidth-28?ex:null},{passive:true});
 document.addEventListener('touchend',e=>{if(cx0==null)return;const dx=e.changedTouches[0].clientX-cx0;cx0=null;if(Math.abs(dx)>50){swiped=Date.now();crateGo(dx<0?1:-1)}});
 /* adding */
 const isUrl=s=>/^https?:\/\/\S+$/i.test(s.trim());
@@ -1069,7 +1087,7 @@ function search(q,my){const e=encodeURIComponent(q);
     f(e).then(v=>{c.res[i]=v.filter(r=>r.title)},()=>{c.fail[i]=1}).finally(()=>{if(cache===c&&my===seq)redraw()})});
   redraw()}
 /* library menu */
-function dlg(html){const d=$('#dlg');d.innerHTML=html;d.showModal();d.querySelector('[data-close]')?.addEventListener('click',()=>d.close())}
+function dlg(html){const d=$('#dlg');d.innerHTML=html;if(!d.open)layer('dlg');d.showModal();d.querySelector('[data-close]')?.addEventListener('click',()=>d.close())}
 function download(name,text,type){try{const a=document.createElement('a');a.href=URL.createObjectURL(text instanceof Blob?text:new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}catch(e){}}
 function copyBox(title,desc,text,name,type){dlg(`<h3>${title}</h3><p>${desc}</p><textarea id="dt" readonly>${esc(text)}</textarea><div class="dbtn"><button class="btn" data-close>Close</button><button class="btn" id="dl">Download file</button><button class="btn pri" id="cp">Copy</button></div>`);
   $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(text);$('#cp').textContent='Copied'}catch(e){$('#dt').select()}};
