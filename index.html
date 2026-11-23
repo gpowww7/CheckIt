@@ -899,7 +899,7 @@ function showRes(groups,note){lastNote=note||'';const r=$('#res');rs=[];let html
     for(const x of items){rs.push(x);html+=`<button type="button" data-i="${rs.length-1}" class="${rs.length-1===hi?'hi':''}${x.more?' more':''}">${x.it?cover(x.it,'mini'):''}<div><div>${esc(x.label)}</div><small>${esc(x.sub||'')}</small></div></button>`}}
   const ch=groups.chips?`<div class="sf" role="group" aria-label="Search in">${G.map(([k,l])=>`<button type="button" data-sf="${k}" aria-pressed="${sf===k}">${l}</button>`).join('')}</div>`:'';
   r.innerHTML=ch+(note?`<div class="note">${note}</div>`:'')+html;r.classList.toggle('on',!!html)}
-$('#res').addEventListener('click',e=>{const f=e.target.closest('[data-sf]');if(f){setTimeout(()=>{sf=f.dataset.sf;hi=0;showRes(localGroups($('#q').value.trim()),lastNote);$('#res').scrollTop=0;$('#q').focus()},0);return}
+$('#res').addEventListener('click',e=>{const f=e.target.closest('[data-sf]');if(f){setTimeout(()=>{sf=f.dataset.sf;hi=0;const q=$('#q').value.trim();showRes(localGroups(q),lastNote);$('#res').scrollTop=0;if(q.length>1&&!isUrl(q))search(q,seq);$('#q').focus()},0);return}
   const b=e.target.closest('[data-i]');if(!b)return;const x=rs[+b.dataset.i];if(x?.more){e.preventDefault();setTimeout(()=>more(x),0);return}pick(x)});
 function more(x){const i=rs.indexOf(x);exp.add(x.more);const sc=$('#res').scrollTop;hi=i;showRes(localGroups($('#q').value.trim()),lastNote);$('#res').scrollTop=sc;$('#q').focus()}
 function pick(x){if(!x)return;if(x.more)return more(x);if(x.open){openItem(x.open);$('#res').classList.remove('on');$('#q').value=''}else if(x.url)addUrl(x.url);else{const it=addItem(x.add,!x.it);findSpotify(it)}}
@@ -907,7 +907,7 @@ async function findSpotify(it){if(!['album','song'].includes(it.type)||it.spotif
   try{const j=await getJSON('https://api.song.link/v1-alpha.1/links?userCountry=US&url='+encodeURIComponent(it.url));const u=j.linksByPlatform?.spotify?.url;
     if(u){it.spotify=u;save();render();if(cur===it)drawItem()}}catch(e){}}
 let online=null,onNote='';
-function jsonp(u,ms=7000){return new Promise((res,rej)=>{const cb='cb'+uid(),s=document.createElement('script');let done=false;
+function jsonp(u,ms=6000){return new Promise((res,rej)=>{const cb='cb'+uid(),s=document.createElement('script');let done=false;
   const end=()=>{done=true;delete window[cb];s.remove()};
   window[cb]=d=>{end();res(d)};s.onerror=()=>{end();rej(0)};setTimeout(()=>{if(!done){end();rej(0)}},ms);
   s.src=u+(u.includes('?')?'&':'?')+'callback='+cb;document.head.appendChild(s)})}
@@ -940,18 +940,25 @@ function localGroups(q){const ql=q.toLowerCase();
 $('#q').addEventListener('input',e=>{const q=e.target.value.trim();hi=0;online=null;exp.clear();clearTimeout(timer);
   if(!q){$('#res').classList.remove('on');return}
   if(isUrl(q)){const d=fromUrl(q);showRes([['Add link',[{label:`Add ${d.src} link as ${T[d.type].toLowerCase()}`,sub:q,url:q}]]]);return}
-  showRes(localGroups(q),q.length>1?'Searching music, film, TV, games and Mixcloud…':'');if(q.length<2)return;
-  const my=++seq;timer=setTimeout(()=>search(q,my),400)});
+  showRes(localGroups(q),q.length>1?'Searching…':'');if(q.length<2)return;
+  const my=++seq;timer=setTimeout(()=>search(q,my),250)});
 $('#q').addEventListener('keydown',e=>{if(!$('#res').classList.contains('on'))return;
   if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();hi=(hi+(e.key==='ArrowDown'?1:-1)+rs.length)%rs.length;document.querySelectorAll('#res [data-i]').forEach((b,i)=>b.classList.toggle('hi',i===hi))}
   if(e.key==='Enter'){e.preventDefault();pick(rs[hi])}});
-async function search(q,my){const e=encodeURIComponent(q);
-  const got=await Promise.allSettled(SRC.map(([,f])=>f(e)));
-  if(my!==seq)return;
-  online=SRC.map(([h],i)=>[h,got[i].status==='fulfilled'?got[i].value.filter(r=>r.title):[]]);
-  const none=got.every(g=>g.status==='rejected');
-  const g0=localGroups(q);hi=online.some(([,l])=>l.length)?g0[0][1].length:0;showRes(g0,none?'Online search isn’t reachable from this page. Open the app file in your browser to search, or add it by hand.':st.rawg?'':'Add a free RAWG key in Library, Settings to search games too.')}
-
+const SK=['music','music','music','movie','show','game','set'];
+let cache={q:'',res:[],fail:[]};
+const want=i=>sf==='all'||SK[i]===sf;
+function redraw(){const q=$('#q').value.trim();if(!q||isUrl(q)||!cache.q||cache.q!==q)return;
+  const pend=SRC.some((_,i)=>want(i)&&!cache.res[i]&&!cache.fail[i]),any=SRC.some((_,i)=>cache.res[i]);
+  online=SRC.map(([h],i)=>[h,want(i)?(cache.res[i]||[]):[]]);
+  const sc=$('#res').scrollTop,g0=localGroups(q);if(!cache.hs&&any){hi=g0[0][1].length;cache.hs=1}
+  showRes(g0,pend?'Searching…':!any&&SRC.every((_,i)=>!want(i)||cache.fail[i])?'Online search isn’t reachable from this page. Open the app file in your browser to search, or add it by hand.':!st.rawg&&want(5)?'Add a free RAWG key in Library, Settings to search games too.':'');
+  $('#res').scrollTop=sc}
+function search(q,my){const e=encodeURIComponent(q);
+  if(cache.q!==q)cache={q,res:[],fail:[]};const c=cache;
+  SRC.forEach(([,f],i)=>{if(!want(i)||c.res[i]||c.fail[i]||c['p'+i])return;c['p'+i]=1;
+    f(e).then(v=>{c.res[i]=v.filter(r=>r.title)},()=>{c.fail[i]=1}).finally(()=>{if(cache===c&&my===seq)redraw()})});
+  redraw()}
 /* library menu */
 function dlg(html){const d=$('#dlg');d.innerHTML=html;d.showModal();d.querySelector('[data-close]')?.addEventListener('click',()=>d.close())}
 function download(name,text,type){try{const a=document.createElement('a');a.href=URL.createObjectURL(text instanceof Blob?text:new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}catch(e){}}
