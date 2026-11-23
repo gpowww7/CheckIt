@@ -20,7 +20,7 @@
    COLOUR white or near-black ground, ink, one cobalt accent; flat cover colours for items without art
    TYPE Inter Tight for the ledger and wall, Newsreader for the liner notes
    LAYOUT slim header with the add box and view switch, filters on one line, content full width */
-:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f1013);--ink:light-dark(#111214,#ececee);--mut:light-dark(#686b73,#9a9ca3);--rule:light-dark(#e7e8eb,#25272c);--soft:light-dark(#f5f5f6,#17181c);--acc:light-dark(#2b4bff,#8396ff);--scrim:rgba(10,11,14,.78)}
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f1013);--ink:light-dark(#111214,#ececee);--mut:light-dark(#686b73,#9a9ca3);--rule:light-dark(#e7e8eb,#25272c);--soft:light-dark(#f5f5f6,#17181c);--acc:light-dark(#2b4bff,#8396ff);--scrim:rgba(10,11,14,.78);--groove:light-dark(rgba(17,18,20,.045),rgba(255,255,255,.05))}
 :root[data-theme=light]{color-scheme:light}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]) .card .cv{box-shadow:0 18px 40px rgba(0,0,0,.5)}}
 :root[data-theme=dark] .card .cv{box-shadow:0 18px 40px rgba(0,0,0,.5)}:root[data-theme=dark]{color-scheme:dark}
@@ -33,6 +33,11 @@ a{color:inherit}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .wrap{padding-inline:max(4vw,16px)}
 header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--rule)}
+/* background texture: faint vinyl grooves plus TV-static grain */
+body::before,body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1}
+body::before{background:repeating-radial-gradient(circle at 88% 108%,transparent 0 5px,var(--groove) 5px 6px);-webkit-mask:radial-gradient(circle at 88% 108%,#000 0,rgba(0,0,0,.55) 45%,transparent 85%);mask:radial-gradient(circle at 88% 108%,#000 0,rgba(0,0,0,.55) 45%,transparent 85%)}
+body::after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.6 -.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.07}
+header,.tabs{background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .bar{display:flex;align-items:center;gap:20px;height:64px}
 .mark{font-weight:700;font-size:19px;letter-spacing:-.02em;white-space:nowrap}
 .add{position:relative;flex:1;max-width:560px}
