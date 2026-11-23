@@ -525,6 +525,41 @@ dialog .ck input{width:18px;height:18px;flex:none;padding:0}
 .empty .lk{display:inline-block;margin-top:14px;font-size:15px}
 .tl .lk+.lk{margin-left:0}
 @media(max-width:760px){.qa.dn{grid-template-columns:40px minmax(0,1fr) auto auto}.qrow .seg.s3{width:100%}}
+/* browse: top films, TV, music and games */
+body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:none}
+.bw{padding:22px 0 40px}
+.bty{display:flex;gap:22px;flex-wrap:wrap}
+.bty button{font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--mut);line-height:1.2}
+.bty button:hover,.bty button[aria-pressed=true]{color:var(--ink)}
+.bty button[aria-pressed=true]{text-decoration:underline;text-underline-offset:7px;text-decoration-thickness:2px}
+.bct{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:16px}
+.bch{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.bch button{min-height:34px;padding:0 14px;border:1px solid var(--rule);border-radius:17px;font-size:14px;color:var(--mut);white-space:nowrap;flex:none}
+.bch button:hover{color:var(--ink)}
+.bch button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bsel{display:flex;gap:8px}
+.bsel select{height:34px;border:1px solid var(--rule);border-radius:6px;background:var(--soft);padding:0 8px;font-size:14px}
+.bh{margin:12px 0 0;color:var(--mut);font-size:13px}
+.bg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:26px 16px;margin-top:18px}
+.bg.w{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.bp{position:relative;aspect-ratio:2/3;background:var(--soft);border-radius:4px;overflow:hidden}
+.bg.sq .bp{aspect-ratio:1}.bg.w .bp{aspect-ratio:16/10}
+.bp img{width:100%;height:100%;object-fit:cover;display:block}
+.bp .ph{position:absolute;inset:0;display:grid;place-items:center;padding:10px;text-align:center;color:var(--mut);font-size:13px}
+.bp .rk{position:absolute;left:6px;top:6px;background:rgba(0,0,0,.66);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:3px}
+.bm b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:600;font-size:14px;line-height:1.3;margin-top:8px}
+.bm small{display:block;color:var(--mut);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt{display:flex;flex-direction:column}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto;padding-top:8px}
+.ba button{height:32px;border:1px solid var(--rule);border-radius:6px;font-size:12.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
+.ba button:hover{border-color:var(--ink)}
+.ba button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bf{text-align:center;color:var(--mut);padding:28px 0 8px}
+.bf .btn{margin:10px 4px 0}
+@media(max-width:760px){.tabs{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:600px){.bw{padding-top:16px}.bty{gap:18px}.bty button{font-size:20px}.bct{display:block}.bsel{margin-top:10px}.bsel select{flex:1}.bch{margin-inline:-16px;padding-inline:16px}
+.bg{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 10px}.bg.w{grid-template-columns:repeat(2,minmax(0,1fr))}
+.bm b{font-size:13px}.bm small{font-size:12px}.ba{gap:4px}.ba button{height:34px;font-size:16px}.ba button span{display:none}}
 </style>
 </head>
 <body>
@@ -537,9 +572,9 @@ dialog .ck input{width:18px;height:18px;flex:none;padding:0}
       <button type="button" class="cancel" id="qc">Cancel</button>
       <div class="res" id="res" role="listbox"></div>
     </div>
-    <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button></nav>
+    <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-6</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-7</small>
     </div></details>
   </div>
 </header>
@@ -552,6 +587,7 @@ dialog .ck input{width:18px;height:18px;flex:none;padding:0}
   <button data-v="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="7" width="12" height="13" rx="1"/><path d="M9 4h10v12"/></svg>Up next</button>
   <button data-v="library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 20h18M6 20V6M9.5 20V9M13 20V4M17 20l-2.5-12"/></svg>Library</button>
   <button data-v="diary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z"/><path d="M9 7v10" stroke-dasharray="2 2"/></svg>Diary</button>
+  <button data-v="browse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Browse</button>
 </nav>
 <button class="fab" id="tadd" aria-label="Add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
 
@@ -599,7 +635,7 @@ if(!st.v2){st.v2=1;st.layout='covers';st.sort='color'}
 const saveLocal=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
 let onSave=()=>{};
 const save=()=>{saveLocal();onSave()};
-const VIEWS=['next','library','diary'];
+const VIEWS=['next','library','diary','browse'];
 const OLD={index:['library','list'],wall:['library','covers'],notes:['library','list'],shelf:['library','shelf'],crate:['next'],stubs:['diary']};
 const setSt=(it,s)=>{it.status=s;it.touched=new Date().toISOString();if((s==='done'||s==='again')&&!it.doneAt)it.doneAt=it.touched};
 const route=h=>{if(VIEWS.includes(h))st.view=h;else if(OLD[h]){st.view=OLD[h][0];if(OLD[h][1])st.layout=OLD[h][1]}};
@@ -778,6 +814,7 @@ function render(){
   document.body.dataset.view=st.view;
   st.items.forEach(getColor);
   const v=$('#view'),f=$('#filters'),sm=$('#sum');
+  if(st.view==='browse'){f.innerHTML='';sm.innerHTML='';drawBrowse();return}
   const hasSample=st.items.some(i=>i.sample),sample=hasSample?`<span class="smp">These are sample items.<button id="clr">Clear samples</button></span>`:'';
   if(!st.items.length){f.innerHTML='';sm.innerHTML='';v.innerHTML=`<div class="empty"><b>Nothing saved yet</b>Search above for an album, film, show, game or set, or paste a link.</div>`;return}
   if(st.view==='next'){f.innerHTML='';sm.innerHTML='';drawNext(sample);return}
@@ -1194,6 +1231,169 @@ function showTrend(){if($('#q').value.trim())return;const k=st.tmdb+'|'+st.rawg;
   const g=trendGroups(),pend=TR.some(([h,k])=>(sf==='all'||sf===k)&&!trend[h]),has=g.some(([,l])=>l.length);
   const note=pend&&!has?'Loading what’s trending…':!has?(sf==='game'&&!st.rawg?'Add a free RAWG key in Library, Settings to see new games.':(sf==='movie'||sf==='show')&&!st.tmdb?'Add a free TMDB key in Library, Settings to see what’s trending.':sf==='all'||sf==='music'||sf==='movie'||sf==='show'||sf==='game'?'Nothing to show right now.':'Type to search.'):'';
   const sc=$('#res').scrollTop;showRes(g,note);$('#res').classList.add('on');$('#res').scrollTop=sc}
+/* browse: quick lists of top films, TV, music and games, one tap to Up next or Done */
+const BRT=[['movie','Films'],['show','TV'],['album','Music'],['game','Games']];
+const BRL={movie:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],show:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],album:[['classic','Essential albums'],['chart','Charts now'],['songs','Top songs']],game:[['top','Top rated'],['pop','Popular'],['new','New']]};
+const BRG={movie:[[28,'Action'],[12,'Adventure'],[16,'Animation'],[35,'Comedy'],[80,'Crime'],[99,'Documentary'],[18,'Drama'],[10751,'Family'],[14,'Fantasy'],[36,'History'],[27,'Horror'],[10402,'Music'],[9648,'Mystery'],[10749,'Romance'],[878,'Science fiction'],[53,'Thriller'],[10752,'War'],[37,'Western']],
+ show:[[10759,'Action and adventure'],[16,'Animation'],[35,'Comedy'],[80,'Crime'],[99,'Documentary'],[18,'Drama'],[10751,'Family'],[10762,'Kids'],[9648,'Mystery'],[10765,'Sci-fi and fantasy'],[10768,'War and politics'],[37,'Western']],
+ album:[[132,'Pop'],[116,'Hip hop'],[152,'Rock'],[165,'R&B'],[85,'Alternative'],[113,'Dance'],[106,'Electronic'],[84,'Country'],[197,'Latin'],[464,'Metal'],[169,'Soul and funk'],[129,'Jazz'],[98,'Classical'],[144,'Reggae'],[466,'Folk'],[153,'Blues']],
+ game:[['action','Action'],['adventure','Adventure'],['role-playing-games-rpg','RPG'],['shooter','Shooter'],['strategy','Strategy'],['platformer','Platformer'],['puzzle','Puzzle'],['racing','Racing'],['sports','Sports'],['fighting','Fighting'],['simulation','Simulation'],['indie','Indie']]};
+/* essential albums: a short canon by decade (year|artist|title); covers come from Deezer */
+const BRA=`1965|John Coltrane|A Love Supreme
+1965|Bob Dylan|Highway 61 Revisited
+1966|The Beach Boys|Pet Sounds
+1966|The Beatles|Revolver
+1967|The Velvet Underground|The Velvet Underground & Nico
+1967|The Jimi Hendrix Experience|Are You Experienced
+1967|Aretha Franklin|I Never Loved a Man the Way I Love You
+1967|The Doors|The Doors
+1969|The Rolling Stones|Let It Bleed
+1969|The Beatles|Abbey Road
+1971|Marvin Gaye|What's Going On
+1971|Joni Mitchell|Blue
+1971|Carole King|Tapestry
+1971|Led Zeppelin|Led Zeppelin IV
+1972|David Bowie|The Rise and Fall of Ziggy Stardust and the Spiders from Mars
+1973|Pink Floyd|The Dark Side of the Moon
+1975|Bruce Springsteen|Born to Run
+1976|Stevie Wonder|Songs in the Key of Life
+1977|Fleetwood Mac|Rumours
+1977|Bob Marley & The Wailers|Exodus
+1977|Television|Marquee Moon
+1979|The Clash|London Calling
+1980|Talking Heads|Remain in Light
+1982|Michael Jackson|Thriller
+1984|Prince|Purple Rain
+1985|Kate Bush|Hounds of Love
+1986|The Smiths|The Queen Is Dead
+1986|Paul Simon|Graceland
+1987|U2|The Joshua Tree
+1987|Guns N' Roses|Appetite for Destruction
+1988|Public Enemy|It Takes a Nation of Millions to Hold Us Back
+1989|Pixies|Doolittle
+1991|Nirvana|Nevermind
+1991|A Tribe Called Quest|The Low End Theory
+1991|My Bloody Valentine|Loveless
+1992|Dr. Dre|The Chronic
+1994|Nas|Illmatic
+1994|Jeff Buckley|Grace
+1994|The Notorious B.I.G.|Ready to Die
+1995|Oasis|(What's the Story) Morning Glory?
+1997|Radiohead|OK Computer
+1997|Daft Punk|Homework
+1998|Massive Attack|Mezzanine
+1998|Lauryn Hill|The Miseducation of Lauryn Hill
+2000|Radiohead|Kid A
+2000|OutKast|Stankonia
+2001|The Strokes|Is This It
+2001|JAY-Z|The Blueprint
+2001|Daft Punk|Discovery
+2003|The White Stripes|Elephant
+2004|Kanye West|The College Dropout
+2004|Arcade Fire|Funeral
+2006|Amy Winehouse|Back to Black
+2007|LCD Soundsystem|Sound of Silver
+2008|Bon Iver|For Emma, Forever Ago
+2010|Kanye West|My Beautiful Dark Twisted Fantasy
+2011|Adele|21
+2012|Frank Ocean|channel ORANGE
+2012|Kendrick Lamar|good kid, m.A.A.d city
+2013|Vampire Weekend|Modern Vampires of the City
+2014|Taylor Swift|1989
+2015|Kendrick Lamar|To Pimp a Butterfly
+2015|Tame Impala|Currents
+2016|Beyoncé|Lemonade
+2016|Frank Ocean|Blonde
+2016|Solange|A Seat at the Table
+2017|Lorde|Melodrama
+2020|Fiona Apple|Fetch the Bolt Cutters
+2020|Taylor Swift|folklore
+2020|Phoebe Bridgers|Punisher
+2021|Olivia Rodrigo|SOUR
+2022|Bad Bunny|Un Verano Sin Ti
+2022|Beyoncé|RENAISSANCE
+2022|SZA|SOS
+2022|Kendrick Lamar|Mr. Morale & The Big Steppers
+2024|Charli xcx|BRAT
+2024|Billie Eilish|HIT ME HARD AND SOFT`.split('\n').map(l=>{const [y,a,t]=l.split('|');return[+y,a,t]});
+const BCOV=(()=>{try{return JSON.parse(localStorage.getItem('checkit.bcov'))||{}}catch(e){return{}}})();
+const brF=(t,l)=>t==='album'?(l==='classic'?'d':'g'):l==='trend'?'':l==='new'?'g':'gd';
+const brDec=f=>{const a=[];for(let y=2020;y>=f;y-=10)a.push(y);return a};
+const BRC={};let brIx=new Map(),bcBusy=0;
+function brState(){if(!st.br||!BRL[st.br.t])st.br={t:'movie'};const t=st.br.t,s=st.br[t]||(st.br[t]={l:BRL[t][0][0],g:'',d:''});if(!BRL[t].some(x=>x[0]===s.l))s.l=BRL[t][0][0];return[t,s]}
+function brKey(){const[t,s]=brState(),f=brF(t,s.l);return[t,s.l,f.includes('g')?s.g:'',f.includes('d')?s.d:'',st.tmdb?1:0,st.rawg?1:0].join('|')}
+const brN=s=>(s||'').toLowerCase().replace(/\(.*?\)|\[.*?\]/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,'');
+const brK=(type,title,by)=>type+'|'+brN(title)+(type==='album'||type==='song'?'|'+brN(by):'');
+function brIndex(){brIx=new Map();for(const i of st.items){if(i.url)brIx.set('u'+i.url,i);brIx.set(brK(i.type,i.title,i.creator),i)}}
+const brHave=r=>(r.url&&brIx.get('u'+r.url))||brIx.get(brK(r.type,r.title,r.creator))||null;
+async function brFetch(t,l,g,d,p){const now=new Date(),iso=x=>x.toISOString().slice(0,10),ago=n=>iso(new Date(now-n*864e5));
+  if(t==='movie'||t==='show'){if(!st.tmdb)throw'tmdb';const tv=t==='show',k=tv?'tv':'movie',dk=tv?'first_air_date':'primary_release_date';let path;
+    if(l==='trend')path=`trending/${k}/week?page=${p}`;
+    else{const q=[`page=${p}`,'include_adult=false'];
+      if(l==='top')q.push('sort_by=vote_average.desc',`vote_count.gte=${tv?(g||d?150:600):(g||d?400:2500)}`);else q.push('sort_by=popularity.desc',`vote_count.gte=${l==='new'?5:tv?50:100}`);
+      if(tv)q.push('without_genres=10767,10763'+(l==='top'?',10764':''));
+      if(g)q.push('with_genres='+g);
+      if(l==='new')q.push(`${dk}.gte=${ago(tv?150:90)}`,`${dk}.lte=${iso(now)}`);else if(d)q.push(`${dk}.gte=${d}-01-01`,`${dk}.lte=${d+9}-12-31`);
+      path=`discover/${k}?${q.join('&')}`}
+    const j=await tmdbGet(path);
+    return{more:p<Math.min(j.total_pages||1,10),items:(j.results||[]).map(r=>{const y=yr(tv?r.first_air_date:r.release_date),pp=r.poster_path;
+      return{type:t,title:tv?(r.name||r.original_name):(r.title||r.original_title),creator:'',art:pp?`https://image.tmdb.org/t/p/w500${pp}`:'',thumb:pp?`https://image.tmdb.org/t/p/w342${pp}`:'',url:`https://www.themoviedb.org/${k}/${r.id}`,extra:tv?{year:y}:{year:y,tmdbId:r.id},tmdbId:tv?r.id:0,sub:y,score:r.vote_count>=20&&r.vote_average?r.vote_average.toFixed(1):''}})}}
+  if(t==='album'){
+    if(l==='classic')return{more:false,items:BRA.filter(a=>!d||(a[0]>=d&&a[0]<d+10)).map(([y,a,ti])=>{const c=BCOV[a+'|'+ti];return{type:'album',title:ti,creator:a,art:c?.a||'',thumb:c?.t||'',url:c?.u||'',extra:{},sub:`${a}, ${y}`,need:!c}})};
+    const s=l==='songs',j=await jsonp(`https://api.deezer.com/chart/${g||0}/${s?'tracks':'albums'}?limit=50&index=${(p-1)*50}&output=jsonp`);if(j.error)throw 0;const dd=j.data||[];
+    return{more:dd.length===50&&p<2,items:dd.map(r=>s?{type:'song',title:r.title,creator:r.artist?.name||'',art:r.album?.cover_xl||r.album?.cover_medium||'',thumb:r.album?.cover_big||'',url:r.link,extra:{},sub:r.artist?.name||''}
+      :{type:'album',title:r.title,creator:r.artist?.name||'',art:r.cover_xl||r.cover_medium||'',thumb:r.cover_big||'',url:r.link,extra:{},sub:r.artist?.name||''})}}
+  if(!st.rawg)throw'rawg';const q=[`key=${encodeURIComponent(st.rawg)}`,`page=${p}`,'page_size=40','exclude_additions=true'];
+  q.push(l==='top'?'ordering=-metacritic&metacritic=75,100':'ordering=-added');if(g)q.push('genres='+g);
+  if(l==='new')q.push(`dates=${ago(90)},${iso(now)}`);else if(d)q.push(`dates=${d}-01-01,${d+9}-12-31`);
+  const j=await getJSON(`https://api.rawg.io/api/games?${q.join('&')}`);
+  return{more:!!j.next&&p<8,items:(j.results||[]).map(r=>{const pl=(r.parent_platforms||r.platforms||[]).map(x=>x.platform.name).slice(0,3).join(', '),y=yr(r.released),im=r.background_image||'';
+    return{type:'game',title:r.name,creator:'',art:im,thumb:im.replace('/media/games/','/media/resize/640/-/games/'),url:`https://rawg.io/games/${r.slug}`,extra:{year:y,platforms:pl,mins:r.playtime?r.playtime*60:''},sub:[y,pl].filter(Boolean).join(', '),score:r.metacritic||''}})}}
+async function brLoad(k,more){let c=BRC[k];if(c?.busy)return;if(!c)c=BRC[k]={items:[],p:0,more:true};else if(!c.more)return;c.busy=1;c.err=0;brFoot();
+  const [t,l,g,d]=k.split('|');
+  try{const r=await brFetch(t,l,g,d?+d:0,c.p+1),seen=new Set(c.items.map(x=>x.url).filter(Boolean));c.items.push(...r.items.filter(x=>x.title&&!(x.url&&seen.has(x.url))));c.p++;c.more=r.more}
+  catch(e){c.err=e==='tmdb'||e==='rawg'?e:1}
+  c.busy=0;if(st.view==='browse'&&$('#view').dataset.bk===k){brGrid();brFoot();brCovers()}}
+const brAct=r=>{const h=brHave(r),nx=!!h&&h.status!=='done',dn=!!h&&(h.status==='done'||h.status==='again'),v={movie:'seen',show:'seen',game:'played'}[r.type]||'heard';
+  return`<button type="button" data-ba="next" aria-pressed="${nx}" aria-label="${nx?'In Up next, open it':'Add to Up next'}" title="${nx?'In Up next':'Add to Up next'}">${nx?'✓':'+'}<span> Up next</span></button><button type="button" data-ba="done" aria-pressed="${dn}" aria-label="${dn?'Done, open it':'Already '+v+' it, mark done'}" title="${dn?'Done':'Already '+v+' it'}">✓<span> Done</span></button>`};
+const brImg=r=>{const im=r.thumb||r.art;return(im?`<img src="${esc(im)}" alt="" loading="lazy" decoding="async">`:`<span class="ph">${esc(r.title)}</span>`)+(r.score?`<span class="rk">${esc(r.score)}</span>`:'')};
+const brTile=(r,i)=>`<div class="bt" data-bi="${i}"><div class="bp">${brImg(r)}</div><div class="bm"><b>${esc(r.title)}</b><small>${esc(r.sub||'')}</small></div><div class="ba">${brAct(r)}</div></div>`;
+function brGrid(){const g=$('#bgrid'),c=BRC[$('#view').dataset.bk];if(!g||!c)return;brIndex();const n=g.children.length;if(c.items.length>n)g.insertAdjacentHTML('beforeend',c.items.slice(n).map((r,i)=>brTile(r,n+i)).join(''))}
+function brFoot(){const f=$('#bfoot'),c=BRC[$('#view').dataset.bk];if(!f)return;
+  f.innerHTML=!c||c.busy?`<div class="bf">Loading…</div>`:c.err==='tmdb'?`<div class="bf">Add a free TMDB key to browse films and TV.<br><button class="btn" type="button" data-bset>Open settings</button></div>`
+   :c.err==='rawg'?`<div class="bf">Add a free RAWG key to browse games.<br><button class="btn" type="button" data-bset>Open settings</button></div>`
+   :c.err?`<div class="bf">${c.items.length?'Couldn’t load more.':'Couldn’t load this list.'}<br><button class="btn" type="button" data-bretry>Try again</button></div>`
+   :!c.items.length?`<div class="bf">Nothing here. Try another genre or decade.</div>`:c.more?`<div class="bf"><button class="btn" type="button" data-bmore>Show more</button></div>`:''}
+function brPaint(){const c=BRC[$('#view').dataset.bk];if(!c)return;brIndex();document.querySelectorAll('#bgrid .bt').forEach(el=>{const r=c.items[+el.dataset.bi];if(r)el.querySelector('.ba').innerHTML=brAct(r)})}
+async function brCover(r){const id=r.creator+'|'+r.title;
+  try{const j=await jsonp(`https://api.deezer.com/search/album?q=${encodeURIComponent(`artist:"${r.creator}" album:"${r.title}"`)}&limit=5&output=jsonp`),l=j.data||[],m=l.find(a=>brN(a.artist?.name)===brN(r.creator))||l[0];
+    BCOV[id]=m?{a:m.cover_xl||m.cover_big||'',t:m.cover_big||'',u:m.link||''}:{};try{localStorage.setItem('checkit.bcov',JSON.stringify(BCOV))}catch(e){}}catch(e){}
+  r.need=0;const b=BCOV[id];if(b?.a){r.art=b.a;r.thumb=b.t;r.url=b.u}
+  const c=BRC[$('#view').dataset.bk],i=c?c.items.indexOf(r):-1,el=i<0?null:document.querySelector(`#bgrid [data-bi="${i}"]`);if(el){el.querySelector('.bp').innerHTML=brImg(r);brIndex();el.querySelector('.ba').innerHTML=brAct(r)}}
+async function brCovers(){if(bcBusy)return;bcBusy=1;try{for(;;){if(st.view!=='browse')break;const c=BRC[$('#view').dataset.bk],todo=(c?.items||[]).filter(r=>r.need).slice(0,4);if(!todo.length)break;await Promise.all(todo.map(brCover))}}finally{bcBusy=0}}
+function drawBrowse(){const v=$('#view'),k=brKey();if(v.dataset.bk===k&&v.querySelector('.bw')){brPaint();return}
+  v.dataset.bk=k;const[t,s]=brState(),f=brF(t,s.l),vb={movie:'seen',show:'seen',game:'played'}[t]||'heard';
+  v.innerHTML=`<div class="bw"><div class="bty" role="group" aria-label="Browse">${BRT.map(([x,n])=>`<button type="button" data-bt="${x}" aria-pressed="${x===t}">${n}</button>`).join('')}</div>
+  <div class="bct"><div class="bch" role="group" aria-label="List">${BRL[t].map(([x,n])=>`<button type="button" data-bl="${x}" aria-pressed="${x===s.l}">${n}</button>`).join('')}</div>${f?`<div class="bsel">${f.includes('g')?`<select data-bf="g" aria-label="Genre"><option value="">All genres</option>${BRG[t].map(([id,n])=>`<option value="${id}"${String(s.g)===String(id)?' selected':''}>${n}</option>`).join('')}</select>`:''}${f.includes('d')?`<select data-bf="d" aria-label="Decade"><option value="">${t==='album'?'All decades':'All time'}</option>${brDec(t==='game'?1980:t==='album'?1960:1950).map(y=>`<option value="${y}"${+s.d===y?' selected':''}>${y}s</option>`).join('')}</select>`:''}</div>`:''}</div>
+  <p class="bh">+ adds it to Up next. ✓ marks it done if you’ve already ${vb} it.</p><div class="bg${t==='album'?' sq':t==='game'?' w':''}" id="bgrid"></div><div id="bfoot"></div></div>`;
+  if(BRC[k]?.items.length||BRC[k]?.busy){brGrid();brFoot();brCovers()}else brLoad(k)}
+function brObj(r){const o={type:r.type,title:r.title,creator:r.creator||'',art:r.art||'',url:r.url||'',extra:{...(r.extra||{})}};if(r.tmdbId)o.tmdbId=r.tmdbId;return o}
+function brDo(r,a){brIndex();const h=brHave(r),nx=!!h&&h.status!=='done',dn=!!h&&(h.status==='done'||h.status==='again');
+  if(h&&((a==='next'&&nx)||(a==='done'&&dn))){openItem(h.id);return}
+  if(h){upd(()=>setSt(h,a==='done'?'done':'again'),a==='done'?`Marked ${h.title} done`:`${h.title} is back in Up next to revisit`);return}
+  if(a==='done'){if(typeof addDone==='function')addDone(brObj(r),{stay:true});else{const it={id:uid(),status:'check',by:'',note:'',rating:0,added:new Date().toISOString(),...brObj(r)};setSt(it,'done');st.items.unshift(it);save();toast(`Marked ${it.title} done`,()=>{st.items=st.items.filter(x=>x!==it);save();brPaint()})}}
+  else{const it={id:uid(),status:'check',by:'',note:'',rating:0,added:new Date().toISOString(),...brObj(r)};st.items.unshift(it);save();toast(`Added ${it.title} to Up next`,()=>{st.items=st.items.filter(x=>x!==it);save();brPaint()});findSpotify(it)}
+  brPaint()}
+$('#view').addEventListener('click',e=>{if(st.view!=='browse')return;const k=$('#view').dataset.bk,b=x=>e.target.closest(x);
+  const bt=b('[data-bt]'),bl=b('[data-bl]'),ba=b('[data-ba]');
+  if(bt){st.br.t=bt.dataset.bt;saveLocal();drawBrowse();return}
+  if(bl){brState()[1].l=bl.dataset.bl;saveLocal();drawBrowse();return}
+  if(b('[data-bmore]')){brLoad(k,true);return}
+  if(b('[data-bset]')){menu('settings');return}
+  if(b('[data-bretry]')){const c=BRC[k];if(c){c.err=0;if(!c.items.length)delete BRC[k];else c.more=true}if(!BRC[k])brLoad(k);else brLoad(k,true);return}
+  if(ba){const r=BRC[k]?.items[+ba.closest('[data-bi]').dataset.bi];if(r)brDo(r,ba.dataset.ba)}});
+$('#view').addEventListener('change',e=>{const f=e.target.closest('[data-bf]');if(!f||st.view!=='browse')return;brState()[1][f.dataset.bf]=f.value;saveLocal();drawBrowse()});
+$('#dlg').addEventListener('close',()=>{if(st.view==='browse')drawBrowse()});
 function localGroups(q){const ql=q.toLowerCase();
   const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${S[i.status].toLowerCase()}`,open:i.id,it:i}));
   const have=new Set(st.items.map(i=>i.url).filter(Boolean));
