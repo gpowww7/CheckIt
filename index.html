@@ -491,6 +491,40 @@ main{padding-bottom:110px}
 .crate .pkbar .seg button{border:0;padding:0;min-height:30px;background:none;color:color-mix(in srgb,var(--on) 68%,transparent)}
 .crate .pkbar .seg button:hover{color:var(--on)}
 .crate .pkbar .seg button[aria-pressed=true]{background:none;color:var(--on);text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1.5px}
+/* past favorites: seen it, favorites, backfill, Letterboxd */
+.res .rw{display:flex;align-items:center}
+.res .rw>button[data-i]{flex:1;min-width:0}
+.res .rw:hover>button[data-i]{background:var(--soft)}
+.res .rw button.sd{width:auto;flex:none;min-height:32px;padding:0 11px;margin:0 10px 0 4px;border:1px solid var(--rule);border-radius:16px;font-size:13px;color:var(--mut);gap:5px;white-space:nowrap}
+.res .rw button.sd:hover{background:var(--soft);color:var(--ink);border-color:var(--mut)}
+.res .rw button.sd svg{width:14px;height:14px}
+.add.full .res .rw button.sd,.add.full .res .bk button{min-height:36px}
+.res .bk{display:flex;gap:12px;align-items:center;padding:12px;background:color-mix(in srgb,var(--acc) 10%,var(--bg));border-bottom:1px solid var(--rule);font-size:13px}
+.res .bk>div{flex:1;min-width:0}.res .bk b{display:block;font-size:14px;font-weight:600;margin-bottom:2px}.res .bk span{color:var(--mut)}
+.res .bk button{width:auto;min-height:34px;padding:0 14px;border-radius:5px;background:var(--ink);color:var(--bg);font-weight:500;flex:none}
+.res .bk button:hover{background:var(--ink)}
+.res .bk button.lk{background:none;color:var(--acc);padding:0}
+body.bulk .qa{z-index:60}body.bulk .toast{z-index:61}
+.fvm{font-style:normal;color:#e0245e;margin-left:6px;font-size:.85em}
+.wall .cv .fvb{position:absolute;top:5px;right:7px;z-index:3;color:#fff;font-size:14px;text-shadow:0 1px 3px rgba(0,0,0,.7);pointer-events:none}
+.ip .x.fv{right:102px;display:grid;place-items:center}.ip .x.fv svg{width:21px;height:21px}
+.stub .sm em.fv{text-decoration:none}
+.seg.s3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.qrow .seg.s3{width:270px}
+.qa.dn{grid-template-columns:40px minmax(0,1fr) auto auto auto}
+.qa .rate{margin:0}.qa .rate button{width:26px;height:30px;font-size:18px}
+.qa select,.rb select{font:inherit;font-size:14px;border:0;border-bottom:1px solid var(--rule);background:none;color:var(--ink);padding:4px 0;max-width:100%}
+.rb select{font-size:15px;border-bottom-color:transparent}.rb select:hover{border-bottom-color:var(--rule)}
+.qa .qtl{flex-wrap:nowrap;overflow-x:auto;margin-top:8px;scrollbar-width:none;gap:5px}
+.qa .tg2{white-space:nowrap;padding:6px 9px;flex:none}
+.qa .fvt{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;color:var(--mut)}
+.qa .fvt:hover{background:var(--soft)}
+.qa .fvt[aria-pressed=true]{color:#e0245e}.qa .fvt svg{width:22px;height:22px}
+dialog .ck{display:flex;gap:10px;align-items:center;margin:0 0 10px;color:var(--ink);font-size:14.5px}
+dialog .ck input{width:18px;height:18px;flex:none;padding:0}
+.empty .lk{display:inline-block;margin-top:14px;font-size:15px}
+.tl .lk+.lk{margin-left:0}
+@media(max-width:760px){.qa.dn{grid-template-columns:40px minmax(0,1fr) auto auto}.qrow .seg.s3{width:100%}}
 </style>
 </head>
 <body>
@@ -505,7 +539,7 @@ main{padding-bottom:110px}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-5</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-6</small>
     </div></details>
   </div>
 </header>
@@ -527,6 +561,7 @@ main{padding-bottom:110px}
 <div class="toast" id="toast"><span id="tmsg"></span><button id="tundo">Undo</button></div>
 <dialog id="dlg"></dialog>
 <input type="file" id="file" accept="application/json,.json" hidden>
+<input type="file" id="lbfile" accept=".zip,.csv,application/zip,text/csv" multiple hidden>
 <script>
 {
 const T={artist:'Artist',album:'Album',song:'Song',set:'Live set',movie:'Film',show:'TV',game:'Game'};
@@ -698,7 +733,7 @@ function ratePaint(el,v){el.querySelectorAll('button[data-r]').forEach(b=>b.clas
 const rateAt=(b,x)=>{const r=b.getBoundingClientRect();return +b.dataset.r-(x-r.left<r.width/2?.5:0)};
 const md=iso=>new Date(iso).toLocaleDateString(undefined,{month:'short',day:'numeric'});
 const inGrp=(it,g)=>{const x=G.find(a=>a[0]===g)[2];return !x||x.includes(it.type)};
-const inStat=(it,s)=>s==='all'||(s==='open'?it.status!=='done':it.status===s);
+const inStat=(it,s)=>s==='all'||(s==='fav'?!!it.fav:s==='open'?it.status!=='done':it.status===s);
 const hueKey=it=>{const h=col(it).replace('#','');const [r,g,b]=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255);const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;if(!d||d/(1-Math.abs(2*l-1))<.15)return 1000+(1-l)*100;let hu=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;hu=(hu*60+360)%360;return hu+l*.5};
 // Quick-take tags: a short set per type, plus the person's own tags for that type. Stored as it.tags (array of labels), so they sync with the item.
 const QT={movie:['Gripping','Funny','Moving','Dark','Gorgeous','Slow burn','Great ending','Rewatchable'],
@@ -714,6 +749,19 @@ const tagsFor=t=>{const base=QT[t]||[],seen=new Set(base.map(x=>x.toLowerCase())
 function tagBlock(it){const on=it.tags||[];if(!(it.status==='done'||it.status==='again'||on.length))return'';const has=new Set(on.map(x=>x.toLowerCase()));
   const all=tagsFor(it.type);for(const g of on)if(!all.some(x=>x.toLowerCase()===g.toLowerCase()))all.push(g);
   return `<div class="qt"><div class="qth">Quick take<span>${on.length?'':'Tap what fits'}</span></div><div class="qtl" role="group" aria-label="Quick take tags">${all.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" aria-pressed="${has.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}<button type="button" class="tg2 tgadd" data-tagadd>+ Your own</button><input class="tgin" id="tgin" maxlength="24" placeholder="Add a tag" hidden></div></div>`}
+// Past favorites. it.fav marks an all-time favorite. it.era is a rough "when" for things finished before Checkit (a year, a decade like "2010s", "old" or "?"); it.doneAt is set to a matching date so sorting and counts keep working.
+const heartSvg=f=>`<svg viewBox="0 0 24 24" fill="${f?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.2-4.5-9.3-9.1A5 5 0 0 1 12 6.4a5 5 0 0 1 9.3 4.5C19.2 15.5 12 20 12 20z"/></svg>`;
+const favMark=it=>it.fav?'<i class="fvm" title="Favorite">♥</i>':'';
+const favBtn=it=>`<button type="button" class="fvt" data-fav aria-pressed="${!!it.fav}" aria-label="${it.fav?'Remove from favorites':'Add to favorites'}" title="Favorite">${heartSvg(it.fav)}</button>`;
+const toggleFav=it=>{if(it.fav)delete it.fav;else it.fav=true;it.touched=new Date().toISOString();delete it.sample};
+const eraY=()=>new Date().getFullYear(),decs=()=>{const D=Math.floor(eraY()/10)*10;return[D,D-10,D-20,D-30]};
+const eraISO=v=>{const Y=eraY(),D=decs();const y=/^\d{4}$/.test(v)?+v:/^\d{4}s$/.test(v)?Math.min(+v.slice(0,4)+5,Y-2):v==='old'?D[3]-5:1970;return new Date(Date.UTC(y,0,v==='?'?2:1,12)).toISOString()};
+const eraLabel=v=>v==='?'?'Not sure when':v==='old'?`Before ${decs()[3]}`:/^\d{4}s$/.test(v)?`The ${v}`:+v===eraY()?'Earlier this year':String(v);
+function eraOpts(it){const Y=eraY(),v=it.era||'now',D=decs();
+  const o=[['now',it.era||!it.doneAt?'Just now':new Date(it.doneAt).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})],[String(Y),'Earlier this year'],[String(Y-1),'Last year'],...D.map(d=>[d+'s','The '+d+'s']),['old',`Before ${D[3]}`],['?','Not sure when']];
+  if(!o.some(x=>x[0]===v))o.splice(3,0,[v,eraLabel(v)]);return o.map(([k,l])=>`<option value="${k}"${k===v?' selected':''}>${esc(l)}</option>`).join('')}
+function setEra(it,v){it.touched=new Date().toISOString();delete it.sample;if(v==='now'){delete it.era;it.doneAt=it.touched}else{it.era=v;it.doneAt=eraISO(v)}}
+const whenBlock=it=>it.status==='done'||it.status==='again'?`<label class="rb">Finished <select id="f-era" aria-label="When you finished it">${eraOpts(it)}</select></label>`:'';
 const RV=['Once was enough','Maybe someday','Would revisit','Often','On repeat forever'];
 const rvMini=n=>n?`<span class="rvm" title="${RV[n-1]}">${[1,2,3,4,5].map(k=>`<i class="${k<=n?'on':''}" style="height:${3+k*2}px"></i>`).join('')}</span>`:'';
 const sorted=list=>{const l=[...list];
@@ -723,7 +771,7 @@ const sorted=list=>{const l=[...list];
   else if(st.sort==='type')l.sort((a,b)=>Object.keys(T).indexOf(a.type)-Object.keys(T).indexOf(b.type)||a.title.localeCompare(b.title));
   else l.sort((a,b)=>b.added.localeCompare(a.added));return l};
 
-const STATS=[['open','Not done'],['check','Check out'],['prog','In progress'],['again','Revisit'],['done','Done'],['all','Everything']];
+const STATS=[['open','Not done'],['check','Check out'],['prog','In progress'],['again','Revisit'],['done','Done'],['fav','Favorites'],['all','Everything']];
 const LAYOUTS=[['list','List'],['covers','Covers'],['shelf','Shelf']];
 function render(){
   document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===st.view));
@@ -734,9 +782,9 @@ function render(){
   if(!st.items.length){f.innerHTML='';sm.innerHTML='';v.innerHTML=`<div class="empty"><b>Nothing saved yet</b>Search above for an album, film, show, game or set, or paste a link.</div>`;return}
   if(st.view==='next'){f.innerHTML='';sm.innerHTML='';drawNext(sample);return}
   if(st.view==='diary'){const fin=st.items.filter(i=>i.status==='done'||i.status==='again'),yr0=new Date().getFullYear();
-    f.innerHTML=`<div class="fl">${G.map(([k,l])=>`<button data-g="${k}" aria-pressed="${st.grp===k}">${l}<i>${fin.filter(i=>inGrp(i,k)).length}</i></button>`).join('')}</div><div class="tl"><button class="lk" type="button" data-share>Share</button></div>`;
-    const ty=fin.filter(i=>new Date(i.doneAt||i.touched||i.added).getFullYear()===yr0).length,back=fin.filter(i=>(i.rv||0)>=4).length;
-    sm.innerHTML=`<b>${fin.length} finished</b>, ${ty} this year, ${back} you would go back to.${sample}`;drawStubs();return}
+    f.innerHTML=`<div class="fl">${G.map(([k,l])=>`<button data-g="${k}" aria-pressed="${st.grp===k}">${l}<i>${fin.filter(i=>inGrp(i,k)).length}</i></button>`).join('')}</div><div class="tl"><button class="lk" type="button" data-bulk>Add past favorites</button><button class="lk" type="button" data-share>Share</button></div>`;
+    const ty=fin.filter(i=>new Date(i.doneAt||i.touched||i.added).getFullYear()===yr0).length,back=fin.filter(i=>(i.rv||0)>=4).length,nf=fin.filter(i=>i.fav).length;
+    sm.innerHTML=`<b>${fin.length} finished</b>, ${ty} this year, ${back} you would go back to${nf?`, ${nf} favorite${nf>1?'s':''}`:''}.${sample}`;drawStubs();return}
   const byStat=st.items.filter(i=>inStat(i,st.stat)),byGrp=st.items.filter(i=>inGrp(i,st.grp));
   f.innerHTML=`<div class="fl">${G.map(([k,l])=>`<button data-g="${k}" aria-pressed="${st.grp===k}">${l}<i>${byStat.filter(i=>inGrp(i,k)).length}</i></button>`).join('')}<span class="sep"></span>${STATS.map(([k,l])=>`<button data-s="${k}" aria-pressed="${st.stat===k}">${l}<i>${byGrp.filter(i=>inStat(i,k)).length}</i></button>`).join('')}</div>
    <div class="tl"><div class="seg lay" role="group" aria-label="Layout">${LAYOUTS.map(([k,l])=>`<button type="button" data-lay="${k}" aria-pressed="${st.layout===k}">${l}</button>`).join('')}</div>
@@ -748,11 +796,11 @@ function render(){
   if(!list.length){v.innerHTML=`<div class="empty"><b>Nothing here</b>No items match these filters.</div>`;return}
   if(st.layout==='covers'){
     v.innerHTML=`<div class="wall" id="wall">${list.map(it=>{const c=cover(it,shape(it.type));
-      return c.replace('<div class="cv','<div tabindex="0" data-id="'+it.id+'" class="cv').replace(/<\/div>$/,`<div class="hv"><b>${esc(it.title)}</b>${esc(it.creator||T[it.type])}<br><span class="st ${it.status}">${S[it.status]}</span></div></div>`)}).join('')}</div>`;
+      return c.replace('<div class="cv','<div tabindex="0" data-id="'+it.id+'" class="cv').replace(/<\/div>$/,`${it.fav?'<span class="fvb" aria-hidden="true">♥</span>':''}<div class="hv"><b>${esc(it.title)}${favMark(it)}</b>${esc(it.creator||T[it.type])}<br><span class="st ${it.status}">${S[it.status]}</span></div></div>`)}).join('')}</div>`;
     sizeWall();return}
   if(st.layout==='shelf'){drawShelf(list);return}
   v.innerHTML=`<table class="ix"><thead><tr><th>Title</th><th class="hm">Type</th><th>Status</th><th class="hm">Recommended by</th><th class="hm">Rating</th><th class="n hm">Added</th></tr></thead><tbody>${list.map(it=>`<tr class="row${dust(it)>0?' dzr':''}" style="--dust:${dust(it).toFixed(2)}" data-id="${it.id}" tabindex="0">
-    <td><div class="t">${cover(it,'mini'+(it.type==='artist'?' round':''))}<div><b>${esc(it.title)}</b><span>${esc(it.creator||(it.note?it.note.slice(0,60):''))}</span></div></div></td>
+    <td><div class="t">${cover(it,'mini'+(it.type==='artist'?' round':''))}<div><b>${esc(it.title)}${favMark(it)}</b><span>${esc(it.creator||(it.note?it.note.slice(0,60):''))}</span></div></div></td>
     <td class="m hm">${T[it.type]}${VID.includes(it.type)&&svcs(it).length?`<br><span style="font-size:13px">${esc(svcs(it).slice(0,2).join(', '))}${svcs(it).length>2?' +'+(svcs(it).length-2):''}</span>`:''}</td><td><span class="st ${it.status}">${S[it.status]}</span></td><td class="m hm">${esc(it.by)}</td><td class="hm"><span class="stars">${stars(it.rating)}</span>${rvMini(it.rv)}</td><td class="n hm">${md(it.added)}</td></tr>`).join('')}</tbody></table>`;
 }
 /* up next */
@@ -826,12 +874,12 @@ function drawShelf(list){$('#view').innerHTML=`<div class="shelfv" id="shv">${li
   <p class="shl">${list.length} on the shelf. Vinyl for albums, 7-inch singles for songs, dividers for artists, cassettes for sets, VHS for films, box sets for TV, cases for games. Dust settles after a month untouched.</p>`}
 /* stubs */
 function drawStubs(){const l=st.items.filter(i=>(i.status==='done'||i.status==='again')&&inGrp(i,st.grp)).map(i=>[i,Date.parse(i.doneAt||i.touched||i.added)]).sort((a,b)=>b[1]-a[1]);
-  if(!l.length){$('#view').innerHTML=`<div class="empty"><b>No stubs yet</b>Mark something Done or Revisit and it gets a ticket stub here.</div>`;return}
-  const by=new Map();for(const[it,t]of l){const k=new Date(t).toLocaleDateString(undefined,{month:'long',year:'numeric'});if(!by.has(k))by.set(k,[]);by.get(k).push([it,t])}
+  if(!l.length){$('#view').innerHTML=`<div class="empty"><b>No stubs yet</b>Mark something Done or Revisit and it gets a ticket stub here.<br><button class="lk" type="button" data-bulk>Add things you’ve already seen, heard or played</button></div>`;return}
+  const by=new Map();for(const[it,t]of l){const k=it.era?eraLabel(it.era):new Date(t).toLocaleDateString(undefined,{month:'long',year:'numeric'});if(!by.has(k))by.set(k,[]);by.get(k).push([it,t])}
   let n=0;$('#view').innerHTML=`<div class="stubs">${[...by].map(([m,arr])=>`<section><h3>${m}<span>${arr.length} finished</span></h3><div class="sgrid">${arr.map(([it,t])=>{n++;
     return `<button type="button" class="stub" data-id="${it.id}" style="${cs(it)};--rot:${(hash(it.id)%5-2)*.25}deg"><div class="sl"><span>Admit one</span><b>No. ${String(hash(it.id)%9000+1000)}</b></div>
-     <div class="sr"><div class="sk">${T[it.type]}, ${new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}</div><div class="st2">${esc(it.title)}</div>${it.creator?`<div class="sc2">${esc(it.creator)}</div>`:''}
-     <div class="sm">${it.rating?`<span class="stars">${stars(it.rating)}</span>`:''}${rvMini(it.rv)}${it.status==='again'?'<em>Revisit</em>':''}</div>${it.tags?.length?`<div class="stg">${it.tags.map(esc).join(' · ')}</div>`:''}${it.note?`<p>${esc(it.note)}</p>`:''}</div></button>`}).join('')}</div></section>`).join('')}</div>`}
+     <div class="sr"><div class="sk">${T[it.type]}, ${it.era?esc(eraLabel(it.era).replace(/^Earlier this year$/,'This year')):new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}</div><div class="st2">${esc(it.title)}</div>${it.creator?`<div class="sc2">${esc(it.creator)}</div>`:''}
+     <div class="sm">${it.rating?`<span class="stars">${stars(it.rating)}</span>`:''}${rvMini(it.rv)}${it.status==='again'?'<em>Revisit</em>':''}${it.fav?'<em class="fv">♥ Favorite</em>':''}</div>${it.tags?.length?`<div class="stg">${it.tags.map(esc).join(' · ')}</div>`:''}${it.note?`<p>${esc(it.note)}</p>`:''}</div></button>`}).join('')}</div></section>`).join('')}</div>`}
 /* poster */
 const PPAL=[['Ink','#111214','#ffffff','#8396ff'],['Cobalt','#2b4bff','#ffffff','#ffd84a'],['Sun','#f2c230','#111214','#c4321f'],['Rose','#e85a71','#111214','#ffffff'],['Paper','#ffffff','#111214','#2b4bff']];
 const pst={pal:0,title:'Checkit Fest'};
@@ -878,7 +926,7 @@ $('#dlg').addEventListener('close',()=>unlayer('dlg'));
 const LS=[];let warnAt=0;
 function layer(k){LS.push({k});try{history.pushState({ck:LS.length},'')}catch(e){}}
 function unlayer(k){for(let i=LS.length-1;i>=0;i--)if(LS[i].k===k&&!LS[i].dead){LS[i].dead=1;break}}
-function closeSearch(){$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()}
+function closeSearch(){endBulk();$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()}
 addEventListener('popstate',()=>{if(location.hash.startsWith('#setup='))return;
   if(LS.length){const t=LS.pop();if(t.dead){history.back();return}
     if(t.k==='item'){t.dead=1;cur=null;$('#dr').classList.remove('on');$('#shade').classList.remove('on')}
@@ -905,6 +953,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
   $('#dr').innerHTML=`<div class="ip ${sh}" style="${cs(it)}">
    <button class="x" id="dx" aria-label="Close">×</button>
    <button class="x rm" data-del aria-label="Remove from list" title="Remove from list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+   <button class="x fv" data-fav aria-pressed="${!!it.fav}" aria-label="${it.fav?'Remove from favorites':'Add to favorites'}" title="Favorite">${heartSvg(it.fav)}</button>
    <div class="hero">${cover(it,'big ini'+(sh==='p'?' pp':sh==='w'?' ww':''))}
     <div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)||'Untitled'}</h2>${it.creator?`<p>${esc(it.creator)}</p>`:''}</div></div>
    ${links?`<div class="lks">${links}</div>`:''}
@@ -913,6 +962,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
    <div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}<span>${it.rating?it.rating+' / 5':'Rate it'}</span></div>
    <div class="rv"><div class="rvb" role="group" aria-label="Revisit meter">${[1,2,3,4,5].map(n=>`<button type="button" data-rv="${n}" class="${n<=(it.rv||0)?'on':''}" style="height:${8+n*4}px" aria-label="${RV[n-1]}" title="${RV[n-1]}"></button>`).join('')}</div><span class="rvt">${it.rv?RV[it.rv-1]:'How much would you go back to it?'}</span></div>
    ${tagBlock(it)}
+   ${whenBlock(it)}
    <textarea id="f-note" class="nt" rows="1" placeholder="Why is this on your list?">${esc(it.note)}</textarea>
    <label class="rb">Recommended by <input id="f-by" value="${esc(it.by)}" placeholder="Add a name"></label>
    ${watchBlock(it)}
@@ -945,9 +995,10 @@ $('#dr').addEventListener('click',e=>{const eo=e.target.closest('.eo');if(eo){eo
   else if(b.dataset.tagadd!=null){b.hidden=true;const i=$('#tgin');i.hidden=false;i.focus()}
   else if(b.dataset.rv){const n=+b.dataset.rv;upd(()=>{cur.rv=cur.rv===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
   else if(b.dataset.r){const n=e.detail===0?+b.dataset.r:rateAt(b,e.clientX);upd(()=>{cur.rating=cur.rating===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
+  else if(b.hasAttribute('data-fav')){const on=!cur.fav;upd(()=>toggleFav(cur),on?'Added to favorites':'Removed from favorites');drawItem()}
   else if(b.hasAttribute('data-del')){removeItem(cur);closeItem()}});
 function removeItem(it){const t=it.title||'item';upd(()=>{st.items=st.items.filter(i=>i.id!==it.id)},`Removed ${t}`)}
-$('#dr').addEventListener('input',e=>{if(!cur)return;const f=e.target.id?.slice(2);if(!f)return;if(e.target.tagName==='TEXTAREA'){e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px'}
+$('#dr').addEventListener('input',e=>{if(!cur)return;if(e.target.id==='f-era'){upd(()=>setEra(cur,e.target.value));drawItem();return}const f=e.target.id?.slice(2);if(!f)return;if(e.target.tagName==='TEXTAREA'){e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px'}
   if(f==='event'||f==='date'){cur.extra={...cur.extra,[f]:e.target.value}}else cur[f]=e.target.value;
   cur.touched=new Date().toISOString();delete cur.sample;save();render();if(f==='type'||f==='art'){if(f==='art'){delete cur.color;delete cur.colTry;colQ.delete(cur.id)}drawItem()}});
 $('#shade').onclick=closeItem;
@@ -962,6 +1013,7 @@ document.addEventListener('click',e=>{
   const g=e.target.closest('[data-g]'),s=e.target.closest('[data-s]'),v=e.target.closest('[data-v]'),row=e.target.closest('main [data-id]'),m=e.target.closest('[data-m]'),cs=e.target.closest('[data-cs]'),op=e.target.closest('[data-open]');
   if(cs){const it=st.items.find(i=>i.id===$('#stage .c0')?.dataset.id);if(it)upd(()=>{setSt(it,cs.dataset.cs)},`Marked ${S[cs.dataset.cs].toLowerCase()}`);return}
   if(op){openItem(op.dataset.open);return}
+  if(e.target.closest('[data-bulk],[data-m="bulk"]')){$('#menu').open=false;startBulk();return}
   const pg=e.target.closest('main [data-pg]'),pt=e.target.closest('main [data-pt]'),nx=e.target.closest('[data-nx]'),ly=e.target.closest('[data-lay]');
   if(pg){pk.g=pg.dataset.pg;pickQ=null;render();return}if(pt){pk.t=pt.dataset.pt;pickQ=null;render();return}
   if(nx){const it=st.items.find(i=>i.id===pickQ?.[0]);if(it){upd(()=>setSt(it,nx.dataset.nx),nx.dataset.nx==='done'?`Done. ${it.title} is in your diary.`:`Started ${it.title}`)}return}
@@ -976,11 +1028,11 @@ document.addEventListener('click',e=>{
   if(m){$('#menu').open=false;menu(m.dataset.m)}
   if(e.target.id==='clr')upd(()=>st.items=st.items.filter(i=>!i.sample),'Cleared sample items');
   if(e.target.closest('#pick'))pickDlg();
-  if(!e.target.closest('.add')){$('#res').classList.remove('on');$('.add').classList.remove('full')}
+  if(!e.target.closest('.add')&&!e.target.closest('dialog')){endBulk();$('#res').classList.remove('on');$('.add').classList.remove('full')}
   if(!e.target.closest('#menu'))$('#menu').open=false});
 document.addEventListener('change',e=>{if(e.target.id==='sort'){st.sort=e.target.value;save();render()}});
 document.addEventListener('keydown',e=>{const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
-  if(e.key==='Escape'){closeItem();$('#res').classList.remove('on');$('#q').blur()}
+  if(e.key==='Escape'){closeItem();endBulk();$('#res').classList.remove('on');$('#q').blur()}
   if(typing)return;
   if(e.key==='/'){e.preventDefault();$('#q').focus()}
   if(['1','2','3'].includes(e.key)){st.view=VIEWS[+e.key-1];save();render()}
@@ -1002,15 +1054,25 @@ document.addEventListener('touchend',()=>{if(!sw)return;const{tr,dx,on}=sw;sw=nu
 /* full-screen search on phones */
 const phone=()=>matchMedia('(max-width:760px)').matches;
 $('#q').addEventListener('focus',()=>{if(phone())$('.add').classList.add('full');if(!$('#q').value.trim()&&!$('#res').classList.contains('on')){hi=-1;exp.clear();showTrend()}});
-$('#qc').addEventListener('click',()=>{$('#q').value='';$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()});
+$('#qc').addEventListener('click',()=>{endBulk();$('#q').value='';$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()});
 /* quick add card */
 let qt;
-function quick(it){const q=$('#qa');q.dataset.id=it.id;$('#toast').classList.remove('on');
-  q.innerHTML=`${cover(it,'mini'+(it.type==='artist'?' round':''))}<div class="qi"><b>Added ${esc(it.title)}</b><div class="qrow"><div class="seg s2"><button type="button" data-qs="check" aria-pressed="${it.status==='check'}">Check out</button><button type="button" data-qs="again" aria-pressed="${it.status==='again'}">Revisit</button></div><input id="qby" placeholder="Recommended by" value="${esc(it.by)}" aria-label="Recommended by"></div></div><button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`;
-  q.classList.add('on');clearTimeout(qt);qt=setTimeout(()=>q.classList.remove('on'),9000)}
-$('#qa').addEventListener('click',e=>{const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(!it)return;const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.qs){setSt(it,b.dataset.qs);save();render();$('#qa').querySelectorAll('[data-qs]').forEach(x=>x.setAttribute('aria-pressed',x===b))}
+function quick(it){const q=$('#qa');q.dataset.id=it.id;$('#toast').classList.remove('on');const dn=it.status==='done'||it.status==='again';q.classList.toggle('dn',dn);
+  const mini=cover(it,'mini'+(it.type==='artist'?' round':''));
+  if(dn){const on=new Set((it.tags||[]).map(x=>x.toLowerCase())),tg=tagsFor(it.type).slice(0,10);for(const g of it.tags||[])if(!tg.some(x=>x.toLowerCase()===g.toLowerCase()))tg.unshift(g);
+    q.innerHTML=`${mini}<div class="qi"><b>${it.status==='again'?'Revisit':'Done'}: ${esc(it.title)}</b><div class="qrow"><div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}</div><select id="qera" aria-label="When">${eraOpts(it)}</select></div><div class="qtl" role="group" aria-label="Quick take">${tg.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" aria-pressed="${on.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}</div></div>${favBtn(it)}<button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`}
+  else q.innerHTML=`${mini}<div class="qi"><b>Added ${esc(it.title)}</b><div class="qrow"><div class="seg s3"><button type="button" data-qs="check" aria-pressed="${it.status==='check'}">Check out</button><button type="button" data-qs="again" aria-pressed="${it.status==='again'}">Revisit</button><button type="button" data-qs="done" aria-pressed="false">Done</button></div><input id="qby" placeholder="Recommended by" value="${esc(it.by)}" aria-label="Recommended by"></div></div><button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`;
+  q.classList.add('on');qaTimer(dn?15000:9000)}
+const qaTimer=ms=>{clearTimeout(qt);qt=setTimeout(()=>$('#qa').classList.remove('on'),ms)};
+$('#qa').addEventListener('click',e=>{const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(!it)return;const b=e.target.closest('button');if(!b)return;if($('#qa').classList.contains('dn'))qaTimer(15000);
+  const now=()=>{it.touched=new Date().toISOString();delete it.sample};
+  if(b.dataset.qs){setSt(it,b.dataset.qs);save();render();if(b.dataset.qs==='done'){quick(it);return}$('#qa').querySelectorAll('[data-qs]').forEach(x=>x.setAttribute('aria-pressed',x===b))}
+  if(b.dataset.r){const n=e.detail===0?+b.dataset.r:rateAt(b,e.clientX);it.rating=it.rating===n?0:n;now();save();render();ratePaint(b.parentNode,it.rating)}
+  if(b.dataset.tag!=null){const g=b.dataset.tag,k=g.toLowerCase(),l=it.tags||[];it.tags=l.some(x=>x.toLowerCase()===k)?l.filter(x=>x.toLowerCase()!==k):[...l,g];if(!it.tags.length)delete it.tags;now();save();render();b.setAttribute('aria-pressed',(it.tags||[]).some(x=>x.toLowerCase()===k))}
+  if(b.hasAttribute('data-fav')){toggleFav(it);save();render();b.outerHTML=favBtn(it)}
+  if(cur===it&&!b.id)drawItem();
   if(b.id==='qo'){$('#qa').classList.remove('on');openItem(it.id)}if(b.id==='qx')$('#qa').classList.remove('on')});
+$('#qa').addEventListener('change',e=>{if(e.target.id!=='qera')return;const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(!it)return;setEra(it,e.target.value);save();render();if(cur===it)drawItem();qaTimer(15000)});
 $('#qa').addEventListener('input',e=>{const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(it&&e.target.id==='qby'){it.by=e.target.value;save();render()}});
 $('#qa').addEventListener('focusin',()=>clearTimeout(qt));
 $('#qa').addEventListener('focusout',()=>{clearTimeout(qt);qt=setTimeout(()=>$('#qa').classList.remove('on'),6000)});
@@ -1045,9 +1107,27 @@ async function meta(u){const e=encodeURIComponent(u);const yt=u.match(/(?:v=|you
     const by=title.match(/^(.*) by (.*)$/);if(/soundcloud/.test(u)&&by&&!creator){title=by[1];creator=by[2]}
     return{title,creator,art:j.thumbnail_url||(yt?`https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg`:'')}}}catch(x){}}
   return yt?{art:`https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg`}:null}
-function addItem(o,open=true){const it={id:uid(),type:'album',title:'',creator:'',status:'check',by:'',note:'',url:'',art:'',rating:0,added:new Date().toISOString(),extra:{},...o};
-  st.items.unshift(it);save();if(st.stat==='done')st.stat='open';render();if(open){openItem(it.id);toast(`Added ${it.title||'link'}`)}else quick(it);
-  $('#q').value='';$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur();return it}
+function addItem(o,open=true,stay=false){const it={id:uid(),type:'album',title:'',creator:'',status:'check',by:'',note:'',url:'',art:'',rating:0,added:new Date().toISOString(),extra:{},...o};
+  st.items.unshift(it);save();if(st.stat==='done'&&it.status!=='done')st.stat='open';render();if(open){openItem(it.id);toast(`Added ${it.title||'link'}`)}else quick(it);
+  if(!stay){$('#q').value='';$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()}return it}
+// Save something already seen, heard or played straight to Done. opts: {fav:true} also hearts it, {stay:true} keeps search (or the current screen) open, {era} sets a rough when (default "Not sure when"), {rating}.
+// If it is already in the list it is marked done instead of added twice. Shows the quick card for rating, rough date, quick-take tags and the heart.
+function addDone(o,opts={}){const now=new Date().toISOString(),era=opts.era||'?';
+  const ex=st.items.find(i=>i.type===o.type&&((o.url&&i.url===o.url)||(simp(i.title)===simp(o.title)&&simp(i.creator)===simp(o.creator))));
+  if(bulk)bulkN++;
+  if(ex){if(ex.status!=='done'&&ex.status!=='again'){setSt(ex,'done');if(opts.era)setEra(ex,opts.era)}if(opts.fav)ex.fav=true;if(opts.rating&&!ex.rating)ex.rating=opts.rating;ex.touched=now;delete ex.sample;save();render();if(cur===ex)drawItem();quick(ex);
+    if(!opts.stay){$('#q').value='';$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()}return ex}
+  const it=addItem({...o,status:'done',touched:now,doneAt:era==='now'?now:eraISO(era),...(era==='now'?{}:{era}),...(opts.fav?{fav:true}:{}),...(opts.rating?{rating:opts.rating}:{})},false,!!opts.stay);
+  findSpotify(it);return it}
+/* backfill mode: search and tap through many past favorites in a row */
+let bulk=false,bulkN=0;
+function startBulk(){bulk=true;bulkN=0;document.body.classList.add('bulk');$('#q').value='';hi=-1;exp.clear();$('#q').focus();if(phone())$('.add').classList.add('full');showTrend()}
+function endBulk(){if(!bulk)return;bulk=false;document.body.classList.remove('bulk')}
+const bulkBar=()=>`<div class="bk"><div><b>Adding things you’ve already done</b><span>Search, then tap a result to save it to Done. Tap ♥ to save it as an all-time favorite.${bulkN?` ${bulkN} added so far.`:''} Have Letterboxd? <button type="button" class="lk" data-m="lbx">Import it</button></span></div><button type="button" data-bkx>Finish</button></div>`;
+function refreshRes(){const q=$('#q').value.trim(),sc=$('#res').scrollTop;if(!q)showTrend();else if(!isUrl(q))showRes(localGroups(q),lastNote);$('#res').scrollTop=sc;if(!phone()){$('#q').focus();$('#q').select()}}
+function resRow(x,i){const b=`<button type="button" data-i="${i}" class="${i===hi?'hi':''}${x.more?' more':''}">${x.it?cover(x.it,'mini'):''}<div><div>${esc(x.label)}</div><small>${esc(x.sub||'')}</small></div></button>`;
+  if(!x.add||!x.it)return b;
+  return `<div class="rw">${b}<button type="button" class="sd" data-sd="${i}" ${bulk?'aria-label="Save as a favorite" title="Done and favorite"':'title="Already seen, heard or played it? Save it straight to Done"'}>${bulk?heartSvg(0)+'Fave':'Seen it'}</button></div>`}
 async function addUrl(u){const d=fromUrl(u);const it=addItem({type:d.type,title:'Loading '+d.src+' link…',url:u,spotify:/spotify\.com/.test(u)?u:''},false);
   const m=await meta(u);it.title=m?.title||(d.src+' link');if(m?.creator)it.creator=m.creator;if(m?.art)it.art=m.art;
   save();render();if(cur===it)drawItem();if($('#qa').dataset.id===it.id&&$('#qa').classList.contains('on'))quick(it)}
@@ -1056,13 +1136,15 @@ let rs=[],hi=0,timer,seq=0,exp=new Set(),sf='all';
 let lastNote='';
 function showRes(groups,note){lastNote=note||'';const r=$('#res');rs=[];let html='';
   for(const [h,items] of groups){if(!items.length)continue;html+=h?`<h6>${h}</h6>`:'<hr>';
-    for(const x of items){rs.push(x);html+=`<button type="button" data-i="${rs.length-1}" class="${rs.length-1===hi?'hi':''}${x.more?' more':''}">${x.it?cover(x.it,'mini'):''}<div><div>${esc(x.label)}</div><small>${esc(x.sub||'')}</small></div></button>`}}
+    for(const x of items){rs.push(x);html+=resRow(x,rs.length-1)}}
   const ch=groups.chips?`<div class="sf" role="group" aria-label="Search in">${G.map(([k,l])=>`<button type="button" data-sf="${k}" aria-pressed="${sf===k}">${l}</button>`).join('')}</div>`:'';
-  r.innerHTML=ch+(note?`<div class="note">${note}</div>`:'')+html;r.classList.toggle('on',!!html)}
+  r.innerHTML=(bulk?bulkBar():'')+ch+(note?`<div class="note">${note}</div>`:'')+html;r.classList.toggle('on',!!html||bulk)}
 $('#res').addEventListener('click',e=>{const f=e.target.closest('[data-sf]');if(f){setTimeout(()=>{sf=f.dataset.sf;hi=0;const q=$('#q').value.trim();if(!q){showTrend();$('#res').scrollTop=0;$('#q').focus();return}showRes(localGroups(q),lastNote);$('#res').scrollTop=0;if(q.length>1&&!isUrl(q))search(q,seq);$('#q').focus()},0);return}
-  const b=e.target.closest('[data-i]');if(!b)return;const x=rs[+b.dataset.i];if(x?.more||x?.go){e.preventDefault();setTimeout(()=>pick(x),0);return}pick(x)});
+  const sd=e.target.closest('[data-sd]');if(sd){const x=rs[+sd.dataset.sd];if(x?.add){e.preventDefault();if(bulk)setTimeout(()=>{addDone(x.add,{stay:true,fav:true});refreshRes()},0);else addDone(x.add)}return}
+  if(e.target.closest('[data-bkx]')){endBulk();$('#q').value='';closeSearch();return}
+  const b=e.target.closest('[data-i]');if(!b)return;const x=rs[+b.dataset.i];if(x?.more||x?.go||(bulk&&x?.add)){e.preventDefault();setTimeout(()=>pick(x),0);return}pick(x)});
 function more(x){const i=rs.indexOf(x);exp.add(x.more);const sc=$('#res').scrollTop;hi=i;if(!$('#q').value.trim())showTrend();else showRes(localGroups($('#q').value.trim()),lastNote);$('#res').scrollTop=sc;$('#q').focus()}
-function pick(x){if(!x)return;if(x.more)return more(x);if(x.ext){window.open(x.ext,'_blank','noopener');return}if(x.go){sf=x.go;hi=0;const q=$('#q').value.trim();showRes(localGroups(q),lastNote);$('#res').scrollTop=0;search(q,seq);return}if(x.open){openItem(x.open);$('#res').classList.remove('on');$('#q').value=''}else if(x.url)addUrl(x.url);else{const it=addItem(x.add,!x.it);findSpotify(it)}}
+function pick(x){if(!x)return;if(x.more)return more(x);if(x.ext){window.open(x.ext,'_blank','noopener');return}if(x.go){sf=x.go;hi=0;const q=$('#q').value.trim();showRes(localGroups(q),lastNote);$('#res').scrollTop=0;search(q,seq);return}if(x.open){openItem(x.open);$('#res').classList.remove('on');$('#q').value=''}else if(x.url)addUrl(x.url);else if(bulk){addDone(x.add,{stay:true});refreshRes()}else{const it=addItem(x.add,!x.it);findSpotify(it)}}
 /* resolve direct Spotify links: Deezer match, then song.link (about 10 lookups a minute, so queued) */
 const spQ=[];let spBusy=false;
 const simp=x=>(x||'').toLowerCase().replace(/\(.*?\)|\[.*?\]|feat\..*$| - .*$/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -1167,12 +1249,87 @@ function menu(k){
   if(k==='import')$('#file').click();
   if(k==='poster')posterDlg();
   if(k==='account')accountDlg();
+  if(k==='lbx')lbDlg();
   if(k==='settings'){dlg(`<h3>Settings</h3><p>Free API keys turn on extra lookups. They stay in this browser. TMDB powers film search and where to watch (themoviedb.org, Settings, API). RAWG powers game search. YouTube adds YouTube results to live set search.</p><label for="tk" style="font-size:13px;color:var(--mut)">TMDB API key</label><input id="tk" value="${esc(st.tmdb)}" autocomplete="off"><label for="rg" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Country</label><input id="rg" value="${esc(st.region)}" maxlength="2" style="width:80px;text-transform:uppercase"><label for="rk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">RAWG API key, for game search (free at rawg.io/apidocs)</label><input id="rk" value="${esc(st.rawg||'')}" autocomplete="off"><label for="yk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">YouTube API key, for live set search on YouTube</label><input id="yk" value="${esc(st.yt||'')}" autocomplete="off"><label for="ok" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">OMDb API key, for Rotten Tomatoes, IMDb and Metacritic scores (free at omdbapi.com)</label><input id="ok" value="${esc(st.omdb||'')}" autocomplete="off"><p style="font-size:13px;color:var(--mut);margin-top:16px">Setting up another device? Copy a setup link, send it to yourself, and open it there. It holds your keys, so keep it private.</p><button class="btn" id="tl" type="button">Copy setup link</button><input id="tlo" readonly style="display:none;margin-top:8px"><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn pri" id="ts">Save</button></div>`);
     $('#tl').onclick=async()=>{const u=location.origin+location.pathname+'#setup='+encodeURIComponent(JSON.stringify({t:$('#tk').value.trim(),r:($('#rg').value.trim()||'US').toUpperCase(),g:$('#rk').value.trim(),y:$('#yk').value.trim(),o:$('#ok').value.trim()}));const o=$('#tlo');o.value=u;o.style.display='block';o.select();try{await navigator.clipboard.writeText(u);toast('Setup link copied')}catch(e){toast('Copy the link shown below')}};
     $('#ts').onclick=()=>{st.tmdb=$('#tk').value.trim();st.region=($('#rg').value.trim()||'US').toUpperCase();st.rawg=$('#rk').value.trim();st.yt=$('#yk').value.trim();st.omdb=$('#ok').value.trim();save();$('#dlg').close();toast('Settings saved');if(cur){loadWatch(cur,true);loadInfo(cur);loadScores(cur);drawItem()}}}
 }
 $('#file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());const inc=(j.items||[]).filter(i=>i.id&&i.title&&T[i.type]);const have=new Set(st.items.map(i=>i.id));
   upd(()=>st.items=[...inc.filter(i=>!have.has(i.id)),...st.items],`Imported ${inc.filter(i=>!have.has(i.id)).length} items`)}catch(x){toast('That file isn’t a backup from this app')}e.target.value=''});
+
+/* Letterboxd import: pick the export .zip (or the CSV files inside). Watched, rated and logged films go to Done with ratings, tags and watch dates.
+   Profile favorites (and, if chosen, liked films) get the heart; the watchlist can go to Check out. Films already in the list are updated, not doubled. */
+async function unzip(buf){const v=new DataView(buf),u8=new Uint8Array(buf),out={},td=new TextDecoder();let e=-1;
+  for(let i=buf.byteLength-22;i>=Math.max(0,buf.byteLength-65557);i--)if(v.getUint32(i,true)===0x06054b50){e=i;break}
+  if(e<0)throw new Error('zip');const n=v.getUint16(e+10,true);let p=v.getUint32(e+16,true);
+  for(let k=0;k<n;k++){if(v.getUint32(p,true)!==0x02014b50)break;const m=v.getUint16(p+10,true),cs=v.getUint32(p+20,true),nl=v.getUint16(p+28,true),xl=v.getUint16(p+30,true),cl=v.getUint16(p+32,true),lo=v.getUint32(p+42,true),name=td.decode(u8.subarray(p+46,p+46+nl));p+=46+nl+xl+cl;
+    if(!/\.csv$/i.test(name))continue;const at=lo+30+v.getUint16(lo+26,true)+v.getUint16(lo+28,true),raw=u8.subarray(at,at+cs);
+    if(m===0)out[name]=td.decode(raw);else if(m===8){if(!window.DecompressionStream)throw new Error('nozip');out[name]=await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text()}}
+  return out}
+function csvRows(t){const rows=[];let row=[],f='',q=false;t=t.replace(/^\uFEFF/,'');
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;else if(c===','){row.push(f);f=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);f='';if(row.length>1||row[0])rows.push(row);row=[]}else f+=c}
+  if(f||row.length){row.push(f);rows.push(row)}
+  const h=(rows.shift()||[]).map(x=>x.trim());return rows.map(r=>Object.fromEntries(h.map((k,j)=>[k,(r[j]||'').trim()])))}
+function lbParse(files){const F={};
+  for(const [path,text] of Object.entries(files)){const p=path.replace(/\\/g,'/').toLowerCase();if(/(^|\/)(deleted|orphaned)\//.test(p))continue;
+    const parts=p.split('/'),b=parts.pop(),d=parts.pop()||'',k=b==='films.csv'?(d==='likes'||!d?'likes':''):d==='lists'||d==='likes'?'':b.replace('.csv','');
+    if(['watched','ratings','diary','likes','watchlist','profile','reviews'].includes(k))F[k]=(F[k]||[]).concat(csvRows(text))}
+  const M=new Map(),get=r=>{const n=r.Name;if(!n)return null;const k=simp(n)+'|'+(r.Year||'');if(!M.has(k))M.set(k,{title:n,year:r.Year||'',uri:'',seen:false,rating:0,dates:[],tags:new Set(),logged:''});return M.get(k)};
+  for(const r of F.watched||[]){const x=get(r);if(x){x.seen=true;x.uri=x.uri||r['Letterboxd URI'];x.logged=r.Date||x.logged}}
+  for(const r of F.ratings||[]){const x=get(r);if(x){x.seen=true;x.rating=+r.Rating||x.rating;x.uri=x.uri||r['Letterboxd URI']}}
+  for(const r of [...(F.diary||[]),...(F.reviews||[])]){const x=get(r);if(!x)continue;x.seen=true;if(r['Watched Date'])x.dates.push(r['Watched Date']);if(!x.rating&&+r.Rating)x.rating=+r.Rating;for(const g of (r.Tags||'').split(','))if(g.trim())x.tags.add(g.trim())}
+  for(const r of F.likes||[]){const x=get(r);if(x){x.like=true;x.uri=x.uri||r['Letterboxd URI']}}
+  for(const r of F.watchlist||[]){const x=get(r);if(x){x.wl=true;x.uri=x.uri||r['Letterboxd URI'];x.wlDate=r.Date}}
+  const top=new Set((F.profile?.[0]?.['Favorite Films']||'').split(/[,\s]+/).filter(Boolean));
+  for(const x of M.values())if(x.uri&&top.has(x.uri))x.top=true;
+  return [...M.values()]}
+const lbISO=d=>/^\d{4}-\d{2}-\d{2}$/.test(d||'')?new Date(d+'T12:00:00').toISOString():'';
+function lbApply(films,o){let add=0,up=0;const now=new Date().toISOString(),list=[];
+  for(const x of films){const seen=x.seen||!!x.rating||x.dates.length>0;if(!seen&&!(o.wl&&x.wl))continue;
+    const fav=x.top||(o.likes&&x.like),last=lbISO([...x.dates].sort().pop()),tags=[...x.tags].map(g=>g[0].toUpperCase()+g.slice(1));
+    const ex=st.items.find(i=>i.type==='movie'&&simp(i.title)===simp(x.title)&&(!x.year||!i.extra?.year||String(i.extra.year)===x.year))||list.find(i=>simp(i.title)===simp(x.title)&&i.extra.year===x.year);
+    if(ex){let ch=false;
+      if(seen&&ex.status!=='done'&&ex.status!=='again'){ex.status='done';ch=true}
+      if(seen&&(!ex.doneAt||(ex.era&&last))){if(last){ex.doneAt=last;delete ex.era}else{ex.era='?';ex.doneAt=eraISO('?')}ch=true}
+      if(x.rating&&!ex.rating){ex.rating=x.rating;ch=true}if(fav&&!ex.fav){ex.fav=true;ch=true}
+      if(tags.length){const h=new Set((ex.tags||[]).map(t=>t.toLowerCase())),nt=tags.filter(t=>!h.has(t.toLowerCase()));if(nt.length){ex.tags=[...(ex.tags||[]),...nt];ch=true}}
+      if(ch&&!list.includes(ex)){ex.touched=now;delete ex.sample;up++}continue}
+    const it={id:uid(),type:'movie',title:x.title,creator:'',status:seen?'done':'check',by:'',note:'',url:x.uri||'',art:'',rating:x.rating||0,added:lbISO(x.logged||x.wlDate)||now,extra:x.year?{year:x.year}:{},lb:1};
+    if(seen){if(last)it.doneAt=last;else{it.era='?';it.doneAt=eraISO('?')}}
+    if(fav)it.fav=true;if(tags.length)it.tags=tags;list.push(it);add++}
+  st.items=[...list,...st.items];return{add,up}}
+let lbFilms=null;
+function lbDlg(){lbFilms=null;dlg(`<h3>Import from Letterboxd</h3><p>On letterboxd.com, open Settings, then Data, then Export your data. You get a .zip file. Pick that file here, or the CSV files inside it.</p><div id="lbs"></div><div class="dbtn"><button class="btn" data-close>Close</button><button class="btn pri" id="lbp">Choose file</button></div>`);
+  $('#lbp').onclick=()=>{if(lbFilms?.length)lbGo();else $('#lbfile').click()}}
+function lbSum(){const f=lbFilms,s=$('#lbs');if(!s)return;if(!f.length){s.innerHTML='<p class="wn">No films found in that file. Pick the .zip from Letterboxd, or watched.csv inside it.</p>';return}
+  const isSeen=x=>x.seen||!!x.rating||x.dates.length>0,seen=f.filter(isSeen),rated=seen.filter(x=>x.rating).length,top=f.filter(x=>x.top).length,likes=f.filter(x=>x.like&&!x.top).length,wl=f.filter(x=>x.wl&&!isSeen(x)).length;
+  s.innerHTML=`<p><b style="color:var(--ink)">${seen.length} watched film${seen.length===1?'':'s'}</b>${rated?`, ${rated} rated`:''}${top?`, ${top} profile favorite${top>1?'s':''} (these get the heart)`:''}. They go to Done with your ratings, tags and watch dates. Films already in Checkit are updated, not added twice.</p>
+   ${likes?`<label class="ck"><input type="checkbox" id="lbl"> Also heart the ${likes} film${likes>1?'s':''} you liked</label>`:''}
+   ${wl?`<label class="ck"><input type="checkbox" id="lbw" checked> Add the ${wl} film${wl>1?'s':''} on your watchlist to Check out</label>`:''}
+   <p class="wn">Posters fill in over the next few minutes while Checkit is open${st.tmdb?'':'. A free TMDB key in Settings makes this much faster'}.</p>`;
+  $('#lbp').textContent='Import'}
+function lbGo(){const o={likes:!!$('#lbl')?.checked,wl:!!$('#lbw')?.checked},before=JSON.stringify(st.items),r=lbApply(lbFilms,o);lbFilms=null;
+  st.view='diary';st.grp='all';try{history.replaceState(null,'','#diary')}catch(x){}save();render();$('#dlg').close();window.scrollTo(0,0);
+  toast(`Imported ${r.add} film${r.add===1?'':'s'}${r.up?`, updated ${r.up}`:''}`,()=>{st.items=JSON.parse(before);save();render()});artSoon()}
+$('#lbfile').addEventListener('change',async e=>{const fs=[...e.target.files];e.target.value='';if(!fs.length)return;const s=$('#lbs');if(s)s.innerHTML='<p>Reading…</p>';
+  try{const files={};for(const f of fs){if(/\.zip$/i.test(f.name)||/zip/.test(f.type))Object.assign(files,await unzip(await f.arrayBuffer()));else files[f.name]=await f.text()}
+    lbFilms=lbParse(files);lbSum()}
+  catch(x){if(s)s.innerHTML=`<p class="wn">${x?.message==='nozip'?'This browser can’t open .zip files. Unzip it first, then pick watched.csv, ratings.csv, diary.csv, watchlist.csv and likes/films.csv.':'That doesn’t look like a Letterboxd export. Pick the .zip file from Letterboxd.'}</p>`}});
+/* posters for imported films: TMDB if there's a key (fast), otherwise iTunes (slow, about 20 a minute) */
+let artBusy=false;
+const artSoon=()=>{if(!artBusy){artBusy=true;setTimeout(artRun,1500)}};
+async function artRun(){const l=st.items.filter(i=>i.lb&&i.type==='movie'&&!i.art&&!(i.artTry&&Date.now()-i.artTry<7*864e5));let n=0;
+  for(const it of l){if(!st.items.includes(it)||it.art)continue;try{await findArt(it)}catch(e){}if(!it.art)it.artTry=Date.now();else delete it.artTry;
+    if(++n%8===0){save();later()}await new Promise(r=>setTimeout(r,st.tmdb?250:3200))}
+  if(n){save();later()}artBusy=false}
+async function findArt(it){const y=it.extra?.year||'',t=simp(it.title);
+  if(st.tmdb){let j=await tmdbGet(`search/movie?query=${encodeURIComponent(it.title)}${y?'&year='+y:''}`);if(!j.results?.length&&y)j=await tmdbGet(`search/movie?query=${encodeURIComponent(it.title)}`);
+    const r=j.results?.[0];if(r){it.tmdbId=r.id;if(r.poster_path)it.art=`https://image.tmdb.org/t/p/w500${r.poster_path}`}return}
+  const j=await jsonp(`https://itunes.apple.com/search?term=${encodeURIComponent(it.title)}&media=movie&entity=movie&limit=6`),l=j.results||[];
+  const r=l.find(x=>simp(x.trackName)===t&&(!y||yr(x.releaseDate)===y))||l.find(x=>simp(x.trackName)===t)||(y?l.find(x=>yr(x.releaseDate)===y):null);if(r?.artworkUrl100)it.art=big(r.artworkUrl100)}
 
 document.addEventListener('error',e=>{const t=e.target;if(t.tagName==='IMG'&&t.parentNode?.classList.contains('cv')){t.parentNode.classList.remove('hasimg');t.remove()}},true);
 // ---- Account and sync (Supabase). Local-first: the app works without signing in; signed in, items sync across devices.
@@ -1248,6 +1405,7 @@ addEventListener('online',()=>{if(sbUser)syncSoon(300)});
 setInterval(()=>{if(sbUser&&document.visibilityState==='visible')sync()},120000);
 render();
 setTimeout(()=>st.items.filter(i=>!i.sample).forEach(i=>findSpotify(i)),3000);
+setTimeout(artSoon,5000);
 }
 </script>
 </body>
