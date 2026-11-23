@@ -1167,17 +1167,17 @@ async function accountDlg(){
     dlg(`<h3>Account and sync</h3><p>Signed in as <b>${esc(sbUser.email||'')}</b>. Your items sync with every device where you sign in.</p><p style="font-size:13px;color:var(--mut)">${syncErr?'Last sync failed: '+esc(syncErr):t?'Last synced at '+t+'.':'Not synced yet.'} API keys in Settings stay on this device.</p><div class="dbtn"><button class="btn" id="so">Sign out</button><button class="btn" data-close>Close</button><button class="btn pri" id="sn">Sync now</button></div>`);
     $('#sn').onclick=async()=>{$('#sn').disabled=true;$('#sn').textContent='Syncing…';await sync();$('#dlg').close();toast(syncErr?'Sync failed. Try again in a bit':'Synced')};
     $('#so').onclick=async()=>{await sync();await sb.auth.signOut();sbUser=null;ss={uid:'',last:'',base:{},mt:{}};saveSS();menuLabel();$('#dlg').close();toast('Signed out. Your items stay on this device')};return}
-  dlg(`<h3>Sign in to sync</h3><p>Use your email to keep your list in sync on your phone and computer. We’ll email you a code. Everything already on this device is added to your account.</p><label for="em" style="font-size:13px;color:var(--mut)">Email</label><input id="em" type="email" autocomplete="email" inputmode="email"><div id="cw" hidden><label for="oc" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Code from the email</label><input id="oc" inputmode="numeric" autocomplete="one-time-code" maxlength="10"></div><p id="am" style="font-size:13px;color:var(--mut);min-height:1em"></p><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn pri" id="ag">Send code</button></div>`);
-  let sent=false;const msg=t=>$('#am').textContent=t;
-  $('#ag').onclick=async()=>{const email=$('#em').value.trim(),b=$('#ag');if(!/^\S+@\S+\.\S+$/.test(email)){msg('Enter your email address.');return}
-    b.disabled=true;
-    if(!sent){msg('Sending…');const {error}=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:true}});b.disabled=false;
-      if(error){msg(/rate|limit|seconds/i.test(error.message)?'Too many emails just now. Wait a minute and try again.':error.message);return}
-      sent=true;$('#cw').hidden=false;$('#em').readOnly=true;b.textContent='Sign in';msg('Check your email for the code.');$('#oc').focus();return}
-    const token=$('#oc').value.replace(/\D/g,'');if(token.length<6){b.disabled=false;msg('Enter the code from the email.');return}
-    msg('Signing in…');const {data,error}=await sb.auth.verifyOtp({email,token,type:'email'});b.disabled=false;
-    if(error){msg('That code didn’t work. Check it, or wait and send a new one.');return}
-    sbUser=data.user;menuLabel();$('#dlg').close();toast('Signed in. Syncing…');sync()}}
+  dlg(`<h3>Sign in to sync</h3><p>Keep your list in sync on your phone and computer. Everything already on this device is added to your account.</p><label for="em" style="font-size:13px;color:var(--mut)">Email</label><input id="em" type="email" autocomplete="username" inputmode="email"><label for="pw" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Password</label><input id="pw" type="password" autocomplete="current-password"><p id="am" style="font-size:13px;color:var(--mut);min-height:1em"></p><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn" id="au">Create account</button><button class="btn pri" id="ag">Sign in</button></div>`);
+  const msg=t=>$('#am').textContent=t,vals=()=>{const email=$('#em').value.trim(),password=$('#pw').value;if(!/^\S+@\S+\.\S+$/.test(email)){msg('Enter your email address.');return null}if(password.length<6){msg('Passwords need at least 6 characters.');return null}return{email,password}};
+  const busy=on=>{$('#ag').disabled=$('#au').disabled=on};
+  const done=u=>{sbUser=u;menuLabel();$('#dlg').close();toast('Signed in. Syncing…');sync()};
+  $('#ag').onclick=async()=>{const v=vals();if(!v)return;busy(true);msg('Signing in…');const {data,error}=await sb.auth.signInWithPassword(v);busy(false);
+    if(error){msg(/confirm/i.test(error.message)?'Confirm your email first: open the link we sent, then sign in here.':/invalid/i.test(error.message)?'Wrong email or password. New here? Tap Create account.':error.message);return}done(data.user)};
+  $('#au').onclick=async()=>{const v=vals();if(!v)return;busy(true);msg('Creating your account…');const {data,error}=await sb.auth.signUp({...v,options:{emailRedirectTo:location.origin+location.pathname}});busy(false);
+    if(error){msg(/registered|exists/i.test(error.message)?'That email already has an account. Tap Sign in.':/rate|limit|seconds/i.test(error.message)?'Too many sign-ups just now. Try again in a bit.':error.message);return}
+    if(data.session)return done(data.user);
+    $('#pw').autocomplete='new-password';msg('Check your email and open the confirmation link. Then come back here and tap Sign in.')}}
+if(/^#.*(access_token|error_description)=/.test(location.hash)){const ok=!/error_description=/.test(location.hash);history.replaceState(null,'',location.pathname+location.search);setTimeout(()=>toast(ok?'Email confirmed. Sign in from More to start syncing':'That link expired. Sign in from More'),400)}
 menuLabel();
 if(sbOn()&&hasSession())sbLoad().catch(()=>{});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&sbUser)syncSoon(300)});
