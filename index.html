@@ -558,6 +558,8 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
 .ba button{height:32px;border:1px solid var(--rule);border-radius:6px;font-size:12.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
 .ba button:hover{border-color:var(--ink)}
 .ba button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bp,.bm{cursor:pointer}.bp img{transition:opacity .15s}.bp:hover img{opacity:.88}
+.dr .bpa{margin-top:0;padding-top:0;gap:8px}.dr .bpa button{height:42px;font-size:14px}.dr .bpa button span{display:inline}
 .bf{text-align:center;color:var(--mut);padding:28px 0 8px}
 .bf .btn{margin:10px 4px 0}
 @media(max-width:760px){.tabs{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -578,7 +580,7 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-13</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-14</small>
     </div></details>
   </div>
 </header>
@@ -1387,7 +1389,23 @@ function drawBrowse(){const v=$('#view'),k=brKey();if(v.dataset.bk===k&&v.queryS
   <div class="bct"><div class="bch" role="group" aria-label="List">${BRL[t].map(([x,n])=>`<button type="button" data-bl="${x}" aria-pressed="${x===s.l}">${n}</button>`).join('')}</div>${f?`<div class="bsel">${f.includes('g')?`<select data-bf="g" aria-label="Genre"><option value="">All genres</option>${BRG[t].map(([id,n])=>`<option value="${id}"${String(s.g)===String(id)?' selected':''}>${n}</option>`).join('')}</select>`:''}${f.includes('d')?`<select data-bf="d" aria-label="Decade"><option value="">${t==='album'?'All decades':'All time'}</option>${brDec(t==='game'?1980:t==='album'?1960:1950).map(y=>`<option value="${y}"${+s.d===y?' selected':''}>${y}s</option>`).join('')}</select>`:''}</div>`:''}</div>
   <p class="bh">+ adds it to Up next. ✓ marks it done if you’ve already ${vb} it.</p><div class="bg${t==='album'?' sq':t==='game'?' w':''}" id="bgrid"></div><div id="bfoot"></div></div>`;
   if(BRC[k]?.items.length||BRC[k]?.busy){brGrid();brFoot();brCovers()}else brLoad(k)}
-function brObj(r){const o={type:r.type,title:r.title,creator:r.creator||'',art:r.art||'',url:r.url||'',extra:{...(r.extra||{})}};if(r.tmdbId)o.tmdbId=r.tmdbId;return o}
+function brObj(r){const o={type:r.type,title:r.title,creator:r.creator||'',art:r.art||'',url:r.url||'',extra:{...(r.extra||{})}};if(r.tmdbId)o.tmdbId=r.tmdbId;
+  const p=brPv?.pv===r?brPv:null;if(p){if(p.tmdbId)o.tmdbId=p.tmdbId;if(p.info&&!p.info.none)o.info=p.info;if(p.watch&&!p.watch.err)o.watch=p.watch;if(p.creator&&!o.creator)o.creator=p.creator;if(p.extra)o.extra={...p.extra,...o.extra}}return o}
+/* browse preview: tap a cover to see details before adding. Details load only for the tapped item and are kept only if it gets added. */
+let brPv=null;
+function brOpen(r){brIndex();const h=brHave(r);if(h){openItem(h.id);return}
+  const it=brPv={id:'pv'+uid(),status:'',rating:0,by:'',note:'',...brObj(r),pv:r};try{getColor(it)}catch(e){}
+  if(!$('#dr').classList.contains('on'))layer('item');cur=null;$('#dr').classList.add('on');$('#shade').classList.add('on');brPvDraw();$('#dr').scrollTop=0;
+  (async()=>{const w=loadWatch(it);try{await loadInfo(it)}catch(e){}if(!it.info)it.info={at:0,none:1};brPvDraw();await w;brPvDraw();
+    if(st.omdb&&it.info.imdb){for(let i=0;i<20&&!it.info.scores&&!it.info.sErr;i++)await new Promise(z=>setTimeout(z,300));brPvDraw()}})()}
+function brPvDraw(){const it=brPv;if(!it||cur||!$('#dr').classList.contains('on'))return;const sh=shape(it.type),meta=[T[it.type],it.extra?.year,it.extra?.platforms].filter(Boolean).map(esc).join(', ');
+  const keep=[...$('#dr').querySelectorAll('.syn.open')].length;
+  $('#dr').innerHTML=`<div class="ip ${sh}" style="${cs(it)}"><button class="x" data-bpx aria-label="Close">×</button>
+   <div class="hero">${cover(it,'big ini'+(sh==='p'?' pp':sh==='w'?' ww':''))}<div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)}</h2>${it.creator?`<p>${esc(it.creator)}</p>`:''}</div></div>
+   <div class="ba bpa">${brAct(it.pv)}</div>${infoBlock({...it,info:it.info&&{...it.info,sl:null}})}${watchBlock(it)}</div>`;
+  if(keep)$('#dr .syn')?.classList.add('open')}
+$('#dr').addEventListener('click',e=>{if(cur||!brPv)return;if(e.target.closest('[data-bpx]')){closeItem();return}const a=e.target.closest('[data-ba]');if(!a)return;
+  const r=brPv.pv;brIndex();const h=brHave(r);closeItem();if(h){openItem(h.id);return}brDo(r,a.dataset.ba)});
 function brDo(r,a){brIndex();const h=brHave(r),nx=!!h&&h.status!=='done',dn=!!h&&(h.status==='done'||h.status==='again');
   if(h&&((a==='next'&&nx)||(a==='done'&&dn))){openItem(h.id);return}
   if(h){upd(()=>setSt(h,a==='done'?'done':'again'),a==='done'?`Marked ${h.title} done`:`${h.title} is back in Up next to revisit`);return}
@@ -1401,7 +1419,8 @@ $('#view').addEventListener('click',e=>{if(st.view!=='browse')return;const k=$('
   if(b('[data-bmore]')){brLoad(k,true);return}
   if(b('[data-bset]')){menu('settings');return}
   if(b('[data-bretry]')){const c=BRC[k];if(c){c.err=0;if(!c.items.length)delete BRC[k];else c.more=true}if(!BRC[k])brLoad(k);else brLoad(k,true);return}
-  if(ba){const r=BRC[k]?.items[+ba.closest('[data-bi]').dataset.bi];if(r)brDo(r,ba.dataset.ba)}});
+  if(ba){const r=BRC[k]?.items[+ba.closest('[data-bi]').dataset.bi];if(r)brDo(r,ba.dataset.ba);return}
+  const bo=b('#bgrid .bp,#bgrid .bm');if(bo){const r=BRC[k]?.items[+bo.closest('[data-bi]').dataset.bi];if(r)brOpen(r)}});
 $('#view').addEventListener('change',e=>{const f=e.target.closest('[data-bf]');if(!f||st.view!=='browse')return;brState()[1][f.dataset.bf]=f.value;saveLocal();drawBrowse()});
 $('#dlg').addEventListener('close',()=>{if(st.view==='browse')drawBrowse()});
 function localGroups(q){const ql=q.toLowerCase();
