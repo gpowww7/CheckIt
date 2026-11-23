@@ -514,6 +514,7 @@ body.bulk .qa{z-index:60}body.bulk .toast{z-index:61}
 .ip .x.fv{right:102px;display:grid;place-items:center}.ip .x.fv svg{width:21px;height:21px}
 .stub .sm em.fv{text-decoration:none}
 .seg.s3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.qa .seg.qg{width:220px;margin:0 0 8px}.qa .seg.qg button{min-height:30px;font-size:13px}
 .qrow .seg.s3{width:270px}
 .qa.dn{grid-template-columns:40px minmax(0,1fr) auto auto auto}
 .qa .rate{margin:0}.qa .rate button{width:26px;height:30px;font-size:18px}
@@ -583,7 +584,7 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-16</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-17</small>
     </div></details>
   </div>
 </header>
@@ -784,7 +785,7 @@ function ratePaint(el,v){el.querySelectorAll('button[data-r]').forEach(b=>b.clas
 const rateAt=(b,x)=>{const r=b.getBoundingClientRect();return +b.dataset.r-(x-r.left<r.width/2?.5:0)};
 const md=iso=>new Date(iso).toLocaleDateString(undefined,{month:'short',day:'numeric'});
 const inGrp=(it,g)=>{const x=G.find(a=>a[0]===g)[2];return !x||x.includes(it.type)};
-const inStat=(it,s)=>s==='all'||(s==='fav'?!!it.fav:s==='open'?it.status!=='done':it.status===s);
+const inStat=(it,s)=>s==='all'||(s==='dnf'?it.status==='done'&&!!it.dnf:s==='fav'?!!it.fav:s==='open'?it.status!=='done':it.status===s);
 const hueKey=it=>{const h=col(it).replace('#','');const [r,g,b]=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255);const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;if(!d||d/(1-Math.abs(2*l-1))<.15)return 1000+(1-l)*100;let hu=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;hu=(hu*60+360)%360;return hu+l*.5};
 // Quick-take tags: a short set per type, plus the person's own tags for that type. Stored as it.tags (array of labels), so they sync with the item.
 const QT={movie:['Gripping','Funny','Moving','Dark','Gorgeous','Slow burn','Great ending','Rewatchable'],
@@ -822,7 +823,14 @@ const sorted=list=>{const l=[...list];
   else if(st.sort==='type')l.sort((a,b)=>Object.keys(T).indexOf(a.type)-Object.keys(T).indexOf(b.type)||a.title.localeCompare(b.title));
   else l.sort((a,b)=>b.added.localeCompare(a.added));return l};
 
-const STATS=[['open','Not done'],['check','Check out'],['prog','In progress'],['again','Revisit'],['done','Done'],['fav','Favorites'],['all','Everything']];
+// Games use their own status words. "Didn't finish" is status done plus it.dnf, so it syncs and counts as played everywhere.
+const SG={check:'Want to play',prog:'Playing',done:'Played – finished',again:'Revisit'};
+const sLab=(it,k=it.status)=>it?.type==='game'?(k==='done'&&it.dnf?'Played – didn’t finish':SG[k]):S[k];
+const stOpts=it=>it.type==='game'?[['check','Want to play'],['prog','Playing'],['done','Finished'],['dnf','Didn’t finish'],['again','Revisit']]:Object.entries(S);
+const stOn=(it,k)=>k==='dnf'?it.status==='done'&&!!it.dnf:k==='done'?it.status==='done'&&!it.dnf:it.status===k;
+const setSt2=(it,k)=>{if(k==='dnf'){setSt(it,'done');it.dnf=true}else{setSt(it,k);delete it.dnf}};
+const statLab=(k,l)=>st.grp==='game'?({open:'Not played',check:'Want to play',prog:'Playing',done:'Played',dnf:'Didn’t finish'}[k]||l):l;
+const STATS=[['open','Not done'],['check','Check out'],['prog','In progress'],['again','Revisit'],['done','Done'],['dnf','Didn’t finish'],['fav','Favorites'],['all','Everything']];
 const LAYOUTS=[['list','List'],['covers','Covers'],['shelf','Shelf']];
 function render(){
   document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===st.view));
@@ -838,7 +846,7 @@ function render(){
     const ty=fin.filter(i=>new Date(i.doneAt||i.touched||i.added).getFullYear()===yr0).length,back=fin.filter(i=>(i.rv||0)>=4).length,nf=fin.filter(i=>i.fav).length;
     sm.innerHTML=`<b>${fin.length} finished</b>, ${ty} this year, ${back} you would go back to${nf?`, ${nf} favorite${nf>1?'s':''}`:''}.${sample}`;drawStubs();return}
   const byStat=st.items.filter(i=>inStat(i,st.stat)),byGrp=st.items.filter(i=>inGrp(i,st.grp));
-  f.innerHTML=`<div class="fl">${G.map(([k,l])=>`<button data-g="${k}" aria-pressed="${st.grp===k}">${l}<i>${byStat.filter(i=>inGrp(i,k)).length}</i></button>`).join('')}<span class="sep"></span>${STATS.map(([k,l])=>`<button data-s="${k}" aria-pressed="${st.stat===k}">${l}<i>${byGrp.filter(i=>inStat(i,k)).length}</i></button>`).join('')}</div>
+  f.innerHTML=`<div class="fl">${G.map(([k,l])=>`<button data-g="${k}" aria-pressed="${st.grp===k}">${l}<i>${byStat.filter(i=>inGrp(i,k)).length}</i></button>`).join('')}<span class="sep"></span>${STATS.filter(([k])=>k!=='dnf'||st.grp==='game').map(([k,l])=>`<button data-s="${k}" aria-pressed="${st.stat===k}">${statLab(k,l)}<i>${byGrp.filter(i=>inStat(i,k)).length}</i></button>`).join('')}</div>
    <div class="tl"><div class="seg lay" role="group" aria-label="Layout">${LAYOUTS.map(([k,l])=>`<button type="button" data-lay="${k}" aria-pressed="${st.layout===k}">${l}</button>`).join('')}</div>
    <select id="sort" aria-label="Sort"><option value="added">Recently added</option><option value="title">Title</option><option value="type">Type</option><option value="color">Color</option><option value="revisit">Most revisitable</option></select><button class="lk" type="button" data-share>Share</button></div>`;
   $('#sort').value=st.sort;
@@ -848,12 +856,12 @@ function render(){
   if(!list.length){v.innerHTML=`<div class="empty"><b>Nothing here</b>No items match these filters.</div>`;return}
   if(st.layout==='covers'){
     v.innerHTML=`<div class="wall" id="wall">${list.map(it=>{const c=cover(it,shape(it.type));
-      return c.replace('<div class="cv','<div tabindex="0" data-id="'+it.id+'" class="cv').replace(/<\/div>$/,`${it.fav?'<span class="fvb" aria-hidden="true">♥</span>':''}<div class="hv"><b>${esc(it.title)}${favMark(it)}</b>${esc(it.creator||T[it.type])}<br><span class="st ${it.status}">${S[it.status]}</span></div></div>`)}).join('')}</div>`;
+      return c.replace('<div class="cv','<div tabindex="0" data-id="'+it.id+'" class="cv').replace(/<\/div>$/,`${it.fav?'<span class="fvb" aria-hidden="true">♥</span>':''}<div class="hv"><b>${esc(it.title)}${favMark(it)}</b>${esc(it.creator||T[it.type])}<br><span class="st ${it.status}">${sLab(it)}</span></div></div>`)}).join('')}</div>`;
     sizeWall();return}
   if(st.layout==='shelf'){drawShelf(list);return}
   v.innerHTML=`<table class="ix"><thead><tr><th>Title</th><th class="hm">Type</th><th>Status</th><th class="hm">Recommended by</th><th class="hm">Rating</th><th class="n hm">Added</th></tr></thead><tbody>${list.map(it=>`<tr class="row${dust(it)>0?' dzr':''}" style="--dust:${dust(it).toFixed(2)}" data-id="${it.id}" tabindex="0">
     <td><div class="t">${cover(it,'mini'+(it.type==='artist'?' round':''))}<div><b>${esc(it.title)}${favMark(it)}</b><span>${esc(it.creator||(it.note?it.note.slice(0,60):''))}</span></div></div></td>
-    <td class="m hm">${T[it.type]}${VID.includes(it.type)&&svcs(it).length?`<br><span style="font-size:13px">${esc(svcs(it).slice(0,2).join(', '))}${svcs(it).length>2?' +'+(svcs(it).length-2):''}</span>`:''}</td><td><span class="st ${it.status}">${S[it.status]}</span></td><td class="m hm">${esc(it.by)}</td><td class="hm"><span class="stars">${stars(it.rating)}</span>${rvMini(it.rv)}</td><td class="n hm">${md(it.added)}</td></tr>`).join('')}</tbody></table>`;
+    <td class="m hm">${T[it.type]}${VID.includes(it.type)&&svcs(it).length?`<br><span style="font-size:13px">${esc(svcs(it).slice(0,2).join(', '))}${svcs(it).length>2?' +'+(svcs(it).length-2):''}</span>`:''}</td><td><span class="st ${it.status}">${sLab(it)}</span></td><td class="m hm">${esc(it.by)}</td><td class="hm"><span class="stars">${stars(it.rating)}</span>${rvMini(it.rv)}</td><td class="n hm">${md(it.added)}</td></tr>`).join('')}</tbody></table>`;
 }
 /* up next */
 let pickQ=null;
@@ -870,7 +878,7 @@ function drawNext(sample){const ids=new Set(cands().map(i=>i.id));if(!pickQ||pic
     <div class="cinfo">${ctr}<div class="mt">${T[it.type]}, ${why.toLowerCase()}${it.rv?', '+RV[it.rv-1].toLowerCase():''}</div><h2>${esc(it.title)}</h2>${it.creator?`<p class="by">${esc(it.creator)}</p>`:''}
      ${it.note?`<blockquote>${esc(it.note)}${it.by?`<cite>Recommended by ${esc(it.by)}</cite>`:''}</blockquote>`:it.by?`<blockquote><cite>Recommended by ${esc(it.by)}</cite></blockquote>`:''}
      <div class="lks">${linksFor(it)}<button class="lk" type="button" data-open="${it.id}">Open item</button></div>
-     <div class="cnav">${it.status!=='prog'?`<button type="button" class="pri" data-nx="prog">Start it</button>`:''}<button type="button" data-nx="done">Done</button><button type="button" id="cnext">Not now →</button><span class="cnum">${n} to pick from</span></div></div></section>`
+     <div class="cnav">${it.status!=='prog'?`<button type="button" class="pri" data-nx="prog">Start it</button>`:''}<button type="button" data-nx="done">${it.type==='game'?'Finished':'Done'}</button><button type="button" id="cnext">Not now →</button><span class="cnum">${n} to pick from</span></div></div></section>`
     :`<section class="crate none"><div class="cinfo">${ctr}<h2>Nothing fits that.</h2><p class="by">Try another type or length.</p></div></section>`;
   const open=st.items.filter(i=>i.status!=='done'),byAge=(a,b)=>ageDays(b)-ageDays(a);
   const chk=open.filter(i=>i.status==='check'),old=[...chk].sort(byAge).slice(0,8),oldS=new Set(old.map(i=>i.id));
@@ -931,7 +939,7 @@ function drawStubs(){const l=st.items.filter(i=>(i.status==='done'||i.status==='
   let n=0;$('#view').innerHTML=`<div class="stubs">${[...by].map(([m,arr])=>`<section><h3>${m}<span>${arr.length} finished</span></h3><div class="sgrid">${arr.map(([it,t])=>{n++;
     return `<button type="button" class="stub" data-id="${it.id}" style="${cs(it)};--rot:${(hash(it.id)%5-2)*.25}deg"><div class="sl"><span>Admit one</span><b>No. ${String(hash(it.id)%9000+1000)}</b></div>
      <div class="sr"><div class="sk">${T[it.type]}, ${it.era?esc(eraLabel(it.era).replace(/^Earlier this year$/,'This year')):new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}</div><div class="st2">${esc(it.title)}</div>${it.creator?`<div class="sc2">${esc(it.creator)}</div>`:''}
-     <div class="sm">${it.rating?`<span class="stars">${stars(it.rating)}</span>`:''}${rvMini(it.rv)}${it.status==='again'?'<em>Revisit</em>':''}${it.fav?'<em class="fv">♥ Favorite</em>':''}</div>${it.tags?.length?`<div class="stg">${it.tags.map(g=>`<span class="stp" style="--r:${hash(g.toLowerCase())%7*.6-1.8}deg">${esc(g)}</span>`).join('')}</div>`:''}${it.note?`<p>${esc(it.note)}</p>`:''}</div></button>`}).join('')}</div></section>`).join('')}</div>`}
+     <div class="sm">${it.rating?`<span class="stars">${stars(it.rating)}</span>`:''}${rvMini(it.rv)}${it.status==='again'?'<em>Revisit</em>':''}${it.type==='game'&&it.dnf?'<em>Didn’t finish</em>':''}${it.fav?'<em class="fv">♥ Favorite</em>':''}</div>${it.tags?.length?`<div class="stg">${it.tags.map(g=>`<span class="stp" style="--r:${hash(g.toLowerCase())%7*.6-1.8}deg">${esc(g)}</span>`).join('')}</div>`:''}${it.note?`<p>${esc(it.note)}</p>`:''}</div></button>`}).join('')}</div></section>`).join('')}</div>`}
 /* poster */
 const PPAL=[['Ink','#111214','#ffffff','#8396ff'],['Cobalt','#2b4bff','#ffffff','#ffd84a'],['Sun','#f2c230','#111214','#c4321f'],['Rose','#e85a71','#111214','#ffffff'],['Paper','#ffffff','#111214','#2b4bff']];
 const pst={pal:0,title:'Checkit Fest'};
@@ -1010,7 +1018,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
     <div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)||'Untitled'}</h2>${it.creator?`<p>${esc(it.creator)}</p>`:''}</div></div>
    ${links?`<div class="lks">${links}</div>`:''}
    ${infoBlock(it)}
-   <div class="seg" role="group" aria-label="Status">${Object.entries(S).map(([k,l])=>`<button type="button" data-st="${k}" aria-pressed="${it.status===k}">${l}</button>`).join('')}</div>
+   <div class="seg" role="group" aria-label="Status"${it.type==='game'?' style="grid-template-columns:repeat(5,minmax(0,1fr))"':''}>${stOpts(it).map(([k,l])=>`<button type="button" data-st="${k}" aria-pressed="${stOn(it,k)}">${l}</button>`).join('')}</div>
    <div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}<span>${it.rating?it.rating+' / 5':'Rate it'}</span></div>
    <div class="rv"><div class="rvb" role="group" aria-label="Revisit meter">${[1,2,3,4,5].map(n=>`<button type="button" data-rv="${n}" class="${n<=(it.rv||0)?'on':''}" style="height:${8+n*4}px" aria-label="${RV[n-1]}" title="${RV[n-1]}"></button>`).join('')}</div><span class="rvt">${it.rv?RV[it.rv-1]:'How much would you go back to it?'}</span></div>
    ${tagBlock(it)}
@@ -1042,7 +1050,7 @@ $('#dr').addEventListener('pointermove',e=>{const b=e.target.closest('.rate butt
 $('#dr').addEventListener('pointerout',e=>{const rt=e.target.closest('.rate');if(rt&&cur&&!rt.contains(e.relatedTarget))ratePaint(rt,cur.rating||0)});
 $('#dr').addEventListener('click',e=>{const eo=e.target.closest('.eo');if(eo){eo.classList.toggle('open');return}const sy=e.target.closest('.syn');if(sy){sy.classList.toggle('open');return}const b=e.target.closest('button');if(!b||!cur)return;
   if(b.id==='dx')closeItem();
-  else if(b.dataset.st){upd(()=>{setSt(cur,b.dataset.st)},`Marked ${S[b.dataset.st].toLowerCase()}`);drawItem()}
+  else if(b.dataset.st){const k=b.dataset.st;upd(()=>{setSt2(cur,k)},`Marked ${(cur.type==='game'?(k==='dnf'?'played – didn’t finish':SG[k]):S[k]).toLowerCase()}`);drawItem()}
   else if(b.dataset.tag!=null){const g=b.dataset.tag,k=g.toLowerCase();upd(()=>{const l=cur.tags||[];cur.tags=l.some(x=>x.toLowerCase()===k)?l.filter(x=>x.toLowerCase()!==k):[...l,g];if(!cur.tags.length)delete cur.tags;cur.touched=new Date().toISOString()});drawItem()}
   else if(b.dataset.tagadd!=null){b.hidden=true;const i=$('#tgin');i.hidden=false;i.focus()}
   else if(b.dataset.rv){const n=+b.dataset.rv;upd(()=>{cur.rv=cur.rv===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
@@ -1063,7 +1071,7 @@ $('#tundo').onclick=()=>{undoFn?.();$('#toast').classList.remove('on')};
 /* events */
 document.addEventListener('click',e=>{
   const g=e.target.closest('[data-g]'),s=e.target.closest('[data-s]'),v=e.target.closest('[data-v]'),row=e.target.closest('main [data-id]'),m=e.target.closest('[data-m]'),cs=e.target.closest('[data-cs]'),op=e.target.closest('[data-open]');
-  if(cs){const it=st.items.find(i=>i.id===$('#stage .c0')?.dataset.id);if(it)upd(()=>{setSt(it,cs.dataset.cs)},`Marked ${S[cs.dataset.cs].toLowerCase()}`);return}
+  if(cs){const it=st.items.find(i=>i.id===$('#stage .c0')?.dataset.id);if(it)upd(()=>{setSt2(it,cs.dataset.cs)},`Marked ${sLab({type:it.type},cs.dataset.cs).toLowerCase()}`);return}
   if(op){openItem(op.dataset.open);return}
   if(e.target.closest('[data-bulk],[data-m="bulk"]')){$('#menu').open=false;startBulk();return}
   const pg=e.target.closest('main [data-pg]'),pt=e.target.closest('main [data-pt]'),nx=e.target.closest('[data-nx]'),ly=e.target.closest('[data-lay]');
@@ -1102,7 +1110,7 @@ document.addEventListener('touchmove',e=>{if(!sw)return;const dx=e.touches[0].cl
 document.addEventListener('touchend',()=>{if(!sw)return;const{tr,dx,on}=sw;sw=null;if(!on)return;swiped=Date.now();
   tr.querySelectorAll('td').forEach(td=>td.style.transform='');tr.classList.remove('swp');
   const it=st.items.find(i=>i.id===tr.dataset.id);if(!it)return;
-  if(-dx>rmAt(tr))removeItem(it);else if(Math.abs(dx)>90){const ns=dx>0?'done':'again';upd(()=>{setSt(it,ns)},`Marked ${S[ns].toLowerCase()}`)}});
+  if(-dx>rmAt(tr))removeItem(it);else if(Math.abs(dx)>90){const ns=dx>0?'done':'again';upd(()=>{setSt2(it,ns)},`Marked ${sLab({type:it.type},ns).toLowerCase()}`)}});
 /* full-screen search on phones */
 const phone=()=>matchMedia('(max-width:760px)').matches;
 $('#q').addEventListener('focus',()=>{if(phone())$('.add').classList.add('full');if(!$('#q').value.trim()&&!$('#res').classList.contains('on')){hi=-1;exp.clear();showTrend()}});
@@ -1112,13 +1120,14 @@ let qt;
 function quick(it){const q=$('#qa');q.dataset.id=it.id;$('#toast').classList.remove('on');const dn=it.status==='done'||it.status==='again';q.classList.toggle('dn',dn);
   const mini=cover(it,'mini'+(it.type==='artist'?' round':''));
   if(dn){const on=new Set((it.tags||[]).map(x=>x.toLowerCase())),tg=tagsFor(it.type).slice(0,10);for(const g of it.tags||[])if(!tg.some(x=>x.toLowerCase()===g.toLowerCase()))tg.unshift(g);
-    q.innerHTML=`${mini}<div class="qi"><b>${it.status==='again'?'Revisit':'Done'}: ${esc(it.title)}</b><div class="qrow"><div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}</div><select id="qera" aria-label="When">${eraOpts(it)}</select></div><div class="qtl" role="group" aria-label="Quick take">${tg.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" style="--r:${hash(g.toLowerCase())%7*.6-1.8}deg" aria-pressed="${on.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}</div></div>${favBtn(it)}<button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`}
-  else q.innerHTML=`${mini}<div class="qi"><b>Added ${esc(it.title)}</b><div class="qrow"><div class="seg s3"><button type="button" data-qs="check" aria-pressed="${it.status==='check'}">Check out</button><button type="button" data-qs="again" aria-pressed="${it.status==='again'}">Revisit</button><button type="button" data-qs="done" aria-pressed="false">Done</button></div><input id="qby" placeholder="Recommended by" value="${esc(it.by)}" aria-label="Recommended by"></div></div><button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`;
+    q.innerHTML=`${mini}<div class="qi"><b>${it.status==='again'?'Revisit':it.type==='game'?'Played':'Done'}: ${esc(it.title)}</b>${it.type==='game'&&it.status==='done'?`<div class="seg s2 qg"><button type="button" data-qd="0" aria-pressed="${!it.dnf}">Finished</button><button type="button" data-qd="1" aria-pressed="${!!it.dnf}">Didn’t finish</button></div>`:''}<div class="qrow"><div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}</div><select id="qera" aria-label="When">${eraOpts(it)}</select></div><div class="qtl" role="group" aria-label="Quick take">${tg.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" style="--r:${hash(g.toLowerCase())%7*.6-1.8}deg" aria-pressed="${on.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}</div></div>${favBtn(it)}<button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`}
+  else q.innerHTML=`${mini}<div class="qi"><b>Added ${esc(it.title)}</b><div class="qrow"><div class="seg s3"><button type="button" data-qs="check" aria-pressed="${it.status==='check'}">${it.type==='game'?'Want to play':'Check out'}</button><button type="button" data-qs="again" aria-pressed="${it.status==='again'}">Revisit</button><button type="button" data-qs="done" aria-pressed="false">${it.type==='game'?'Played':'Done'}</button></div><input id="qby" placeholder="Recommended by" value="${esc(it.by)}" aria-label="Recommended by"></div></div><button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`;
   q.classList.add('on');qaTimer(dn?15000:9000)}
 const qaTimer=ms=>{clearTimeout(qt);qt=setTimeout(()=>$('#qa').classList.remove('on'),ms)};
 $('#qa').addEventListener('click',e=>{const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(!it)return;const b=e.target.closest('button');if(!b)return;if($('#qa').classList.contains('dn'))qaTimer(15000);
   const now=()=>{it.touched=new Date().toISOString();delete it.sample};
   if(b.dataset.qs){setSt(it,b.dataset.qs);save();render();if(b.dataset.qs==='done'){quick(it);return}$('#qa').querySelectorAll('[data-qs]').forEach(x=>x.setAttribute('aria-pressed',x===b))}
+  if(b.dataset.qd!=null){if(b.dataset.qd==='1')it.dnf=true;else delete it.dnf;now();save();render();if(cur===it)drawItem();quick(it);return}
   if(b.dataset.r){const n=e.detail===0?+b.dataset.r:rateAt(b,e.clientX);it.rating=it.rating===n?0:n;now();save();render();ratePaint(b.parentNode,it.rating)}
   if(b.dataset.tag!=null){const g=b.dataset.tag,k=g.toLowerCase(),l=it.tags||[];it.tags=l.some(x=>x.toLowerCase()===k)?l.filter(x=>x.toLowerCase()!==k):[...l,g];if(!it.tags.length)delete it.tags;now();save();render();b.setAttribute('aria-pressed',(it.tags||[]).some(x=>x.toLowerCase()===k))}
   if(b.hasAttribute('data-fav')){toggleFav(it);save();render();b.outerHTML=favBtn(it)}
@@ -1179,7 +1188,7 @@ const bulkBar=()=>`<div class="bk"><div><b>Adding things you’ve already done</
 function refreshRes(){const q=$('#q').value.trim(),sc=$('#res').scrollTop;if(!q)showTrend();else if(!isUrl(q))showRes(localGroups(q),lastNote);$('#res').scrollTop=sc;if(!phone()){$('#q').focus();$('#q').select()}}
 function resRow(x,i){const b=`<button type="button" data-i="${i}" class="${i===hi?'hi':''}${x.more?' more':''}">${x.it?cover(x.it,'mini'):''}<div><div>${esc(x.label)}</div><small>${esc(x.sub||'')}</small></div></button>`;
   if(!x.add||!x.it)return b;
-  return `<div class="rw">${b}<button type="button" class="sd" data-sd="${i}" ${bulk?'aria-label="Save as a favorite" title="Done and favorite"':'title="Already seen, heard or played it? Save it straight to Done"'}>${bulk?heartSvg(0)+'Fave':'Seen it'}</button></div>`}
+  return `<div class="rw">${b}<button type="button" class="sd" data-sd="${i}" ${bulk?'aria-label="Save as a favorite" title="Done and favorite"':'title="Already seen, heard or played it? Save it straight to Done"'}>${bulk?heartSvg(0)+'Fave':x.add.type==='game'?'Played it':'Seen it'}</button></div>`}
 async function addUrl(u){const d=fromUrl(u);const it=addItem({type:d.type,title:'Loading '+d.src+' link…',url:u,spotify:/spotify\.com/.test(u)?u:''},false);
   const m=await meta(u);it.title=m?.title||(d.src+' link');if(m?.creator)it.creator=m.creator;if(m?.art)it.art=m.art;
   save();render();if(cur===it)drawItem();if($('#qa').dataset.id===it.id&&$('#qa').classList.contains('on'))quick(it)}
@@ -1806,7 +1815,7 @@ $('#view').addEventListener('click',e=>{if(st.view!=='browse')return;const k=$('
 $('#view').addEventListener('change',e=>{const f=e.target.closest('[data-bf]');if(!f||st.view!=='browse')return;brState()[1][f.dataset.bf]=f.value;saveLocal();drawBrowse()});
 $('#dlg').addEventListener('close',()=>{if(st.view==='browse')drawBrowse()});
 function localGroups(q){const ql=q.toLowerCase();
-  const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${S[i.status].toLowerCase()}`,open:i.id,it:i}));
+  const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${sLab(i).toLowerCase()}`,open:i.id,it:i}));
   const have=new Set(st.items.map(i=>i.url).filter(Boolean));
   const g=[['In your list',mine]];
   g.chips=1;
