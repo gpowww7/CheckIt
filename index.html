@@ -159,8 +159,9 @@ table.ix{width:100%;border-collapse:collapse}
 .rate{display:flex;align-items:center;gap:0;margin-top:-10px}
 .rate button{width:34px;height:36px;font-size:21px;color:var(--rule)}
 .rate button.on{color:var(--ink)}
-.rate:hover button{color:var(--ink)}
-.rate button:hover~button{color:var(--rule)}
+.rate button.half,.hs{background:linear-gradient(90deg,var(--ink) 50%,var(--rule) 50%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hs{background-image:linear-gradient(90deg,var(--ink) 50%,color-mix(in srgb,var(--ink) 25%,transparent) 50%)}
+.stub .hs{background-image:linear-gradient(90deg,var(--on) 50%,color-mix(in srgb,var(--on) 25%,transparent) 50%)}
 .rate span{color:var(--mut);font-size:13px;margin-left:6px}
 .rv{display:flex;align-items:flex-end;gap:12px;margin-top:-12px}
 .rvb{display:flex;align-items:flex-end;gap:4px;height:28px}
@@ -495,7 +496,7 @@ main{padding-bottom:110px}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-3</small>
+      <button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-4</small>
     </div></details>
   </div>
 </header>
@@ -682,7 +683,10 @@ function watchBlock(it){if(!VID.includes(it.type))return'';
   const w=it.watch,row=(l,a)=>a?.length?`<div class="wr"><span>${l}</span><div>${a.map(p=>`<span class="pv">${logo(p)}${esc(p.name)}</span>`).join('')}</div></div>`:'';
   const body=!st.tmdb?`<p class="wn">Add a free TMDB key in Library, Settings to show services here.</p>`:!w?`<p class="wn">Checking…</p>`:w.err?`<p class="wn">Couldn’t reach the streaming data. Check the TMDB key in Settings.</p>`:(w.stream.length||w.rent.length)?row('Stream',w.stream)+row('Rent or buy',w.rent):`<p class="wn">Not streaming in ${esc(w.region)} right now.</p>`;
   return `<div class="watch"><div class="wh"><b>Where to watch</b><a class="sp" href="${esc(w?.link||jw(it))}" target="_blank" rel="noopener">${w?.link?'All options':'Search JustWatch'}</a></div>${body}${w&&!w.err?`<p class="wn">Data from JustWatch via TMDB.</p>`:''}</div>`}
-const stars=n=>n?'★'.repeat(n)+'<span style="opacity:.25">'+'★'.repeat(5-n)+'</span>':'';
+const stars=n=>{if(!n)return'';const f=Math.floor(n),h=n-f>=.5?1:0;return'★'.repeat(f)+(h?'<span class="hs">★</span>':'')+'<span style="opacity:.25">'+'★'.repeat(5-f-h)+'</span>'};
+const rateCls=(n,v)=>n<=v?'on':n-.5<=v?'half':'';
+function ratePaint(el,v){el.querySelectorAll('button[data-r]').forEach(b=>b.className=rateCls(+b.dataset.r,v))}
+const rateAt=(b,x)=>{const r=b.getBoundingClientRect();return +b.dataset.r-(x-r.left<r.width/2?.5:0)};
 const md=iso=>new Date(iso).toLocaleDateString(undefined,{month:'short',day:'numeric'});
 const inGrp=(it,g)=>{const x=G.find(a=>a[0]===g)[2];return !x||x.includes(it.type)};
 const inStat=(it,s)=>s==='all'||(s==='open'?it.status!=='done':it.status===s);
@@ -883,7 +887,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
    ${links?`<div class="lks">${links}</div>`:''}
    ${infoBlock(it)}
    <div class="seg" role="group" aria-label="Status">${Object.entries(S).map(([k,l])=>`<button type="button" data-st="${k}" aria-pressed="${it.status===k}">${l}</button>`).join('')}</div>
-   <div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${n<=it.rating?'on':''}" aria-label="${n} stars">★</button>`).join('')}<span>${it.rating?'':'Rate it'}</span></div>
+   <div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}<span>${it.rating?it.rating+' / 5':'Rate it'}</span></div>
    <div class="rv"><div class="rvb" role="group" aria-label="Revisit meter">${[1,2,3,4,5].map(n=>`<button type="button" data-rv="${n}" class="${n<=(it.rv||0)?'on':''}" style="height:${8+n*4}px" aria-label="${RV[n-1]}" title="${RV[n-1]}"></button>`).join('')}</div><span class="rvt">${it.rv?RV[it.rv-1]:'How much would you go back to it?'}</span></div>
    <textarea id="f-note" class="nt" rows="1" placeholder="Why is this on your list?">${esc(it.note)}</textarea>
    <label class="rb">Recommended by <input id="f-by" value="${esc(it.by)}" placeholder="Add a name"></label>
@@ -904,11 +908,13 @@ function drawItem(){const it=cur,sh=shape(it.type);
   if($('#dr').dataset.more===it.id)$('#dr .more').open=true}
 $('#dr').addEventListener('toggle',e=>{const t=e.target;if(cur&&t.matches?.('details.sea,details.sn')){const k=cur.id+'/'+(t.dataset.sn??'all');if(t.open){SOPEN.add(k);if(t.dataset.sn!=null)loadSeason(cur,+t.dataset.sn)}else SOPEN.delete(k);return}if(e.target.classList?.contains('more'))$('#dr').dataset.more=e.target.open&&cur?cur.id:''},true);
 const upd=(fn,msg)=>{const before=JSON.stringify(st.items);fn();if(cur)delete cur.sample;save();render();if(msg)toast(msg,()=>{st.items=JSON.parse(before);save();render();if(cur){cur=st.items.find(i=>i.id===cur.id);cur?drawItem():closeItem()}})};
+$('#dr').addEventListener('pointermove',e=>{const b=e.target.closest('.rate button[data-r]');if(b&&e.pointerType==='mouse')ratePaint(b.parentNode,rateAt(b,e.clientX))});
+$('#dr').addEventListener('pointerout',e=>{const rt=e.target.closest('.rate');if(rt&&cur&&!rt.contains(e.relatedTarget))ratePaint(rt,cur.rating||0)});
 $('#dr').addEventListener('click',e=>{const eo=e.target.closest('.eo');if(eo){eo.classList.toggle('open');return}const sy=e.target.closest('.syn');if(sy){sy.classList.toggle('open');return}const b=e.target.closest('button');if(!b||!cur)return;
   if(b.id==='dx')closeItem();
   else if(b.dataset.st){upd(()=>{setSt(cur,b.dataset.st)},`Marked ${S[b.dataset.st].toLowerCase()}`);drawItem()}
   else if(b.dataset.rv){const n=+b.dataset.rv;upd(()=>{cur.rv=cur.rv===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
-  else if(b.dataset.r){const n=+b.dataset.r;upd(()=>{cur.rating=cur.rating===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
+  else if(b.dataset.r){const n=e.detail===0?+b.dataset.r:rateAt(b,e.clientX);upd(()=>{cur.rating=cur.rating===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
   else if(b.hasAttribute('data-del')){removeItem(cur);closeItem()}});
 function removeItem(it){const t=it.title||'item';upd(()=>{st.items=st.items.filter(i=>i.id!==it.id)},`Removed ${t}`)}
 $('#dr').addEventListener('input',e=>{if(!cur)return;const f=e.target.id?.slice(2);if(!f)return;if(e.target.tagName==='TEXTAREA'){e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px'}
