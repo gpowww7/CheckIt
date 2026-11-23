@@ -752,7 +752,7 @@ function sizeWall(){const w=$('#wall');if(!w)return;
 
 /* drawer */
 let cur=null;
-function openItem(id){cur=st.items.find(i=>i.id===id);if(!cur)return;drawItem();loadWatch(cur);$('#dr').classList.add('on');$('#shade').classList.add('on')}
+function openItem(id){cur=st.items.find(i=>i.id===id);if(!cur)return;drawItem();loadWatch(cur);findSpotify(cur,true);$('#dr').classList.add('on');$('#shade').classList.add('on')}
 function closeItem(){cur=null;$('#dr').classList.remove('on');$('#shade').classList.remove('on')}
 const HN={youtube:'YouTube','youtu':'YouTube',soundcloud:'SoundCloud',mixcloud:'Mixcloud',twitch:'Twitch',vimeo:'Vimeo',bandcamp:'Bandcamp',apple:'Apple TV',tvmaze:'TVmaze',imdb:'IMDb',letterboxd:'Letterboxd',themoviedb:'TMDB',musicbrainz:'MusicBrainz'};
 const hostName=h=>{const k=h.split('.').slice(-2,-1)[0]||h;return HN[k]||k[0].toUpperCase()+k.slice(1)};
@@ -911,9 +911,20 @@ $('#res').addEventListener('click',e=>{const f=e.target.closest('[data-sf]');if(
   const b=e.target.closest('[data-i]');if(!b)return;const x=rs[+b.dataset.i];if(x?.more){e.preventDefault();setTimeout(()=>more(x),0);return}pick(x)});
 function more(x){const i=rs.indexOf(x);exp.add(x.more);const sc=$('#res').scrollTop;hi=i;if(!$('#q').value.trim())showTrend();else showRes(localGroups($('#q').value.trim()),lastNote);$('#res').scrollTop=sc;$('#q').focus()}
 function pick(x){if(!x)return;if(x.more)return more(x);if(x.open){openItem(x.open);$('#res').classList.remove('on');$('#q').value=''}else if(x.url)addUrl(x.url);else{const it=addItem(x.add,!x.it);findSpotify(it)}}
-async function findSpotify(it){if(!['album','song'].includes(it.type)||it.spotify||!/deezer\.com/.test(it.url))return;
-  try{const j=await getJSON('https://api.song.link/v1-alpha.1/links?userCountry=US&url='+encodeURIComponent(it.url));const u=j.linksByPlatform?.spotify?.url;
-    if(u){it.spotify=u;save();render();if(cur===it)drawItem()}}catch(e){}}
+/* resolve direct Spotify links: Deezer match, then song.link (about 10 lookups a minute, so queued) */
+const spQ=[];let spBusy=false;
+const simp=x=>(x||'').toLowerCase().replace(/\(.*?\)|\[.*?\]|feat\..*$| - .*$/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+function findSpotify(it,front){if(!it||!['album','song'].includes(it.type)||it.spotify||(it.spTry&&Date.now()-it.spTry<3*864e5))return;
+  if(spQ.includes(it)){if(front){spQ.splice(spQ.indexOf(it),1);spQ.unshift(it)}}else front?spQ.unshift(it):spQ.push(it);spRun()}
+async function spRun(){if(spBusy||!spQ.length)return;spBusy=true;const it=spQ.shift();
+  try{let u=/deezer\.com|music\.apple\.com|itunes\.apple\.com/.test(it.url||'')?it.url:'';
+    if(!u){const k=it.type==='album'?'album':'track',j=await jsonp(`https://api.deezer.com/search/${k}?q=${encodeURIComponent((it.title+' '+(it.creator||'')).trim())}&limit=5&output=jsonp`);
+      const t=simp(it.title),c=simp(it.creator);const m=(j.data||[]).find(r=>simp(r.title)===t&&(!c||simp(r.artist?.name).includes(c.split(' ')[0])||c.includes(simp(r.artist?.name))))||(j.data||[]).find(r=>simp(r.title).startsWith(t));
+      u=m?.link||''}
+    if(u){const j=await getJSON('https://api.song.link/v1-alpha.1/links?userCountry='+encodeURIComponent(st.region||'US')+'&url='+encodeURIComponent(u));const sp=j.linksByPlatform?.spotify?.url;
+      if(sp){it.spotify=sp;delete it.spTry;save();render();if(cur===it)drawItem()}else{it.spTry=Date.now();save()}}
+    else{it.spTry=Date.now();save()}}catch(e){}
+  setTimeout(()=>{spBusy=false;spRun()},6500)}
 let online=null,onNote='';
 function jsonp(u,ms=6000){return new Promise((res,rej)=>{const cb='cb'+uid(),s=document.createElement('script');let done=false;
   const end=()=>{done=true;delete window[cb];s.remove()};
@@ -1078,6 +1089,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 addEventListener('online',()=>{if(sbUser)syncSoon(300)});
 setInterval(()=>{if(sbUser&&document.visibilityState==='visible')sync()},120000);
 render();
+setTimeout(()=>st.items.filter(i=>!i.sample).forEach(i=>findSpotify(i)),3000);
 }
 </script>
 </body>
