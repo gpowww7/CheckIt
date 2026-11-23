@@ -569,7 +569,7 @@ function getColor(it){if(!it.art||it.color||it.colTry||colQ.has(it.id))return;co
     if(W){it.color='#'+[R,G,B].map(v=>Math.round(v/W).toString(16).padStart(2,'0')).join('');save();later()}}catch(e){it.colTry=1;save()}};
   im.onerror=()=>{it.colTry=1;save()};im.src=it.art}
 const MUS=['artist','album','song'];
-const spot=it=>MUS.includes(it.type)?(it.spotify||`https://open.spotify.com/search/${encodeURIComponent((it.type==='artist'?it.title:(it.title+' '+(it.creator||''))).trim())}${it.type==='artist'?'/artists':it.type==='album'?'/albums':'/tracks'}`):'';
+const spot=it=>MUS.includes(it.type)?(it.spotify||`https://open.spotify.com/search/${encodeURIComponent((it.type==='artist'?it.title:(it.title+' '+(it.creator||''))).trim())}`):'';
 const spLink=it=>MUS.includes(it.type)?`<a class="sp" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Open in Spotify':'Find on Spotify'}</a>`:'';
 const VID=['movie','show'];
 const steam=it=>`https://store.steampowered.com/search/?term=${encodeURIComponent(it.title)}`;
