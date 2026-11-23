@@ -605,7 +605,7 @@ async function deezerId(it,k){const m=(it.url||'').match(new RegExp('deezer\\.co
   const t=simp(it.title),c=simp(it.creator),l=j.data||[];const r=l.find(r=>simp(r.title)===t&&(!c||c.includes(simp(r.artist?.name))||simp(r.artist?.name).includes(c.split(' ')[0])))||l.find(r=>simp(r.title).startsWith(t));return r?.id}
 const mmss=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 const fdate=d=>{if(!d||d.length<10)return d||'';const x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})};
-async function loadInfo(it){if(it.info&&Date.now()-it.info.at<30*864e5)return;
+async function loadInfo(it){if(it.info&&Date.now()-it.info.at<30*864e5&&!(VID.includes(it.type)&&!it.info.none&&it.info.date===undefined))return;
   if(it.type==='album'||it.type==='song')return loadMusicInfo(it);if(it.type==='game')return loadGameInfo(it);
   if(!VID.includes(it.type)||!st.tmdb)return;
   const kind=it.type==='show'?'tv':'movie';
@@ -613,7 +613,7 @@ async function loadInfo(it){if(it.info&&Date.now()-it.info.at<30*864e5)return;
     const d=await tmdbGet(`${kind}/${id}?append_to_response=credits`),cr=d.credits||{};
     const by=kind==='movie'?(cr.crew||[]).filter(c=>c.job==='Director').map(c=>c.name):(d.created_by||[]).map(c=>c.name);
     const mins=kind==='movie'?d.runtime:(d.episode_run_time||[])[0];
-    it.info={at:Date.now(),overview:d.overview||'',tagline:d.tagline||'',genres:(d.genres||[]).map(g=>g.name).slice(0,4),by:by.slice(0,3),cast:(cr.cast||[]).slice(0,6).map(c=>c.name),mins:mins||0,seasons:d.number_of_seasons||0,eps:d.number_of_episodes||0,status:kind==='tv'?d.status||'':'',net:kind==='tv'?(d.networks||[])[0]?.name||'':'',year:yr(d.release_date||d.first_air_date),score:d.vote_count>20?Math.round(d.vote_average*10)/10:0,link:`https://www.themoviedb.org/${kind}/${id}`};
+    it.info={at:Date.now(),overview:d.overview||'',tagline:d.tagline||'',genres:(d.genres||[]).map(g=>g.name).slice(0,4),by:by.slice(0,3),cast:(cr.cast||[]).slice(0,6).map(c=>c.name),mins:mins||0,seasons:d.number_of_seasons||0,eps:d.number_of_episodes||0,status:kind==='tv'?d.status||'':'',net:kind==='tv'?(d.networks||[])[0]?.name||'':'',year:yr(d.release_date||d.first_air_date),date:(kind==='movie'?d.release_date:d.first_air_date)||'',last:kind==='tv'?d.last_air_date||'':'',next:kind==='tv'?d.next_episode_to_air?.air_date||'':'',score:d.vote_count>20?Math.round(d.vote_average*10)/10:0,link:`https://www.themoviedb.org/${kind}/${id}`};
     if(!it.creator)it.creator=kind==='movie'?by[0]||'':it.info.net||by[0]||'';
     it.extra={...it.extra};if(!it.extra.year&&it.info.year)it.extra.year=it.info.year;if(!it.extra.mins&&mins)it.extra.mins=kind==='tv'&&it.info.eps?mins*it.info.eps:mins;
     if(!it.art&&d.poster_path)it.art=`https://image.tmdb.org/t/p/w500${d.poster_path}`;
@@ -646,7 +646,7 @@ function infoBlock(it){const f=it.info,row=(l,v)=>v?`<div class="wr"><span>${l}<
   if(!f)return`<div class="info"><p class="wn">Loading details…</p></div>`;if(f.none)return'';
   const len=it.type==='movie'?(f.mins?hm(f.mins):''):[f.seasons?`${f.seasons} season${f.seasons>1?'s':''}`:'',f.eps?`${f.eps} episodes`:'',f.mins?`about ${f.mins} min each`:''].filter(Boolean).join(', ');
   return `<div class="info">${f.tagline?`<p class="tg">${esc(f.tagline)}</p>`:''}${f.overview?`<p class="syn" tabindex="0">${esc(f.overview)}</p>`:''}
-    ${row(it.type==='movie'?'Director':'Created by',esc(f.by.join(', ')))}${row('Cast',esc(f.cast.join(', ')))}${row(it.type==='movie'?'Runtime':'Length',esc(len))}${it.type==='show'?row('Network',esc([f.net,f.status==='Ended'||f.status==='Canceled'?f.status.toLowerCase():f.status?'still running':''].filter(Boolean).join(', '))):''}${row('Genres',esc(f.genres.join(', ')))}${row('TMDB score',f.score?`${f.score} / 10`:'')}
+    ${row(it.type==='movie'?'Director':'Created by',esc(f.by.join(', ')))}${row('Cast',esc(f.cast.join(', ')))}${row(it.type==='movie'?'Released':'First aired',esc(fdate(f.date)))}${it.type==='show'?row('Last aired',f.last&&f.last!==f.date?esc(fdate(f.last)):'')+row('Next episode',esc(fdate(f.next))):''}${row(it.type==='movie'?'Runtime':'Length',esc(len))}${it.type==='show'?row('Network',esc([f.net,f.status==='Ended'||f.status==='Canceled'?f.status.toLowerCase():f.status?'still running':''].filter(Boolean).join(', '))):''}${row('Genres',esc(f.genres.join(', ')))}${row('TMDB score',f.score?`${f.score} / 10`:'')}
     <p class="wn"><a class="sp" href="${esc(f.link)}" target="_blank" rel="noopener">More on TMDB</a></p></div>`}
 function watchBlock(it){if(!VID.includes(it.type))return'';
   const w=it.watch,row=(l,a)=>a?.length?`<div class="wr"><span>${l}</span><div>${a.map(p=>`<span class="pv">${logo(p)}${esc(p.name)}</span>`).join('')}</div></div>`:'';
