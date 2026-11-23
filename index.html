@@ -1113,7 +1113,7 @@ $('#file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)r
 
 document.addEventListener('error',e=>{const t=e.target;if(t.tagName==='IMG'&&t.parentNode?.classList.contains('cv')){t.parentNode.classList.remove('hasimg');t.remove()}},true);
 // ---- Account and sync (Supabase). Local-first: the app works without signing in; signed in, items sync across devices.
-const SB_URL='',SB_KEY='';// Project URL and publishable/anon key. Safe to ship: row-level security keeps each account's rows private.
+const SB_URL='https://lfzgxoanvkxegeztzdlg.supabase.co',SB_KEY='sb_publishable_9Snf5R-qkYS4RAfnGiWT5w_eo9vKkV8';// Project URL and publishable/anon key. Safe to ship: row-level security keeps each account's rows private.
 const SYNC_KEY='checkit.sync';
 let sb=null,sbUser=null,syncing=false,syncAgain=false,syncTimer=0,lastSyncAt=0,syncErr='';
 let ss={uid:'',last:'',base:{},mt:{}};
