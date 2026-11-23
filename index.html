@@ -170,14 +170,17 @@ table.ix{width:100%;border-collapse:collapse}
 .rvb:hover button{background:var(--acc)}
 .rvb button:hover~button{background:var(--rule)}
 .qt{margin-top:-4px}.qth{font-size:13px;color:var(--mut);margin-bottom:8px;display:flex;gap:8px}.qth span{opacity:.75}
-.qtl{display:flex;flex-wrap:wrap;gap:6px}
-.tg2{font-size:13px;line-height:1;padding:8px 11px;border:1px solid var(--rule);border-radius:999px;color:var(--mut);background:none;transition:background .12s,color .12s,border-color .12s}
+.qtl{display:flex;flex-wrap:wrap;gap:10px 8px;align-items:center}
+.tg2,.stp{--sc:color-mix(in srgb,var(--ic,var(--acc)) 72%,var(--ink));font:700 11px/1 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:7px 9px 6px;border-radius:3px;white-space:nowrap}
+.tg2{border:1.5px dashed var(--rule);color:var(--mut);background:none;transition:transform .15s,color .15s,border-color .15s}.tg2[aria-pressed=false],.tg2.tgadd{font:500 13px/1 Inter,system-ui,sans-serif;letter-spacing:0;text-transform:none;padding:7px 9px}
 .tg2:hover{color:var(--ink);border-color:var(--mut)}
-.tg2[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.ip .tg2[aria-pressed=true]{background:var(--ic);border-color:var(--ic);color:var(--on)}
-.tg2.tgadd{border-style:dashed}
+.tg2[aria-pressed=true],.ip .tg2[aria-pressed=true],.stp{border:2px solid var(--sc);color:var(--sc);background:none;transform:rotate(var(--r));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sc) 35%,transparent);-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 2.1'/%3E%3C/filter%3E%3Crect width='120' height='60' filter='url(%23n)'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 2.1'/%3E%3C/filter%3E%3Crect width='120' height='60' filter='url(%23n)'/%3E%3C/svg%3E");-webkit-mask-size:120px 60px;mask-size:120px 60px}
+.tg2[aria-pressed=true]{animation:stamp .22s ease-out}
+@keyframes stamp{0%{transform:rotate(var(--r)) scale(1.35);opacity:0}70%{transform:rotate(var(--r)) scale(.96);opacity:1}100%{transform:rotate(var(--r)) scale(1)}}
+.tg2.tgadd{border-style:dashed;letter-spacing:.06em}
+.stg{display:flex;flex-wrap:wrap;gap:8px 6px;margin-top:10px}
+.stp{--sc:var(--on);font-size:9.5px;padding:5px 7px 4px;border-width:1.5px}
 .tgin{font-size:13px;padding:7px 11px;border:1px solid var(--mut);border-radius:999px;width:150px;background:none;color:var(--ink)}
-.stg{font-size:12px;margin-top:6px;color:color-mix(in srgb,var(--on) 80%,transparent)}
 .rvt{font-size:13px;color:var(--mut);padding-bottom:1px}
 .rvm{display:inline-flex;align-items:flex-end;gap:2px;margin-left:10px;height:13px;vertical-align:-1px}
 .rvm i{width:3px;background:var(--rule);border-radius:1px}
@@ -574,7 +577,7 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-7</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-8</small>
     </div></details>
   </div>
 </header>
@@ -784,7 +787,7 @@ const tagsFor=t=>{const base=QT[t]||[],seen=new Set(base.map(x=>x.toLowerCase())
   return [...base,...[...own.values()].sort((a,b)=>b[1]-a[1]).map(x=>x[0])]};
 function tagBlock(it){const on=it.tags||[];if(!(it.status==='done'||it.status==='again'||on.length))return'';const has=new Set(on.map(x=>x.toLowerCase()));
   const all=tagsFor(it.type);for(const g of on)if(!all.some(x=>x.toLowerCase()===g.toLowerCase()))all.push(g);
-  return `<div class="qt"><div class="qth">Quick take<span>${on.length?'':'Tap what fits'}</span></div><div class="qtl" role="group" aria-label="Quick take tags">${all.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" aria-pressed="${has.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}<button type="button" class="tg2 tgadd" data-tagadd>+ Your own</button><input class="tgin" id="tgin" maxlength="24" placeholder="Add a tag" hidden></div></div>`}
+  return `<div class="qt"><div class="qth">Quick take<span>${on.length?'':'Tap what fits'}</span></div><div class="qtl" role="group" aria-label="Quick take tags">${all.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" style="--r:${hash(g.toLowerCase())%7*.6-1.8}deg" aria-pressed="${has.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}<button type="button" class="tg2 tgadd" data-tagadd>+ Your own</button><input class="tgin" id="tgin" maxlength="24" placeholder="Add a tag" hidden></div></div>`}
 // Past favorites. it.fav marks an all-time favorite. it.era is a rough "when" for things finished before Checkit (a year, a decade like "2010s", "old" or "?"); it.doneAt is set to a matching date so sorting and counts keep working.
 const heartSvg=f=>`<svg viewBox="0 0 24 24" fill="${f?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.2-4.5-9.3-9.1A5 5 0 0 1 12 6.4a5 5 0 0 1 9.3 4.5C19.2 15.5 12 20 12 20z"/></svg>`;
 const favMark=it=>it.fav?'<i class="fvm" title="Favorite">♥</i>':'';
@@ -916,7 +919,7 @@ function drawStubs(){const l=st.items.filter(i=>(i.status==='done'||i.status==='
   let n=0;$('#view').innerHTML=`<div class="stubs">${[...by].map(([m,arr])=>`<section><h3>${m}<span>${arr.length} finished</span></h3><div class="sgrid">${arr.map(([it,t])=>{n++;
     return `<button type="button" class="stub" data-id="${it.id}" style="${cs(it)};--rot:${(hash(it.id)%5-2)*.25}deg"><div class="sl"><span>Admit one</span><b>No. ${String(hash(it.id)%9000+1000)}</b></div>
      <div class="sr"><div class="sk">${T[it.type]}, ${it.era?esc(eraLabel(it.era).replace(/^Earlier this year$/,'This year')):new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}</div><div class="st2">${esc(it.title)}</div>${it.creator?`<div class="sc2">${esc(it.creator)}</div>`:''}
-     <div class="sm">${it.rating?`<span class="stars">${stars(it.rating)}</span>`:''}${rvMini(it.rv)}${it.status==='again'?'<em>Revisit</em>':''}${it.fav?'<em class="fv">♥ Favorite</em>':''}</div>${it.tags?.length?`<div class="stg">${it.tags.map(esc).join(' · ')}</div>`:''}${it.note?`<p>${esc(it.note)}</p>`:''}</div></button>`}).join('')}</div></section>`).join('')}</div>`}
+     <div class="sm">${it.rating?`<span class="stars">${stars(it.rating)}</span>`:''}${rvMini(it.rv)}${it.status==='again'?'<em>Revisit</em>':''}${it.fav?'<em class="fv">♥ Favorite</em>':''}</div>${it.tags?.length?`<div class="stg">${it.tags.map(g=>`<span class="stp" style="--r:${hash(g.toLowerCase())%7*.6-1.8}deg">${esc(g)}</span>`).join('')}</div>`:''}${it.note?`<p>${esc(it.note)}</p>`:''}</div></button>`}).join('')}</div></section>`).join('')}</div>`}
 /* poster */
 const PPAL=[['Ink','#111214','#ffffff','#8396ff'],['Cobalt','#2b4bff','#ffffff','#ffd84a'],['Sun','#f2c230','#111214','#c4321f'],['Rose','#e85a71','#111214','#ffffff'],['Paper','#ffffff','#111214','#2b4bff']];
 const pst={pal:0,title:'Checkit Fest'};
@@ -1097,7 +1100,7 @@ let qt;
 function quick(it){const q=$('#qa');q.dataset.id=it.id;$('#toast').classList.remove('on');const dn=it.status==='done'||it.status==='again';q.classList.toggle('dn',dn);
   const mini=cover(it,'mini'+(it.type==='artist'?' round':''));
   if(dn){const on=new Set((it.tags||[]).map(x=>x.toLowerCase())),tg=tagsFor(it.type).slice(0,10);for(const g of it.tags||[])if(!tg.some(x=>x.toLowerCase()===g.toLowerCase()))tg.unshift(g);
-    q.innerHTML=`${mini}<div class="qi"><b>${it.status==='again'?'Revisit':'Done'}: ${esc(it.title)}</b><div class="qrow"><div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}</div><select id="qera" aria-label="When">${eraOpts(it)}</select></div><div class="qtl" role="group" aria-label="Quick take">${tg.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" aria-pressed="${on.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}</div></div>${favBtn(it)}<button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`}
+    q.innerHTML=`${mini}<div class="qi"><b>${it.status==='again'?'Revisit':'Done'}: ${esc(it.title)}</b><div class="qrow"><div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}</div><select id="qera" aria-label="When">${eraOpts(it)}</select></div><div class="qtl" role="group" aria-label="Quick take">${tg.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" style="--r:${hash(g.toLowerCase())%7*.6-1.8}deg" aria-pressed="${on.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}</div></div>${favBtn(it)}<button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`}
   else q.innerHTML=`${mini}<div class="qi"><b>Added ${esc(it.title)}</b><div class="qrow"><div class="seg s3"><button type="button" data-qs="check" aria-pressed="${it.status==='check'}">Check out</button><button type="button" data-qs="again" aria-pressed="${it.status==='again'}">Revisit</button><button type="button" data-qs="done" aria-pressed="false">Done</button></div><input id="qby" placeholder="Recommended by" value="${esc(it.by)}" aria-label="Recommended by"></div></div><button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`;
   q.classList.add('on');qaTimer(dn?15000:9000)}
 const qaTimer=ms=>{clearTimeout(qt);qt=setTimeout(()=>$('#qa').classList.remove('on'),ms)};
