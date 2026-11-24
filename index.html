@@ -587,54 +587,74 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
 .gqb button:hover{color:var(--ink);border-color:var(--mut)}
 .gqr{align-items:center;margin-top:-6px}.gqr b{color:var(--ink)}.gqr .gqb{margin-left:auto}.gqr .gqb button{height:32px;font-size:13px}
 @media(max-width:600px){.gq .gq1{grid-template-columns:120px minmax(0,1fr);gap:14px;padding:12px}.gq .gqc .cv{width:120px;height:68px}.gq .gqi b{font-size:19px}}
-/* library: shelves, find box, sort and filter sheet, rate and rank */
-body[data-view=library] main>.filters{display:block;padding-block:14px 6px}
-.lbar{display:grid;gap:12px}
-.lseg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--rule);border-radius:8px;padding:3px;gap:3px;background:var(--soft);max-width:560px}
-.filters .lseg button{padding:0;min-height:38px;border-radius:6px;color:var(--mut);font-weight:500;font-size:14px;display:flex;align-items:center;justify-content:center;gap:2px;white-space:nowrap}
-.filters .lseg button[aria-pressed=true]{background:var(--bg);color:var(--ink);text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.lseg .hrt{color:#e0245e;margin-right:3px}
-.lseg i{font-size:12px}
-.ltool{display:flex;gap:8px;align-items:center}
-.lfind{flex:1;position:relative;min-width:0;max-width:420px}
-.lfind svg{position:absolute;left:11px;top:50%;width:15px;height:15px;transform:translateY(-50%);color:var(--mut);pointer-events:none}
-.lfind input{width:100%;height:38px;border:1px solid var(--rule);border-radius:8px;background:var(--bg);padding:0 10px 0 33px;font-size:16px;color:var(--ink)}
+/* library: shelves, types, find, inline sort and filter dropdowns, rate and rank */
+body[data-view=library] main>.filters{display:block;padding-block:12px 4px}
+.lbar{display:grid;gap:14px}
+/* shelves: full-width underline tabs */
+.lseg{display:flex;border-bottom:1px solid var(--rule)}
+.filters .lseg button{flex:1;min-height:46px;padding:0 4px;font-size:15px;font-weight:500;color:var(--mut);display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.filters .lseg button[aria-pressed=true]{color:var(--ink);text-decoration:none;border-bottom-color:var(--ink)}
+.lseg .hrt{color:#e0245e}
+.filters .lseg i{font-size:12px;margin:0;opacity:.6}
+/* types segmented control + views */
+.lrow{display:flex;align-items:center;gap:10px}
+.ltype{display:flex;flex:0 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none;background:var(--soft);border:1px solid var(--rule);border-radius:9px;padding:3px;gap:2px}
+.ltype::-webkit-scrollbar{display:none}
+.filters .ltype button{flex:none;height:32px;padding:0 12px;border-radius:6px;font-size:14px;font-weight:500;color:var(--mut);white-space:nowrap}
+.filters .ltype button[aria-pressed=true]{background:var(--bg);color:var(--ink);text-decoration:none;box-shadow:0 1px 2px rgba(0,0,0,.12),0 0 0 1px var(--rule)}
+.lviews{display:flex;flex:none;margin-left:auto;background:var(--soft);border:1px solid var(--rule);border-radius:9px;padding:3px;gap:2px}
+.filters .lviews button{width:36px;height:32px;border-radius:6px;display:grid;place-items:center;color:var(--mut);padding:0}
+.filters .lviews button[aria-pressed=true]{background:var(--bg);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12),0 0 0 1px var(--rule)}
+.lviews svg{width:18px;height:18px}
+.lviews button:not([aria-pressed=true]) svg rect[fill]{opacity:.5}
+/* find + dropdown toolbar */
+.lrow2{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.lfind{flex:1 1 260px;position:relative;min-width:0;max-width:420px}
+.lfind svg{position:absolute;left:12px;top:50%;width:15px;height:15px;transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.lfind input{width:100%;height:40px;border:1px solid var(--rule);border-radius:9px;background:var(--bg);padding:0 12px 0 34px;font-size:16px;color:var(--ink)}
+.lfind input:focus{outline:2px solid var(--acc);outline-offset:-1px}
 .lfind input::placeholder{color:var(--mut)}
-.filters .lfb{height:38px;border:1px solid var(--rule);border-radius:8px;padding:0 11px;display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-size:14px;white-space:nowrap;flex:none}
-.lfb svg{width:18px;height:18px}
-.filters .lfb i{background:var(--acc);color:#fff;border-radius:9px;min-width:18px;height:18px;font-size:11.5px;display:inline-grid;place-items:center;margin:0;opacity:1;padding:0 5px}
-.filters .lly{padding:0;width:38px;justify-content:center}
-.lsub{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * max(4vw,16px));padding-inline:max(4vw,16px)}
-.lsub::-webkit-scrollbar,.ltype::-webkit-scrollbar{display:none}
-.filters .lsub button{flex:none;height:32px;padding:0 12px;border:1px solid var(--rule);border-radius:16px;font-size:13.5px;color:var(--mut)}
-.filters .lsub button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);text-decoration:none}
-.filters .ltype{gap:4px 18px}
-.lsum{display:flex;flex-wrap:wrap;align-items:center;gap:8px 8px;min-height:32px}
-.lsum .lcount{margin-right:4px}
+.lctl{display:flex;align-items:center;gap:8px;flex:1 1 auto;overflow-x:auto;scrollbar-width:none}
+.lctl::-webkit-scrollbar{display:none}
+.lsel{position:relative;flex:none;display:flex;align-items:center;height:40px;border:1px solid var(--rule);border-radius:9px;background:var(--bg);padding:0 30px 0 12px;font-size:14px;gap:6px;cursor:pointer}
+.lsel:hover{border-color:var(--mut)}
+.lsel span{color:var(--mut)}
+.lsel b{font-weight:500;color:var(--ink);white-space:nowrap;max-width:170px;overflow:hidden;text-overflow:ellipsis}
+.lsel select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;appearance:none;-webkit-appearance:none}
+.lsel select:focus{outline:none}.lsel:focus-within{outline:2px solid var(--acc);outline-offset:-1px}
+.lsel select::after{content:none}
+.lsel option{color:initial}
+.lsel>svg{position:absolute;right:11px;top:50%;width:10px;height:6px;transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.lsel.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 8%,var(--bg))}
+.lsel.on span{color:var(--acc)}
+.filters .lrev{flex:none;width:40px;height:40px;border:1px solid var(--rule);border-radius:9px;color:var(--ink);font-size:16px;padding:0;margin-left:-4px}
+.filters .lrev:hover{border-color:var(--mut)}
+.filters .lclr{flex:none;padding:0 4px;color:var(--acc);font-weight:500}
+@media(max-width:760px){
+ .lseg{margin-inline:calc(-1 * max(4vw,16px));padding-inline:max(4vw,16px)}
+ .lfind{flex-basis:100%;max-width:none}
+ .lctl{flex-basis:100%;margin-inline:calc(-1 * max(4vw,16px));padding-inline:max(4vw,16px)}
+}
+@media(max-width:480px){.filters .lseg button{font-size:14px;gap:4px}.lseg .hrt{display:none}.filters .lseg i{font-size:11.5px}.filters .ltype button{padding:0 10px}}
+@media(max-width:380px){.filters .lseg i{display:none}}
+/* summary line */
+.lsum{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;min-height:32px}
 .lsum .lsp{flex:1}
 .sum .lsum button{margin-left:0}
-.pill{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 6px 0 10px;border-radius:14px;background:color-mix(in srgb,var(--acc) 12%,var(--bg));color:var(--ink)!important;font-size:13px}
-.pill span{font-size:16px;color:var(--mut);line-height:1}
-.lcta{height:32px;padding:0 12px;border-radius:16px;background:var(--ink);color:var(--bg)!important;font-weight:500;font-size:13.5px;white-space:nowrap}
-.wall .cv .lbg{position:absolute;top:6px;right:6px;z-index:3;background:rgba(10,11,14,.66);color:#fff;font-size:12px;font-weight:600;line-height:1;padding:4px 6px;border-radius:10px;pointer-events:none;font-variant-numeric:tabular-nums;white-space:nowrap}
+.lsum .lsort{color:var(--mut)}
+.sum .lcta{color:var(--acc);font-weight:600;font-size:14px;white-space:nowrap}
+.sum .lcta:hover{text-decoration:underline;text-underline-offset:3px}
+/* covers badge, list extras */
+.wall .cv .lbg{position:absolute;top:6px;right:6px;z-index:3;background:rgba(10,11,14,.66);color:#fff;font-size:12px;font-weight:600;line-height:1;padding:4px 6px;border-radius:4px;pointer-events:none;font-variant-numeric:tabular-nums;white-space:nowrap}
 .wall .cv .lbg .h{color:#ff5c8a}
 .ix .lrk{width:22px;flex:none;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;color:var(--mut)}
 .ix .t span.lrs{display:none;font-size:12px;letter-spacing:1px;color:var(--ink)}
-@media(max-width:720px){.ix .t span.lrs{display:block}.ix td:first-child{width:100%}}
-/* sheet */
-dialog.sheet h4{margin:18px 0 8px;font-size:13px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+@media(max-width:720px){.ix .t span.lrs{display:block}.ix td:first-child{width:100%}.ix.nost th:nth-child(3),.ix.nost td:nth-child(3){display:none}}
+/* dialogs */
 .shd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
 .shd h3{margin:0}
 dialog .x{width:36px;height:36px;border-radius:50%;font-size:24px;color:var(--mut);flex:none}
 dialog .x:hover{background:var(--soft);color:var(--ink)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{height:34px;padding:0 13px;border:1px solid var(--rule);border-radius:17px;font-size:14px;display:inline-flex;align-items:center;gap:6px}
-.chip i{font-style:normal;color:var(--mut);font-size:12px}
-.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.chip[aria-pressed=true] i{color:inherit;opacity:.7}
-dialog.sheet .dbtn{position:sticky;bottom:-22px;background:var(--bg);padding:14px 0 4px;margin-top:18px}
-@media(max-width:600px){dialog.sheet{margin:auto 0 0;width:100vw;max-width:100vw;max-height:86vh;border-radius:16px 16px 0 0;border-bottom:0;padding:18px 18px calc(18px + env(safe-area-inset-bottom))}}
-/* rate as you go */
 .rq{text-align:center}
 .rqn{color:var(--mut);font-size:14px}
 .rqc{display:block;margin:6px auto 12px}
@@ -647,7 +667,6 @@ dialog.sheet .dbtn{position:sticky;bottom:-22px;background:var(--bg);padding:14p
 .rqa{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 .rqf[aria-pressed=true]{background:#e0245e;border-color:#e0245e;color:#fff}
 .rq .wn{margin-top:12px}
-/* rank */
 .rkp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 4px}
 .rkt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border:1px solid var(--rule);border-radius:10px;text-align:center}
 .rkt:hover,.rkt:active{border-color:var(--ink);background:var(--soft)}
@@ -656,34 +675,11 @@ dialog.sheet .dbtn{position:sticky;bottom:-22px;background:var(--bg);padding:14p
 .rkt b{font-size:15px;line-height:1.2}.rkt small{color:var(--mut);font-size:12.5px}
 .rkl{max-height:56vh;overflow:auto}
 .rkl .gqt{cursor:default}
-@media(max-width:480px){.filters .lfb:not(.lly) span{display:none}.filters .lfb:not(.lly){width:auto;padding:0 10px}}
-.lsum .lsort{color:var(--mut)}
-@media(min-width:481px){.lsum .lsort{display:none}}
-@media(max-width:720px){.ix.nost th:nth-child(3),.ix.nost td:nth-child(3){display:none}}
-
-/* v-3 header: shelves as full-width tabs, types and tools on one row */
-.lbar{gap:14px}
-.lseg{display:flex;max-width:none;background:none;border:0;border-bottom:1px solid var(--rule);border-radius:0;padding:0;gap:0}
-.filters .lseg button{flex:1;min-height:44px;border-radius:0;font-size:15px;box-shadow:none;border-bottom:2px solid transparent;margin-bottom:-1px;gap:5px}
-.filters .lseg button[aria-pressed=true]{background:none;box-shadow:none;border-bottom-color:var(--ink);color:var(--ink)}
-.lseg i{font-size:12.5px}
-.lrow{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
-.ltype{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1 1 auto;min-width:0}
-.filters .ltype button{flex:none;height:34px;padding:0 13px;border:1px solid var(--rule);border-radius:17px;font-size:14px;color:var(--mut)}
-.filters .ltype button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg);text-decoration:none}
-.ltool{flex:0 1 460px;margin-left:auto}
-.lfind{max-width:none}
-.filters .lsub button{height:30px;font-size:13px}
-@media(max-width:760px){.lseg{margin-inline:calc(-1 * max(4vw,16px));padding-inline:max(4vw,16px)}.ltype{flex-basis:100%;margin-inline:calc(-1 * max(4vw,16px));padding-inline:max(4vw,16px)}.ltool{flex-basis:100%}.filters .lseg button{font-size:14px}}
-@media(max-width:380px){.lseg i{display:none}}
-
-@media(max-width:480px){.filters .lseg button{flex:1 1 auto;font-size:14px;gap:3px;padding:0 2px}.lseg .hrt{display:none}.lseg i{font-size:11.5px}}
-
-.lviews{display:flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;flex:none}
-.filters .lviews .lfb{border:0;border-radius:0;width:38px;height:36px;color:var(--mut)}
-.filters .lviews .lfb+.lfb{border-left:1px solid var(--rule)}
-.filters .lviews .lfb[aria-pressed=true]{background:var(--soft);color:var(--ink)}
-.lviews .lfb:not([aria-pressed=true]) svg rect[fill]{opacity:.55}
+@media(max-width:760px){.ltype{flex:1 1 auto}.filters .ltype button{flex:1 0 auto}}
+@media(max-width:760px){.lctl{flex-wrap:wrap;overflow:visible;margin-inline:0;padding-inline:0}.lsel{flex:1 1 auto;min-width:0}.lsel b{max-width:none}}
+.filters .lseg button{align-items:baseline;padding-top:13px}
+@media(min-width:761px){.lrow2 .lviews{order:3}}
+@media(max-width:760px){.lfind{flex:1 1 0}.lrow2 .lviews{margin-left:0}.ltype{width:100%}}
 </style>
 </head>
 <body>
@@ -698,7 +694,7 @@ dialog.sheet .dbtn{position:sticky;bottom:-22px;background:var(--bg);padding:14p
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-4</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-5</small>
     </div></details>
   </div>
 </header>
@@ -992,20 +988,32 @@ const IC={find:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strok
  list:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10"/><circle cx="3.5" cy="5" r=".8" fill="currentColor"/><circle cx="3.5" cy="10" r=".8" fill="currentColor"/><circle cx="3.5" cy="15" r=".8" fill="currentColor"/></svg>'};
 function libBar(){const base=st.items.filter(i=>inGrp(i,st.grp)),segAll=st.items.filter(segOf[st.lseg]),inSeg=st.items.filter(lsOk);
   const seg=`<div class="lseg" role="group" aria-label="Show">${LSEG.map(([k,l])=>`<button type="button" data-lseg="${k}" aria-pressed="${st.lseg===k}">${k==='fav'?'<span class="hrt" aria-hidden="true">♥</span>':''}${k==='todo'&&st.grp==='game'?'To play':l}<i>${base.filter(segOf[k]).length}</i></button>`).join('')}</div>`;
-  const types=`<div class="ltype" role="group" aria-label="Type">${G.map(([k,l])=>[k,l,st.items.filter(i=>inGrp(i,k)).length]).filter(([k,,n])=>k==='all'||n||st.grp===k).map(([k,l])=>`<button type="button" data-g="${k}" aria-pressed="${st.grp===k}">${k==='all'?'All types':l}</button>`).join('')}</div>`;
+  const types=`<div class="ltype" role="group" aria-label="Type">${G.map(([k,l])=>[k,l,st.items.filter(i=>inGrp(i,k)).length]).filter(([k,,n])=>k==='all'||n||st.grp===k).map(([k,l])=>`<button type="button" data-g="${k}" aria-pressed="${st.grp===k}">${k==='all'?'All':l}</button>`).join('')}</div>`;
   const subs=(LSUB[st.lseg]||[]).map(([k,l])=>[k,subLab(k,l),k?inSeg.filter(i=>subOk(i,k)).length:inSeg.length]).filter(([k,,n])=>!k||n||st.lsub===k);
-  const sub=subs.length>2||(subs.length>1&&subs[1][2]!==subs[0][2])?`<div class="lsub">${subs.map(([k,l,n])=>`<button type="button" data-lsub="${k}" aria-pressed="${(st.lsub||'')===k}">${l}<i>${n}</i></button>`).join('')}</div>`:'';
-  const nf=nFilt();
-  const tool=`<div class="ltool"><label class="lfind">${IC.find}<input id="lq" type="search" placeholder="Find in your library" value="${esc(lf.q)}" autocomplete="off" enterkeyhint="search" aria-label="Find in your library"></label><button type="button" class="lfb" data-lf aria-label="Sort and filter">${IC.filt}<span>Sort: ${st.layout==='wall'?'Color':SORTL[st.sort]||''}</span>${nf?`<i>${nf}</i>`:''}</button><div class="lviews" role="group" aria-label="View">${[['list','List',IC.list],['covers','Covers',IC.grid],['wall','Color wall',IC.wall]].map(([k,l,ic])=>`<button type="button" class="lfb lly" data-lly="${k}" aria-pressed="${st.layout===k}" aria-label="${l}" title="${l}">${ic}</button>`).join('')}</div></div>`;
-  return `<div class="lbar">${seg}<div class="lrow">${types}${tool}</div>${sub}</div>`}
+  const opt=(v,l,on)=>`<option value="${esc(v)}"${on?' selected':''}>${l}</option>`;
+  const sel=(k,lab,html,on)=>{const v=(html.match(/<option[^>]* selected>([^<]*)</)||html.match(/<option[^>]*>([^<]*)</)||[])[1]||'';return `<label class="lsel${on?' on':''}"><span>${lab}</span><b>${v.replace(/ \(\d+\)$/,'')}</b><select data-lsel="${k}" aria-label="${lab}">${html}</select><svg viewBox="0 0 10 6" aria-hidden="true"><path d="m1 1 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></label>`};
+  const wl=st.layout==='wall',so=[...LSORT[st.lseg]];if(!so.includes(st.sort))so.push(st.sort);
+  const tags=new Map();for(const i of inSeg)for(const g of i.tags||[]){const k=g.toLowerCase();const e=tags.get(k)||[g,0];e[1]++;tags.set(k,e)}
+  const bys=new Map();for(const i of inSeg)if(i.by)bys.set(i.by,(bys.get(i.by)||0)+1);
+  const tg=st.ltag[0]||'';if(tg&&!tags.has(tg.toLowerCase()))tags.set(tg.toLowerCase(),[tg,0]);
+  const ctl=[
+    sel('sort','Sort',(wl?opt('wall','Color (wall)',1):'')+so.map(k=>opt(k,SORTL[k]||k,!wl&&st.sort===k)).join(''),0)+(wl?'':`<button type="button" class="lrev" data-srev aria-label="${st.sortRev?'Normal order':'Reverse order'}" title="Reverse order">${st.sortRev?'↑':'↓'}</button>`),
+    subs.length>1?sel('sub','Show',subs.map(([k,l,n])=>opt(k,`${l} (${n})`,(st.lsub||'')===k)).join(''),!!st.lsub):'',
+    sel('rate','Rating',[['','Any'],['4.5','4½★ and up'],['4','4★ and up'],['3','3★ and up'],['none','Not rated']].map(([k,l])=>opt(k,l,(st.lrate||'')===k)).join(''),!!st.lrate),
+    tags.size?sel('tag','Tag',opt('','Any',!tg)+[...tags.values()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([g,n])=>opt(g,`${esc(g)} (${n})`,tg.toLowerCase()===g.toLowerCase())).join(''),!!tg):'',
+    bys.size||st.lby?sel('by','From',opt('','Anyone',!st.lby)+[...bys].sort((a,b)=>b[1]-a[1]).map(([g,n])=>opt(g,`${esc(g)} (${n})`,st.lby===g)).join(''),!!st.lby):'',
+    `<button type="button" class="lk lclr" data-lx="*"${nFilt()||st.lsub||lf.q.trim()?'':' hidden'}>Clear</button>`].filter(Boolean).join('');
+  const views=`<div class="lviews" role="group" aria-label="View">${[['list','List',IC.list],['covers','Covers',IC.grid],['wall','Color wall',IC.wall]].map(([k,l,ic])=>`<button type="button" class="lly" data-lly="${k}" aria-pressed="${st.layout===k}" aria-label="${l}" title="${l}">${ic}</button>`).join('')}</div>`;
+  const find=`<label class="lfind">${IC.find}<input id="lq" type="search" placeholder="Find in your library" value="${esc(lf.q)}" autocomplete="off" enterkeyhint="search" aria-label="Find in your library"></label>`;
+  return `<div class="lbar">${seg}<div class="lrow">${types}</div><div class="lrow2">${find}${views}<div class="lctl">${ctl}</div></div></div>`}
 function libPills(){const p=[];if(lf.q.trim())p.push(['q',`“${esc(lf.q.trim())}”`]);if(st.lrate)p.push(['rate',st.lrate==='none'?'Unrated':'★ '+st.lrate+'+']);st.ltag.forEach(t=>p.push(['tag:'+t,esc(t)]));if(st.lby)p.push(['by','From '+esc(st.lby)]);return p}
 function drawLibView(sample){$('#filters').innerHTML=libBar();drawLibBody(sample)}
 function drawLibBody(sample){const v=$('#view'),sm=$('#sum');if(sample===undefined)sample=st.items.some(i=>i.sample)?`<span class="smp">These are sample items.<button id="clr">Clear samples</button></span>`:'';
   const wl=st.layout==='wall',s0=[st.sort,st.sortRev];if(wl){st.sort='color';st.sortRev=false}const list=sorted(st.items.filter(libMatch));if(wl)[st.sort,st.sortRev]=s0;const segN=st.items.filter(i=>lsOk(i)&&subOk(i,st.lsub)).length,pills=libPills();
   const unr=st.items.filter(i=>inGrp(i,st.grp)&&segOf.done(i)&&!i.rating).length,favs=st.items.filter(i=>inGrp(i,st.grp)&&i.fav);
-  const cta=st.lseg==='done'&&unr?`<button type="button" class="lcta" data-rate>★ Rate ${unr} unrated</button>`:st.lseg==='fav'&&favs.length>1?`<button type="button" class="lcta" data-rank>${favs.some(i=>i.fr!=null)?(favs.some(i=>i.fr==null)&&st.grp!=='all'?'Rank '+favs.filter(i=>i.fr==null).length+' new':'Edit ranking'):'Rank them'}</button>`:st.lseg==='todo'&&list.length>1?`<button type="button" class="lcta" data-lpick>Pick one for me</button>`:'';
+  const cta=st.lseg==='done'&&unr?`<button type="button" class="lcta" data-rate>Rate ${unr} unrated →</button>`:st.lseg==='fav'&&favs.length>1?`<button type="button" class="lcta" data-rank>${favs.some(i=>i.fr!=null)?(favs.some(i=>i.fr==null)&&st.grp!=='all'?'Rank '+favs.filter(i=>i.fr==null).length+' new':'Edit ranking'):'Rank them'} →</button>`:st.lseg==='todo'&&list.length>1?`<button type="button" class="lcta" data-lpick>Pick one for me →</button>`:'';
   const rankOn=st.sort==='rank'&&st.grp!=='all';
-  sm.innerHTML=`<div class="lsum"><span class="lcount"><b>${list.length}</b> ${list.length===segN?'':'of '+segN+' '}${SEGN[st.lseg]}<span class="lsort">, ${wl?'color wall':(SORTL[st.sort]||'').toLowerCase()+(st.sortRev?' (reversed)':'')}</span></span>${pills.map(([k,l])=>`<button type="button" class="pill" data-lx="${esc(k)}" aria-label="Remove filter ${l}">${l}<span aria-hidden="true">×</span></button>`).join('')}${pills.length>1?'<button type="button" class="lk" data-lx="*">Clear all</button>':''}<span class="lsp"></span>${cta}<button class="lk" type="button" data-share>Share</button></div>${sample?`<div>${sample}</div>`:''}${st.layout==='list'&&list.length?'<span class="hint">Swipe a row right for done, left to revisit, or all the way left to remove.</span>':''}`;
+  sm.innerHTML=`<div class="lsum"><span class="lcount"><b>${list.length}</b> ${list.length===segN?'':'of '+segN+' '}${SEGN[st.lseg]}</span><span class="lsp"></span>${cta}<button class="lk" type="button" data-share>Share</button></div>${sample?`<div>${sample}</div>`:''}${st.layout==='list'&&list.length?'<span class="hint">Swipe a row right for done, left to revisit, or all the way left to remove.</span>':''}`;
   if(!list.length){const why=pills.length?`<b>Nothing matches</b>Try fewer filters.<br><button class="lk" type="button" data-lx="*">Clear filters</button>`:
      st.lseg==='fav'?`<b>No favorites yet</b>Tap ♥ on anything you love. Rating your finished things is a quick way to find them.${unr?`<br><button class="lk" type="button" data-rate>Rate ${unr} unrated</button>`:''}`:
      st.lseg==='done'?`<b>Nothing finished here yet</b>Add things you’ve already seen, heard or played.<br><button class="lk" type="button" data-bulk>Add past favorites</button>`:
@@ -1024,25 +1032,6 @@ function drawLibBody(sample){const v=$('#view'),sm=$('#sum');if(sample===undefin
     <td class="m hm">${T[it.type]}${VID.includes(it.type)&&svcs(it).length?`<br><span style="font-size:13px">${esc(svcs(it).slice(0,2).join(', '))}${svcs(it).length>2?' +'+(svcs(it).length-2):''}</span>`:''}</td><td><span class="st ${it.status}">${sLab(it)}</span></td><td class="m hm">${esc(it.by)}</td><td class="hm"><span class="stars">${stars(it.rating)}</span>${rvMini(it.rv)}</td><td class="n hm">${md(it.added)}</td></tr>`).join('')}</tbody></table>`}
 const dlgR=html=>{const d=$('#dlg');if(d.open)d.innerHTML=html;else dlg(html);d.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>d.close()))};
 const dlgOff=()=>{const d=$('#dlg');d.addEventListener('close',()=>{d.onclick=null;d.classList.remove('sheet')},{once:true})};
-function libSheet(){const d=$('#dlg'),pool=st.items.filter(lsOk),opts=[...LSORT[st.lseg]];if(!opts.includes(st.sort))opts.push(st.sort);
-  const cnt=(m,key,lab)=>{const o=new Map();for(const i of pool)for(const g of key(i)){const k=g.toLowerCase();const e=o.get(k)||[g,0];e[1]++;o.set(k,e)}return o};
-  const tags=cnt(0,i=>i.tags||[]),bys=cnt(0,i=>i.by?[i.by]:[]);
-  st.ltag.forEach(t=>{if(!tags.has(t.toLowerCase()))tags.set(t.toLowerCase(),[t,0])});
-  const ch=(a,val,on,label,n)=>`<button type="button" class="chip" data-${a}="${esc(val)}" aria-pressed="${on}">${label}${n!=null?`<i>${n}</i>`:''}</button>`;
-  const n=st.items.filter(libMatch).length,wasOpen=d.open,sc=d.scrollTop;
-  dlgR(`<div class="shd"><h3>Sort and filter</h3><button type="button" class="x" data-close aria-label="Close">×</button></div>
-   <h4>Sort by</h4><div class="chips">${opts.map(k=>ch('fs',k,st.sort===k,SORTL[k]||k)).join('')}${ch('frev','1',!!st.sortRev,'Reverse order')}</div>
-   <h4>Your rating</h4><div class="chips">${[['','Any'],['4.5','★ 4½ and up'],['4','★ 4 and up'],['3','★ 3 and up'],['none','Not rated yet']].map(([k,l])=>ch('frt',k,(st.lrate||'')===k,l)).join('')}</div>
-   ${tags.size?`<h4>Tags</h4><div class="chips">${[...tags.values()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([g,c])=>ch('ft',g,st.ltag.some(t=>t.toLowerCase()===g.toLowerCase()),esc(g),c)).join('')}</div>`:''}
-   ${bys.size?`<h4>Recommended by</h4><div class="chips">${[...bys.values()].sort((a,b)=>b[1]-a[1]).map(([g,c])=>ch('fb',g,st.lby===g,esc(g),c)).join('')}</div>`:''}
-   <h4>Layout</h4><div class="chips">${LAYOUTS.map(([k,l])=>ch('fly',k,st.layout===k,l)).join('')}</div>
-   <div class="dbtn"><button type="button" class="btn" data-fclr ${nFilt()?'':'disabled'}>Clear filters</button><button type="button" class="btn pri" data-close>Show ${n}</button></div>`);
-  d.classList.add('sheet');if(wasOpen)d.scrollTop=sc;else dlgOff();
-  d.onclick=e=>{const b=e.target.closest('button');if(!b||b.hasAttribute('data-close'))return;const x=b.dataset;
-    if(x.fs){st.sort=x.fs;st.sortRev=false;if(st.layout==='wall')st.layout='covers'}else if(x.frev)st.sortRev=!st.sortRev;else if(x.frt!==undefined)st.lrate=x.frt;
-    else if(x.ft!==undefined){const k=x.ft.toLowerCase();st.ltag=st.ltag.some(t=>t.toLowerCase()===k)?st.ltag.filter(t=>t.toLowerCase()!==k):[...st.ltag,x.ft]}
-    else if(x.fb!==undefined)st.lby=st.lby===x.fb?'':x.fb;else if(x.fly)st.layout=x.fly;else if(b.hasAttribute('data-fclr')){st.lrate='';st.ltag=[];st.lby=''}else return;
-    save();render();libSheet()}}
 /* rate as you go: one unrated finished item at a time */
 let rq=null;
 function rateDlg(){const l=st.items.filter(i=>inGrp(i,st.grp)&&segOf.done(i)&&!i.rating).sort((a,b)=>(b.doneAt||b.added).localeCompare(a.doneAt||a.added));
@@ -1097,14 +1086,14 @@ function rankList(){const l=rk.r.map(byId).filter(Boolean);
     else if(x.rkr!==undefined){const now=new Date().toISOString();rk.r.forEach(id=>{const it=byId(id);if(it){delete it.fr;it.touched=now}});save();rankDlg(rk.g)}
     else if(x.rkc!==undefined)rankNext();
     else if(x.rkd!==undefined){$('#dlg').close();if(st.view==='library'){if(st.lseg!=='fav')setSeg('fav');st.grp=rk.g;st.sort='rank';st.sortRev=false;save();render()}}}}
-document.addEventListener('input',e=>{if(e.target.id==='lq'){lf.q=e.target.value;drawLibBody()}});
+document.addEventListener('input',e=>{if(e.target.id==='lq'){lf.q=e.target.value;drawLibBody();const c=document.querySelector('.lclr');if(c)c.hidden=!(nFilt()||st.lsub||lf.q.trim())}});
+document.addEventListener('change',e=>{const k=e.target.dataset?.lsel;if(!k)return;const v=e.target.value;
+  if(k==='sort'){if(v!=='wall'){st.sort=v;st.sortRev=false;if(st.layout==='wall')st.layout='covers'}}else if(k==='sub')st.lsub=v;else if(k==='rate')st.lrate=v;else if(k==='tag')st.ltag=v?[v]:[];else if(k==='by')st.lby=v;save();render()});
 document.addEventListener('keydown',e=>{if(e.target.id==='lq'&&e.key==='Enter')e.target.blur()});
-document.addEventListener('click',e=>{const t=e.target.closest('[data-lseg],[data-lsub],[data-lf],[data-lly],[data-lx],[data-rate],[data-rank],[data-lpick]');if(!t)return;const x=t.dataset;
+document.addEventListener('click',e=>{const t=e.target.closest('[data-lseg],[data-lly],[data-lx],[data-rate],[data-rank],[data-lpick]');if(!t)return;const x=t.dataset;
   if(x.lseg){setSeg(x.lseg);save();render();return}
-  if(x.lsub!==undefined){st.lsub=st.lsub===x.lsub?'':x.lsub;save();render();return}
-  if(x.lf!==undefined){libSheet();return}
   if(x.lly){st.layout=x.lly;save();render();return}
-  if(x.lx){const k=x.lx;if(k==='*'||k==='q'){lf.q='';const q=$('#lq');if(q)q.value=''}if(k==='*'){st.lrate='';st.ltag=[];st.lby=''}else if(k==='rate')st.lrate='';else if(k==='by')st.lby='';else if(k.startsWith('tag:'))st.ltag=st.ltag.filter(g=>g!==k.slice(4));save();render();return}
+  if(x.lx){const k=x.lx;if(k==='*'||k==='q'){lf.q='';const q=$('#lq');if(q)q.value=''}if(k==='*'){st.lrate='';st.ltag=[];st.lby='';st.lsub=''}else if(k==='rate')st.lrate='';else if(k==='by')st.lby='';else if(k.startsWith('tag:'))st.ltag=st.ltag.filter(g=>g!==k.slice(4));save();render();return}
   if(x.rate!==undefined){rateDlg();return}
   if(x.lpick!==undefined){pk.g=st.grp;pickDlg();return}
   if(x.rank!==undefined)rankDlg()});
