@@ -660,6 +660,24 @@ dialog.sheet .dbtn{position:sticky;bottom:-22px;background:var(--bg);padding:14p
 .lsum .lsort{color:var(--mut)}
 @media(min-width:481px){.lsum .lsort{display:none}}
 @media(max-width:720px){.ix.nost th:nth-child(3),.ix.nost td:nth-child(3){display:none}}
+
+/* v-3 header: shelves as full-width tabs, types and tools on one row */
+.lbar{gap:14px}
+.lseg{display:flex;max-width:none;background:none;border:0;border-bottom:1px solid var(--rule);border-radius:0;padding:0;gap:0}
+.filters .lseg button{flex:1;min-height:44px;border-radius:0;font-size:15px;box-shadow:none;border-bottom:2px solid transparent;margin-bottom:-1px;gap:5px}
+.filters .lseg button[aria-pressed=true]{background:none;box-shadow:none;border-bottom-color:var(--ink);color:var(--ink)}
+.lseg i{font-size:12.5px}
+.lrow{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.ltype{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1 1 auto;min-width:0}
+.filters .ltype button{flex:none;height:34px;padding:0 13px;border:1px solid var(--rule);border-radius:17px;font-size:14px;color:var(--mut)}
+.filters .ltype button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg);text-decoration:none}
+.ltool{flex:0 1 460px;margin-left:auto}
+.lfind{max-width:none}
+.filters .lsub button{height:30px;font-size:13px}
+@media(max-width:760px){.lseg{margin-inline:calc(-1 * max(4vw,16px));padding-inline:max(4vw,16px)}.ltype{flex-basis:100%;margin-inline:calc(-1 * max(4vw,16px));padding-inline:max(4vw,16px)}.ltool{flex-basis:100%}.filters .lseg button{font-size:14px}}
+@media(max-width:380px){.lseg i{display:none}}
+
+@media(max-width:480px){.filters .lseg button{flex:1 1 auto;font-size:14px;gap:3px;padding:0 2px}.lseg .hrt{display:none}.lseg i{font-size:11.5px}}
 </style>
 </head>
 <body>
@@ -674,7 +692,7 @@ dialog.sheet .dbtn{position:sticky;bottom:-22px;background:var(--bg);padding:14p
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-2</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-3</small>
     </div></details>
   </div>
 </header>
@@ -936,11 +954,11 @@ const STATS=[['open','Not done'],['check','Check out'],['prog','In progress'],['
 const LAYOUTS=[['list','List'],['covers','Covers'],['shelf','Shelf']];
 /* library: shelves (To do, Done, Favorites, All), a find box, a sort and filter sheet, rate-as-you-go and favorite ranking.
    View state is local (st.lseg, st.lsub, st.sorts, st.lrate, st.ltag, st.lby). it.fr is a favorite's rank within its type group; it syncs. */
-const LSEG=[['todo','To do'],['done','Done'],['fav','Favorites'],['all','All']];
+const LSEG=[['todo','To do'],['done','Done'],['fav','Favorites'],['all','Everything']];
 const LSORT={todo:['next','added','title','year','type','by','color'],done:['done','rating','revisit','title','year','added','type','color'],fav:['rank','rating','done','title','year','type','color'],all:['added','title','rating','status','type','year','by','revisit','color']};
 const SORTL={next:'Up next first',added:'Recently added',done:'Recently finished',rank:'Your ranking',rating:'Your rating',revisit:'Most revisitable',title:'Title',year:'Release year',type:'Type',status:'Status',by:'Recommended by',color:'Color'};
 const segOf={todo:i=>i.status!=='done',done:i=>i.status==='done'||i.status==='again',fav:i=>!!i.fav,all:()=>true};
-const LSUB={todo:[['','Everything'],['prog','In progress'],['check','Check out'],['again','Revisit']],done:[['','Everything'],['unrated','Unrated'],['dnf','Didn’t finish']]};
+const LSUB={todo:[['','All to do'],['prog','In progress'],['check','Check out'],['again','Revisit']],done:[['','All done'],['unrated','Unrated'],['dnf','Didn’t finish']]};
 const SEGN={todo:'to do',done:'done',fav:'favorites',all:'saved'};
 const lf={q:''};
 const relYr=it=>+(it.extra?.year||String(it.info?.date||'').slice(0,4))||0;
@@ -967,12 +985,12 @@ const IC={find:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strok
  list:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10"/><circle cx="3.5" cy="5" r=".8" fill="currentColor"/><circle cx="3.5" cy="10" r=".8" fill="currentColor"/><circle cx="3.5" cy="15" r=".8" fill="currentColor"/></svg>'};
 function libBar(){const base=st.items.filter(i=>inGrp(i,st.grp)),segAll=st.items.filter(segOf[st.lseg]),inSeg=st.items.filter(lsOk);
   const seg=`<div class="lseg" role="group" aria-label="Show">${LSEG.map(([k,l])=>`<button type="button" data-lseg="${k}" aria-pressed="${st.lseg===k}">${k==='fav'?'<span class="hrt" aria-hidden="true">♥</span>':''}${k==='todo'&&st.grp==='game'?'To play':l}<i>${base.filter(segOf[k]).length}</i></button>`).join('')}</div>`;
-  const types=`<div class="fl ltype">${G.map(([k,l])=>[k,l,segAll.filter(i=>inGrp(i,k)).length]).filter(([k,,n])=>k==='all'||n||st.grp===k).map(([k,l,n])=>`<button data-g="${k}" aria-pressed="${st.grp===k}">${l}<i>${n}</i></button>`).join('')}</div>`;
+  const types=`<div class="ltype" role="group" aria-label="Type">${G.map(([k,l])=>[k,l,st.items.filter(i=>inGrp(i,k)).length]).filter(([k,,n])=>k==='all'||n||st.grp===k).map(([k,l])=>`<button type="button" data-g="${k}" aria-pressed="${st.grp===k}">${k==='all'?'All types':l}</button>`).join('')}</div>`;
   const subs=(LSUB[st.lseg]||[]).map(([k,l])=>[k,subLab(k,l),k?inSeg.filter(i=>subOk(i,k)).length:inSeg.length]).filter(([k,,n])=>!k||n||st.lsub===k);
   const sub=subs.length>2||(subs.length>1&&subs[1][2]!==subs[0][2])?`<div class="lsub">${subs.map(([k,l,n])=>`<button type="button" data-lsub="${k}" aria-pressed="${(st.lsub||'')===k}">${l}<i>${n}</i></button>`).join('')}</div>`:'';
   const nf=nFilt();
-  const tool=`<div class="ltool"><label class="lfind">${IC.find}<input id="lq" type="search" placeholder="Find in your library" value="${esc(lf.q)}" autocomplete="off" enterkeyhint="search" aria-label="Find in your library"></label><button type="button" class="lfb" data-lf aria-label="Sort and filter">${IC.filt}<span>${SORTL[st.sort]||'Sort'}</span>${nf?`<i>${nf}</i>`:''}</button><button type="button" class="lfb lly" data-lly aria-label="${st.layout==='list'?'Show covers':'Show as a list'}" title="${st.layout==='list'?'Covers':'List'}">${st.layout==='list'?IC.grid:IC.list}</button></div>`;
-  return `<div class="lbar">${seg}${types}${tool}${sub}</div>`}
+  const tool=`<div class="ltool"><label class="lfind">${IC.find}<input id="lq" type="search" placeholder="Find in your library" value="${esc(lf.q)}" autocomplete="off" enterkeyhint="search" aria-label="Find in your library"></label><button type="button" class="lfb" data-lf aria-label="Sort and filter">${IC.filt}<span>Sort: ${SORTL[st.sort]||''}</span>${nf?`<i>${nf}</i>`:''}</button><button type="button" class="lfb lly" data-lly aria-label="${st.layout==='list'?'Show covers':'Show as a list'}" title="${st.layout==='list'?'Covers':'List'}">${st.layout==='list'?IC.grid:IC.list}</button></div>`;
+  return `<div class="lbar">${seg}<div class="lrow">${types}${tool}</div>${sub}</div>`}
 function libPills(){const p=[];if(lf.q.trim())p.push(['q',`“${esc(lf.q.trim())}”`]);if(st.lrate)p.push(['rate',st.lrate==='none'?'Unrated':'★ '+st.lrate+'+']);st.ltag.forEach(t=>p.push(['tag:'+t,esc(t)]));if(st.lby)p.push(['by','From '+esc(st.lby)]);return p}
 function drawLibView(sample){$('#filters').innerHTML=libBar();drawLibBody(sample)}
 function drawLibBody(sample){const v=$('#view'),sm=$('#sum');if(sample===undefined)sample=st.items.some(i=>i.sample)?`<span class="smp">These are sample items.<button id="clr">Clear samples</button></span>`:'';
