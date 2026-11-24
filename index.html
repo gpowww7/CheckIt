@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#0f1013"><meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter+Tight:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Calistoga&family=Inter+Tight:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
 <style>
 /* VOICE everyday personal tool, quiet and exact
    IDEA a record shop's catalogue index: one ledger for records, films, shows and sets
@@ -753,6 +753,13 @@ dialog .x:hover{background:var(--soft);color:var(--ink)}
  .lrow2 .lctl .lclr{flex:1 1 100%;height:40px}
 }
 @media(max-width:760px){.lrow2 .lctl .lsel:first-child>span{display:none}}
+@media(max-width:760px){.lrow2 .lctl .lsel:first-child{flex:0 0 calc(100% - 44px)}.lrow2 .lctl .lsel:first-child>span{display:inline}}
+/* -10: Calistoga display type: logo, shelf tabs, cover titles, headings */
+.mark,.filters .lseg button,.cv .ct b,.nrow h2,.empty b,dialog h3,.crate h2,.ip h2,.stubs h3,.rqt b,.rkt b{font-family:Calistoga,"Inter Tight",serif;font-weight:400;letter-spacing:-.005em}
+.filters .lseg button{font-size:15.5px}
+.filters .lseg i{font-family:"Inter Tight",system-ui,sans-serif}
+@media(max-width:480px){.filters .lseg button{font-size:14.5px}}
+@media(max-width:480px){.filters .lseg button{font-size:14px;gap:3px}.filters .lseg i{font-size:11px}}
 </style>
 </head>
 <body>
@@ -767,7 +774,7 @@ dialog .x:hover{background:var(--soft);color:var(--ink)}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-9</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-10</small>
     </div></details>
   </div>
 </header>
