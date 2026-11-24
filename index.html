@@ -935,6 +935,7 @@ body.mo-live[data-world=music] #view .wall>.cv:not(.mo-t){animation:moBeatC .625
 body.mo-live[data-world=set] #view .wall>.cv:not(.mo-t){animation:moBounce .4839s ease-out infinite}
 body.mo-live[data-world=set] #view .wall>.cv:nth-child(even):not(.mo-t){animation-delay:-.24s}
 @media(prefers-reduced-motion:reduce){#mo-ecot,#mo-grade,#mo-hud{display:none}}
+@media(max-width:600px){body[data-lgrp=game] .wall .w{grid-column:span 3;grid-row:span 2}.bg.w{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}}
 body.mo-off .mo-t,body.mo-off .mo-pg,body.mo-off .mark,body.mo-off .tabs svg,body.mo-off dialog[open]{animation:none!important}
 body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 @media(prefers-reduced-motion:reduce){.mo-t,.mo-pg,.mark,.tabs button svg,dialog[open],dialog[open]::backdrop{animation:none!important}img.mo-ld{opacity:1;transform:none}.mo-fx{display:none}#view.mo-hold{opacity:1}.wall>.cv,.stub,.strip>.tile,#bgrid>.bt{transition:none}}
@@ -957,7 +958,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-15</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-16</small>
     </div></details>
   </div>
 </header>
@@ -4050,6 +4051,8 @@ const ECOD2={
 Object.assign(ECOD,ECOD2);
 {const r0=moAfter;moAfter=function(){const r=r0.apply(this,arguments);try{moHud()}catch(e){}return r}}
 moAmb(moType());
+/* games two to a row on phones: Library covers and Browse (CSS `body[data-lgrp=game]`, `.bg.w`). */
+{const r1=moAfter;moAfter=function(){document.body.dataset.lgrp=st.view==='library'?st.grp:'';return r1.apply(this,arguments)}}
 render();
 setTimeout(()=>st.items.filter(i=>!i.sample).forEach(i=>findSpotify(i)),3000);
 setTimeout(artSoon,5000);
