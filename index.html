@@ -958,7 +958,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-16</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-17</small>
     </div></details>
   </div>
 </header>
@@ -1675,9 +1675,9 @@ function quick(it){const q=$('#qa');q.dataset.id=it.id;$('#toast').classList.rem
   if(dn){const on=new Set((it.tags||[]).map(x=>x.toLowerCase())),tg=tagsFor(it.type).slice(0,10);for(const g of it.tags||[])if(!tg.some(x=>x.toLowerCase()===g.toLowerCase()))tg.unshift(g);
     q.innerHTML=`${mini}<div class="qi"><b>${it.status==='again'?'Revisit':it.type==='game'?'Played':'Done'}: ${esc(it.title)}</b>${it.type==='game'&&it.status==='done'?`<div class="seg s2 qg"><button type="button" data-qd="0" aria-pressed="${!it.dnf}">Finished</button><button type="button" data-qd="1" aria-pressed="${!!it.dnf}">Didn’t finish</button></div>`:''}<div class="qrow"><div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}</div><select id="qera" aria-label="When">${eraOpts(it)}</select></div><div class="qtl" role="group" aria-label="Quick take">${tg.map(g=>`<button type="button" class="tg2" data-tag="${esc(g)}" style="--r:${hash(g.toLowerCase())%7*.6-1.8}deg" aria-pressed="${on.has(g.toLowerCase())}">${esc(g)}</button>`).join('')}</div></div>${favBtn(it)}<button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`}
   else q.innerHTML=`${mini}<div class="qi"><b>Added ${esc(it.title)}</b><div class="qrow"><div class="seg s3"><button type="button" data-qs="check" aria-pressed="${it.status==='check'}">${it.type==='game'?'Want to play':'Check out'}</button><button type="button" data-qs="again" aria-pressed="${it.status==='again'}">Revisit</button><button type="button" data-qs="done" aria-pressed="false">${it.type==='game'?'Played':'Done'}</button></div><input id="qby" placeholder="Recommended by" value="${esc(it.by)}" aria-label="Recommended by"></div></div><button type="button" class="lk" id="qo">Open</button><button type="button" class="qx" id="qx" aria-label="Dismiss">×</button>`;
-  q.classList.add('on');qaTimer(dn?15000:9000)}
+  q.classList.add('on');qaTimer(dn?7000:6000)}
 const qaTimer=ms=>{clearTimeout(qt);qt=setTimeout(()=>$('#qa').classList.remove('on'),ms)};
-$('#qa').addEventListener('click',e=>{const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(!it)return;const b=e.target.closest('button');if(!b)return;if($('#qa').classList.contains('dn'))qaTimer(15000);
+$('#qa').addEventListener('click',e=>{const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(!it)return;const b=e.target.closest('button');if(!b)return;if($('#qa').classList.contains('dn'))qaTimer(7000);
   const now=()=>{it.touched=new Date().toISOString();delete it.sample};
   if(b.dataset.qs){setSt(it,b.dataset.qs);save();render();if(b.dataset.qs==='done'){quick(it);return}$('#qa').querySelectorAll('[data-qs]').forEach(x=>x.setAttribute('aria-pressed',x===b))}
   if(b.dataset.qd!=null){if(b.dataset.qd==='1')it.dnf=true;else delete it.dnf;now();save();render();if(cur===it)drawItem();quick(it);return}
@@ -1686,10 +1686,17 @@ $('#qa').addEventListener('click',e=>{const it=st.items.find(i=>i.id===$('#qa').
   if(b.hasAttribute('data-fav')){toggleFav(it);save();render();b.outerHTML=favBtn(it)}
   if(cur===it&&!b.id)drawItem();
   if(b.id==='qo'){$('#qa').classList.remove('on');openItem(it.id)}if(b.id==='qx')$('#qa').classList.remove('on')});
-$('#qa').addEventListener('change',e=>{if(e.target.id!=='qera')return;const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(!it)return;setEra(it,e.target.value);save();render();if(cur===it)drawItem();qaTimer(15000)});
+$('#qa').addEventListener('change',e=>{if(e.target.id!=='qera')return;const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(!it)return;setEra(it,e.target.value);save();render();if(cur===it)drawItem();qaTimer(7000)});
 $('#qa').addEventListener('input',e=>{const it=st.items.find(i=>i.id===$('#qa').dataset.id);if(it&&e.target.id==='qby'){it.by=e.target.value;save();render()}});
-$('#qa').addEventListener('focusin',()=>clearTimeout(qt));
-$('#qa').addEventListener('focusout',()=>{clearTimeout(qt);qt=setTimeout(()=>$('#qa').classList.remove('on'),6000)});
+/* the quick card only waits while you type in it; taps on stars or tags just restart a short timer */
+$('#qa').addEventListener('focusin',e=>{if(e.target.matches('input,select,textarea'))clearTimeout(qt)});
+$('#qa').addEventListener('focusout',e=>{if(e.target.matches('input,select,textarea'))qaTimer(4000)});
+/* swipe the quick card down, or tap anywhere outside it, to dismiss */
+{let y0=null,x0=0,dy=0;const q=$('#qa');
+  q.addEventListener('touchstart',e=>{if(e.target.closest('input,select,textarea'))return;y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0},{passive:true});
+  q.addEventListener('touchmove',e=>{if(y0==null)return;const d=e.touches[0].clientY-y0,dx=Math.abs(e.touches[0].clientX-x0);if(dx>Math.abs(d)&&dy===0){y0=null;return}dy=Math.max(0,d);if(dy>4){q.style.transition='none';q.style.transform=`translate(-50%,${dy}px)`;q.style.opacity=String(Math.max(.2,1-dy/160))}},{passive:true});
+  q.addEventListener('touchend',()=>{if(y0==null)return;y0=null;q.style.transition='';q.style.transform='';q.style.opacity='';if(dy>50){clearTimeout(qt);q.classList.remove('on')}dy=0});
+  document.addEventListener('pointerdown',e=>{if(q.classList.contains('on')&&!q.contains(e.target)&&!e.target.closest('[data-ba],.toast,#dlg'))q.classList.remove('on')},true)}
 /* swipe crate stage */
 let cx0=null;
 document.addEventListener('touchstart',e=>{const ex=e.touches[0].clientX;cx0=e.target.closest('#stage')&&ex>=28&&ex<=innerWidth-28?ex:null},{passive:true});
