@@ -570,6 +570,23 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
 @media(max-width:600px){.bw{padding-top:16px}.bty{gap:18px}.bty button{font-size:20px}.bct{display:block}.bsel{margin-top:10px}.bsel select{flex:1}.bch{margin-inline:-16px;padding-inline:16px}
 .bg{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 10px}.bg.w{grid-template-columns:repeat(2,minmax(0,1fr))}
 .bm b{font-size:13px}.bm small{font-size:12px}.ba{gap:4px}.ba button{height:34px;font-size:16px}.ba button span{display:none}}
+.gq .gq1{display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px;align-items:center;padding:16px;border-radius:8px;background:color-mix(in srgb,var(--ic) 14%,var(--bg));border:1px solid var(--rule)}
+.gq .gqc{padding:0;display:block}.gq .gqc .cv{width:200px;height:112px;border-radius:4px}
+.gq .gqi b{display:block;font-size:24px;letter-spacing:-.02em;line-height:1.15;font-weight:600}.gq .gqi>span:not(.gqn){color:var(--mut)}
+.gq .gqn{font-variant-numeric:tabular-nums;color:var(--mut);font-weight:600}
+.gq .gqi .gqn{display:inline-block;font-size:13px;color:var(--acc);margin-bottom:4px}
+.gq .gqa{display:flex;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.gql{list-style:none;margin:10px 0 0;padding:0}
+.gql li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--rule)}
+.gql li:last-child{border-bottom:0}
+.gql .gqt{display:flex;gap:12px;align-items:center;text-align:left;min-width:0;padding:0}
+.gql .gqt b{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gql .gqt small{color:var(--mut)}
+.gql .gqt>span{min-width:0}
+.gqb{display:inline-flex;gap:4px}
+.gqb button{min-width:36px;height:36px;padding:0 8px;border:1px solid var(--rule);border-radius:5px;color:var(--mut);font-size:15px;white-space:nowrap}
+.gqb button:hover{color:var(--ink);border-color:var(--mut)}
+.gqr{align-items:center;margin-top:-6px}.gqr b{color:var(--ink)}.gqr .gqb{margin-left:auto}.gqr .gqb button{height:32px;font-size:13px}
+@media(max-width:600px){.gq .gq1{grid-template-columns:120px minmax(0,1fr);gap:14px;padding:12px}.gq .gqc .cv{width:120px;height:68px}.gq .gqi b{font-size:19px}}
 </style>
 </head>
 <body>
@@ -584,7 +601,7 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.23-20</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-1</small>
     </div></details>
   </div>
 </header>
@@ -813,6 +830,8 @@ function eraOpts(it){const Y=eraY(),v=it.era||'now',D=decs();
   const o=[['now',it.era||!it.doneAt?'Just now':new Date(it.doneAt).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})],[String(Y),'Earlier this year'],[String(Y-1),'Last year'],...D.map(d=>[d+'s','The '+d+'s']),['old',`Before ${D[3]}`],['?','Not sure when']];
   if(!o.some(x=>x[0]===v))o.splice(3,0,[v,eraLabel(v)]);return o.map(([k,l])=>`<option value="${k}"${k===v?' selected':''}>${esc(l)}</option>`).join('')}
 function setEra(it,v){it.touched=new Date().toISOString();delete it.sample;if(v==='now'){delete it.era;it.doneAt=it.touched}else{it.era=v;it.doneAt=eraISO(v)}}
+const rankBlock=it=>{if(it.type!=='game'||it.status!=='check')return'';const l=gameQ(),k=l.findIndex(i=>i.id===it.id),n=l.length;
+  return `<div class="rb gqr">Play order <b>#${k+1}</b> of ${n}<span class="gqb">${k>0?`<button type="button" data-gq="top" data-gid="${it.id}" title="Move to top">⤒ Top</button><button type="button" data-gq="up" data-gid="${it.id}" aria-label="Move up">↑</button>`:''}${k<n-1?`<button type="button" data-gq="down" data-gid="${it.id}" aria-label="Move down">↓</button>`:''}</span></div>`};
 const whenBlock=it=>it.status==='done'||it.status==='again'?`<label class="rb">Finished <select id="f-era" aria-label="When you finished it">${eraOpts(it)}</select></label>`:'';
 const RV=['Once was enough','Maybe someday','Would revisit','Often','On repeat forever'];
 const rvMini=n=>n?`<span class="rvm" title="${RV[n-1]}">${[1,2,3,4,5].map(k=>`<i class="${k<=n?'on':''}" style="height:${3+k*2}px"></i>`).join('')}</span>`:'';
@@ -871,9 +890,21 @@ function render(){
 }
 /* up next */
 let pickQ=null;
+// Game queue: games marked Want to play are ranked (it.qr, synced). #1 is the one to play next. New ones join at the bottom.
+const gameQ=()=>st.items.filter(i=>i.type==='game'&&i.status==='check').sort((a,b)=>(a.qr??1e9)-(b.qr??1e9)||a.added.localeCompare(b.added));
+function gqMove(id,how){const l=gameQ(),k=l.findIndex(i=>i.id===id);if(k<0)return;const it=l[k];l.splice(k,1);
+  const to=how==='top'?0:how==='up'?Math.max(0,k-1):how==='bottom'?l.length:Math.min(l.length,k+1);l.splice(to,0,it);
+  const now=new Date().toISOString();l.forEach((x,n)=>{if(x.qr!==n+1){x.qr=n+1;x.touched=now;delete x.sample}});save();render();if(cur)drawItem()}
+function gqHtml(){const l=gameQ();if(!l.length)return'';const now=st.items.filter(i=>i.type==='game'&&i.status==='prog');
+  const ar=(it,k)=>`<span class="gqb">${k>1?`<button type="button" data-gq="top" data-gid="${it.id}" aria-label="Move ${esc(it.title)} to the top" title="Move to top">⤒</button>`:''}${k>0?`<button type="button" data-gq="up" data-gid="${it.id}" aria-label="Move ${esc(it.title)} up" title="Move up">↑</button>`:''}${k<l.length-1?`<button type="button" data-gq="down" data-gid="${it.id}" aria-label="Move ${esc(it.title)} down" title="Move down">↓</button>`:''}</span>`;
+  const f=l[0];
+  return `<section class="nrow gq"><h2>Games, play next<span>${l.length} in line${now.length?`, playing ${esc(now.map(i=>i.title).join(', '))}`:''}</span></h2>
+   <div class="gq1" style="${cs(f)}"><button type="button" class="gqc" data-open="${f.id}">${cover(f,'ini w')}</button><div class="gqi"><span class="gqn">#1</span><b>${esc(f.title)}</b>${f.creator?`<span>${esc(f.creator)}</span>`:''}<div class="gqa"><button type="button" class="btn pri" data-gstart="${f.id}">Start playing</button>${ar(f,0)}</div></div></div>
+   ${l.length>1?`<ol class="gql" start="2">${l.slice(1).map((it,j)=>`<li><span class="gqn">${j+2}</span><button type="button" class="gqt" data-open="${it.id}">${cover(it,'mini')}<span><b>${esc(it.title)}</b>${it.creator?`<small>${esc(it.creator)}</small>`:''}</span></button>${ar(it,j+1)}</li>`).join('')}</ol>`:''}</section>`}
 function cands(){const fit=TIMES.find(t=>t[0]===pk.t)[2];return st.items.filter(i=>i.status!=='done'&&inGrp(i,pk.g)&&fit(mins(i)))}
 function buildQ(){const c=cands(),out=[];const w=c.map(i=>1+ageDays(i)/30+(i.status==='prog'?3:0)+(i.status==='again'?(i.rv||0)*.5:0));
-  while(c.length){let r=Math.random()*w.reduce((a,b)=>a+b,0),k=0;for(;k<c.length-1;k++){r-=w[k];if(r<=0)break}out.push(c[k].id);c.splice(k,1);w.splice(k,1)}pickQ=out}
+  while(c.length){let r=Math.random()*w.reduce((a,b)=>a+b,0),k=0;for(;k<c.length-1;k++){r-=w[k];if(r<=0)break}out.push(c[k].id);c.splice(k,1);w.splice(k,1)}
+  if(pk.g==='game'){const r=new Map(gameQ().map((i,n)=>[i.id,n])),it=id=>st.items.find(i=>i.id===id),sc=id=>{const x=it(id);return x.status==='prog'?-1:x.status==='check'?r.get(id)??999:1e3};out.sort((a,b)=>sc(a)-sc(b))}pickQ=out}
 function linksFor(it){return [MUS.includes(it.type)?`<a class="lk" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Listen on Spotify':'Find on Spotify'}<span>↗</span></a>`:'',VID.includes(it.type)?`<a class="lk" href="${esc(it.watch?.link||jw(it))}" target="_blank" rel="noopener">Where to watch<span>↗</span></a>`:'',it.type==='game'?`<a class="lk" href="${esc(steam(it))}" target="_blank" rel="noopener">Find on Steam<span>↗</span></a>`:''].join('')}
 function card(it,why){const sh=shape(it.type);return `<button type="button" class="tile ${sh}" data-id="${it.id}" aria-label="${esc(it.title)}">${cover(it,'',why)}</button>`}
 function drawNext(sample){const ids=new Set(cands().map(i=>i.id));if(!pickQ||pickQ.some(id=>!ids.has(id))||pickQ.length!==ids.size)buildQ();
@@ -890,7 +921,7 @@ function drawNext(sample){const ids=new Set(cands().map(i=>i.id));if(!pickQ||pic
   const chk=open.filter(i=>i.status==='check'),old=[...chk].sort(byAge).slice(0,8),oldS=new Set(old.map(i=>i.id));
   const rows=[['In progress',open.filter(i=>i.status==='prog'),i=>ago(i)+' in',''],['To revisit',open.filter(i=>i.status==='again').sort((a,b)=>(b.rv||0)-(a.rv||0)),i=>T[i.type],'a'],
     ['Waiting longest',old,i=>ago(i),''],['Just added',[...chk].filter(i=>!oldS.has(i.id)).sort((a,b)=>b.added.localeCompare(a.added)).slice(0,8),i=>'Added '+md(i.added),'']].filter(r=>r[1].length);
-  $('#view').innerHTML=hero+rows.map(([h,l,w,c])=>`<section class="nrow"><h2>${h}<span>${l.length}</span></h2><div class="strip">${l.map(i=>card(i,w(i))).join('')}</div></section>`).join('')+(sample?`<p class="sum">${sample}</p>`:'');
+  $('#view').innerHTML=hero+((pk.g==='all'||pk.g==='game')?gqHtml():'')+rows.map(([h,l,w,c])=>`<section class="nrow"><h2>${h}<span>${l.length}</span></h2><div class="strip">${l.map(i=>card(i,w(i))).join('')}</div></section>`).join('')+(sample?`<p class="sum">${sample}</p>`:'');
   crate.dir=0}
 function crateGo(d){if(!pickQ?.length)return;if(d>0)pickQ.push(pickQ.shift());else pickQ.unshift(pickQ.pop());crate.dir=d;render()}
 
@@ -1027,6 +1058,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
    <div class="seg" role="group" aria-label="Status"${it.type==='game'?' style="grid-template-columns:repeat(5,minmax(0,1fr))"':''}>${stOpts(it).map(([k,l])=>`<button type="button" data-st="${k}" aria-pressed="${stOn(it,k)}">${l}</button>`).join('')}</div>
    <div class="rate" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}<span>${it.rating?it.rating+' / 5':'Rate it'}</span></div>
    <div class="rv"><div class="rvb" role="group" aria-label="Revisit meter">${[1,2,3,4,5].map(n=>`<button type="button" data-rv="${n}" class="${n<=(it.rv||0)?'on':''}" style="height:${8+n*4}px" aria-label="${RV[n-1]}" title="${RV[n-1]}"></button>`).join('')}</div><span class="rvt">${it.rv?RV[it.rv-1]:'How much would you go back to it?'}</span></div>
+   ${rankBlock(it)}
    ${tagBlock(it)}
    ${whenBlock(it)}
    <textarea id="f-note" class="nt" rows="1" placeholder="Why is this on your list?">${esc(it.note)}</textarea>
@@ -1096,6 +1128,8 @@ document.addEventListener('click',e=>{
   if(e.target.closest('#pick'))pickDlg();
   if(!e.target.closest('.add')&&!e.target.closest('dialog')){endBulk();$('#res').classList.remove('on');$('.add').classList.remove('full')}
   if(!e.target.closest('#menu'))$('#menu').open=false});
+document.addEventListener('click',e=>{const g=e.target.closest('[data-gq]');if(g){e.stopPropagation();gqMove(g.dataset.gid,g.dataset.gq);return}
+  const gs=e.target.closest('[data-gstart]');if(gs){const it=st.items.find(i=>i.id===gs.dataset.gstart);if(it)upd(()=>setSt2(it,'prog'),`Playing ${it.title}`)}},true);
 document.addEventListener('change',e=>{if(e.target.id==='sort'){st.sort=e.target.value;st.sortRev=false;save();render()}});
 document.addEventListener('click',e=>{const c=e.target.closest('[data-col]');if(c){const k=c.dataset.col;if(st.sort===k)st.sortRev=!st.sortRev;else{st.sort=k;st.sortRev=false}save();render();return}
   if(e.target.closest('[data-srev]')){st.sortRev=!st.sortRev;save();render()}});
