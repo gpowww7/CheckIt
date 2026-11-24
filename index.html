@@ -938,6 +938,11 @@ body.mo-live[data-world=set] #view .wall>.cv:nth-child(even):not(.mo-t){animatio
 body.mo-off .mo-t,body.mo-off .mo-pg,body.mo-off .mark,body.mo-off .tabs svg,body.mo-off dialog[open]{animation:none!important}
 body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 @media(prefers-reduced-motion:reduce){.mo-t,.mo-pg,.mark,.tabs button svg,dialog[open],dialog[open]::backdrop{animation:none!important}img.mo-ld{opacity:1;transform:none}.mo-fx{display:none}#view.mo-hold{opacity:1}.wall>.cv,.stub,.strip>.tile,#bgrid>.bt{transition:none}}
+.crate .pkall{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;text-align:left;margin:-14px 0 22px;padding:0;background:none;border:0;color:var(--on);font-size:14px}
+.crate .pkall small{grid-column:2;font-size:12px;color:color-mix(in srgb,var(--on) 60%,transparent)}
+.crate .pkall i{grid-row:span 2;width:38px;height:22px;border-radius:11px;background:color-mix(in srgb,var(--on) 22%,transparent);position:relative;transition:background .15s}
+.crate .pkall i::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--on);transition:transform .15s}
+.crate .pkall[aria-checked=true] i{background:var(--acc)}.crate .pkall[aria-checked=true] i::after{transform:translateX(16px);background:#fff}
 </style>
 </head>
 <body>
@@ -952,7 +957,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-14</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-15</small>
     </div></details>
   </div>
 </header>
@@ -1403,21 +1408,23 @@ function epStep(id,how){const it=st.items.find(i=>i.id===id);if(!it)return;
 function tvHtml(){const w=st.items.filter(i=>i.type==='show'&&i.status==='prog').sort((a,b)=>(b.touched||b.added).localeCompare(a.touched||a.added));
   const watching=w.length?`<section class="nrow tvw"><h2>Watching now<span>${w.length>1?w.length+' shows':'1 show'}</span></h2>${w.map(it=>`<div class="tvc" style="${cs(it)}"><button type="button" class="gqc" data-open="${it.id}">${cover(it,'ini p')}</button><div class="gqi"><b>${esc(it.title)}</b>${it.creator?`<span>${esc(it.creator)}</span>`:''}<div class="eprow">${epHtml(it)}</div></div></div>`).join('')}</section>`:'';
   return watching+gqHtml('show')}
-function cands(){const fit=TIMES.find(t=>t[0]===pk.t)[2];return st.items.filter(i=>i.status!=='done'&&inGrp(i,pk.g)&&fit(mins(i)))}
-function buildQ(){const c=cands(),out=[];const w=c.map(i=>1+ageDays(i)/30+(i.status==='prog'?3:0)+(i.status==='again'?(i.rv||0)*.5:0));
+// Up next can also suggest things you've finished (st.pkAll), except ones whose revisit meter says "Once was enough" (rv 1).
+const pkOk=i=>i.status!=='done'||(!!st.pkAll&&i.rv!==1);
+function cands(){const fit=TIMES.find(t=>t[0]===pk.t)[2];return st.items.filter(i=>pkOk(i)&&inGrp(i,pk.g)&&fit(mins(i)))}
+function buildQ(){const c=cands(),out=[];const w=c.map(i=>i.status==='done'?.5+(i.rv||2)*.4+(i.rating||0)*.2:1+ageDays(i)/30+(i.status==='prog'?3:0)+(i.status==='again'?(i.rv||0)*.5:0));
   while(c.length){let r=Math.random()*w.reduce((a,b)=>a+b,0),k=0;for(;k<c.length-1;k++){r-=w[k];if(r<=0)break}out.push(c[k].id);c.splice(k,1);w.splice(k,1)}
   if(pk.g==='game'){const r=new Map(gameQ().map((i,n)=>[i.id,n])),it=id=>st.items.find(i=>i.id===id),sc=id=>{const x=it(id);return x.status==='prog'?-1:x.status==='check'?r.get(id)??999:1e3};out.sort((a,b)=>sc(a)-sc(b))}pickQ=out}
 function linksFor(it){return [MUS.includes(it.type)?`<a class="lk" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Listen on Spotify':'Find on Spotify'}<span>↗</span></a>`:'',VID.includes(it.type)?`<a class="lk" href="${esc(it.watch?.link||jw(it))}" target="_blank" rel="noopener">Where to watch<span>↗</span></a>`:'',it.type==='game'?`<a class="lk" href="${esc(steam(it))}" target="_blank" rel="noopener">Find on Steam<span>↗</span></a>`:''].join('')}
 function card(it,why){const sh=shape(it.type);return `<button type="button" class="tile ${sh}" data-id="${it.id}" aria-label="${esc(it.title)}">${cover(it,'',why)}</button>`}
 function drawNext(sample){const ids=new Set(cands().map(i=>i.id));if(!pickQ||pickQ.some(id=>!ids.has(id))||pickQ.length!==ids.size)buildQ();
   const q=pickQ.map(id=>st.items.find(i=>i.id===id)).filter(Boolean),n=q.length,it=q[0];
-  const ctr=`<div class="pkbar"><span>Suggest</span><div class="seg s6">${G.map(([k,l])=>`<button type="button" data-pg="${k}" aria-pressed="${pk.g===k}">${k==='all'?'Anything':l}</button>`).join('')}</div><div class="seg s4">${TIMES.map(([k,l])=>`<button type="button" data-pt="${k}" aria-pressed="${pk.t===k}">${l}</button>`).join('')}</div></div>`;
-  const why=it?(it.status==='prog'?'In progress':it.status==='again'?'Back for another go':'Waiting '+ago(it)):'';
+  const ctr=`<div class="pkbar"><span>Suggest</span><div class="seg s6">${G.map(([k,l])=>`<button type="button" data-pg="${k}" aria-pressed="${pk.g===k}">${k==='all'?'Anything':l}</button>`).join('')}</div><div class="seg s4">${TIMES.map(([k,l])=>`<button type="button" data-pt="${k}" aria-pressed="${pk.t===k}">${l}</button>`).join('')}</div></div><button type="button" class="pkall" data-pall role="switch" aria-checked="${!!st.pkAll}"><i aria-hidden="true"></i>Also suggest things I’ve finished<small>except ones marked “Once was enough”</small></button>`;
+  const why=it?(it.status==='prog'?'In progress':it.status==='again'?'Back for another go':it.status==='done'?(MUS.includes(it.type)?'Heard before':it.type==='game'?'Played before':'Seen before'):'Waiting '+ago(it)):'';
   const hero=it?`<section class="crate" style="${cs(it)}"><div class="stage" id="stage">${[2,1,0].map(k=>{if(k>=n)return'';const x=q[k];return `<div class="card c${k}${k===0&&crate.dir?' in':''}"${k===0?` data-id="${x.id}"`:''}>${cover(x,'ini crt '+shape(x.type))}</div>`}).join('')}</div>
     <div class="cinfo">${ctr}<div class="mt">${T[it.type]}, ${why.toLowerCase()}${it.rv?', '+RV[it.rv-1].toLowerCase():''}</div><h2>${esc(it.title)}</h2>${it.creator?`<p class="by">${esc(it.creator)}</p>`:''}
      ${it.note?`<blockquote>${esc(it.note)}${it.by?`<cite>Recommended by ${esc(it.by)}</cite>`:''}</blockquote>`:it.by?`<blockquote><cite>Recommended by ${esc(it.by)}</cite></blockquote>`:''}
      <div class="lks">${linksFor(it)}<button class="lk" type="button" data-open="${it.id}">Open item</button></div>
-     <div class="cnav">${it.status!=='prog'?`<button type="button" class="pri" data-nx="prog">Start it</button>`:''}<button type="button" data-nx="done">${it.type==='game'?'Finished':'Done'}</button><button type="button" id="cnext">Not now →</button><span class="cnum">${n} to pick from</span></div></div></section>`
+     <div class="cnav">${it.status!=='prog'?`<button type="button" class="pri" data-nx="prog">Start it</button>`:''}${it.status!=='done'?`<button type="button" data-nx="done">${it.type==='game'?'Finished':'Done'}</button>`:''}<button type="button" id="cnext">Not now →</button><span class="cnum">${n} to pick from</span></div></div></section>`
     :`<section class="crate none"><div class="cinfo">${ctr}<h2>Nothing fits that.</h2><p class="by">Try another type or length.</p></div></section>`;
   const open=st.items.filter(i=>i.status!=='done'),byAge=(a,b)=>ageDays(b)-ageDays(a);
   const chk=open.filter(i=>i.status==='check'),old=[...chk].sort(byAge).slice(0,8),oldS=new Set(old.map(i=>i.id));
@@ -1438,7 +1445,7 @@ const MINS={song:4,album:50,artist:45,set:110,movie:115,show:50,game:600};
 const mins=it=>+it.extra?.mins||MINS[it.type];
 const pk={g:'all',t:'any',last:''};
 const TIMES=[['any','Any length',()=>true],['short','Under an hour',m=>m<=60],['mid','1 to 2 hours',m=>m>60&&m<=130],['long','Longer',m=>m>130]];
-function pickOne(){const fit=TIMES.find(t=>t[0]===pk.t)[2];let c=st.items.filter(i=>i.status!=='done'&&inGrp(i,pk.g)&&fit(mins(i)));
+function pickOne(){const fit=TIMES.find(t=>t[0]===pk.t)[2];let c=st.items.filter(i=>pkOk(i)&&inGrp(i,pk.g)&&fit(mins(i)));
   if(c.length>1)c=c.filter(i=>i.id!==pk.last);if(!c.length)return null;
   const w=c.map(i=>1+ageDays(i)/30+(i.status==='prog'?2:0));let r=Math.random()*w.reduce((a,b)=>a+b,0);
   for(let k=0;k<c.length;k++){r-=w[k];if(r<=0)return c[k]}return c[c.length-1]}
@@ -1615,7 +1622,7 @@ document.addEventListener('click',e=>{
   if(op){openItem(op.dataset.open);return}
   if(e.target.closest('[data-bulk],[data-m="bulk"]')){$('#menu').open=false;startBulk();return}
   const pg=e.target.closest('main [data-pg]'),pt=e.target.closest('main [data-pt]'),nx=e.target.closest('[data-nx]'),ly=e.target.closest('[data-lay]');
-  if(pg){pk.g=pg.dataset.pg;pickQ=null;render();return}if(pt){pk.t=pt.dataset.pt;pickQ=null;render();return}
+  if(pg){pk.g=pg.dataset.pg;pickQ=null;render();return}if(e.target.closest('main [data-pall]')){st.pkAll=!st.pkAll;save();pickQ=null;render();return}if(pt){pk.t=pt.dataset.pt;pickQ=null;render();return}
   if(nx){const it=st.items.find(i=>i.id===pickQ?.[0]);if(it){upd(()=>setSt(it,nx.dataset.nx),nx.dataset.nx==='done'?`Done. ${it.title} is in your diary.`:`Started ${it.title}`)}return}
   if(ly){st.layout=ly.dataset.lay;save();render();return}
   if(e.target.closest('[data-share]')){shareDlg();return}
