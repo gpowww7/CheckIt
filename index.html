@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="Checkit">
 <meta name="application-name" content="Checkit">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0f1013"><meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter+Tight:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
@@ -20,9 +20,8 @@
    COLOUR white or near-black ground, ink, one cobalt accent; flat cover colours for items without art
    TYPE Inter Tight for the ledger and wall, Newsreader for the liner notes
    LAYOUT slim header with the add box and view switch, filters on one line, content full width */
-:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f1013);--ink:light-dark(#111214,#ececee);--mut:light-dark(#686b73,#9a9ca3);--rule:light-dark(#e7e8eb,#25272c);--soft:light-dark(#f5f5f6,#17181c);--acc:light-dark(#2b4bff,#8396ff);--scrim:rgba(10,11,14,.78);--groove:light-dark(rgba(17,18,20,.07),rgba(255,255,255,.08))}
-:root[data-theme=light]{color-scheme:light}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .card .cv{box-shadow:0 18px 40px rgba(0,0,0,.5)}}
+:root{color-scheme:dark;--bg:light-dark(#ffffff,#0f1013);--ink:light-dark(#111214,#ececee);--mut:light-dark(#686b73,#9a9ca3);--rule:light-dark(#e7e8eb,#25272c);--soft:light-dark(#f5f5f6,#17181c);--acc:light-dark(#2b4bff,#8396ff);--scrim:rgba(10,11,14,.78);--groove:light-dark(rgba(17,18,20,.07),rgba(255,255,255,.08))}
+.card .cv{box-shadow:0 18px 40px rgba(0,0,0,.5)}
 :root[data-theme=dark] .card .cv{box-shadow:0 18px 40px rgba(0,0,0,.5)}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html,body{margin:0}
@@ -705,6 +704,18 @@ dialog .x:hover{background:var(--soft);color:var(--ink)}
 .lsel.on{background:color-mix(in srgb,var(--acc) 12%,transparent);border-color:color-mix(in srgb,var(--acc) 55%,transparent)}
 .lseg{border-bottom-color:color-mix(in srgb,var(--ink) 8%,transparent)}
 .lfind svg{z-index:1}
+/* -8: make the glass read clearly: lifted frosted panels with a top highlight, soft glow on selection */
+.lfind input,.lsel,.filters .lrev,.ltype,.lviews{
+  background:light-dark(rgba(255,255,255,.55),rgba(255,255,255,.055));
+  border:1px solid light-dark(rgba(17,18,20,.08),rgba(255,255,255,.10));
+  box-shadow:inset 0 1px 0 light-dark(rgba(255,255,255,.9),rgba(255,255,255,.07)),0 8px 24px -12px light-dark(rgba(17,18,20,.18),rgba(0,0,0,.6));
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4)}
+.lsel:hover,.filters .lrev:hover,.lfind input:hover{background:light-dark(rgba(255,255,255,.75),rgba(255,255,255,.09));border-color:light-dark(rgba(17,18,20,.16),rgba(255,255,255,.18))}
+.filters .ltype button[aria-pressed=true],.filters .lviews button[aria-pressed=true]{
+  background:light-dark(#fff,rgba(255,255,255,.14));color:var(--ink);
+  box-shadow:0 0 0 1px light-dark(rgba(17,18,20,.06),rgba(255,255,255,.14)),0 2px 10px light-dark(rgba(43,75,255,.18),rgba(131,150,255,.28))}
+.lsel.on{background:light-dark(rgba(43,75,255,.10),rgba(131,150,255,.14));border-color:light-dark(rgba(43,75,255,.45),rgba(131,150,255,.5));box-shadow:0 0 0 3px light-dark(rgba(43,75,255,.08),rgba(131,150,255,.10))}
+.filters .lseg button[aria-pressed=true]{border-bottom-color:var(--acc);text-shadow:0 0 18px light-dark(rgba(43,75,255,.25),rgba(131,150,255,.55))}
 </style>
 </head>
 <body>
@@ -719,7 +730,7 @@ dialog .x:hover{background:var(--soft);color:var(--ink)}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-7</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-8</small>
     </div></details>
   </div>
 </header>
