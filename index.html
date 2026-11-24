@@ -680,6 +680,22 @@ dialog .x:hover{background:var(--soft);color:var(--ink)}
 .filters .lseg button{align-items:baseline;padding-top:13px}
 @media(min-width:761px){.lrow2 .lviews{order:3}}
 @media(max-width:760px){.lfind{flex:1 1 0}.lrow2 .lviews{margin-left:0}.ltype{width:100%}}
+
+/* polish pass (impeccable audit): one radius scale, real hover/focus/press states, quieter secondary actions, readable counts */
+.ltype,.lviews{border-radius:8px}
+.filters .ltype button,.filters .lviews button{border-radius:6px;transition:background-color .15s,color .15s,transform .16s}
+.lfind input,.lsel,.filters .lrev{border-radius:8px}
+.rkt{border-radius:8px}
+.filters .ltype button:hover,.filters .lviews button:hover,.filters .lseg button:hover{color:var(--ink)}
+.filters .ltype button:active,.filters .lviews button:active,.filters .lrev:active,.lsel:active,.rkt:active{transform:scale(.97)}
+.filters .lseg button:focus-visible,.filters .ltype button:focus-visible,.filters .lviews button:focus-visible,.filters .lrev:focus-visible,.sum .lcta:focus-visible,.sum .lshr:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.lsel,.filters .lrev{transition:border-color .15s,transform .16s}
+.filters .lseg i{opacity:1;color:var(--mut);font-variant-numeric:tabular-nums}
+.sum .lshr{color:var(--mut);font-size:14px;font-weight:500}
+.sum .lshr:hover{color:var(--ink)}
+.wall .cv .lbg{border-radius:5px}
+@media(prefers-reduced-motion:reduce){.filters button,.lsel,.rkt{transition:none!important;transform:none!important}}
+.filters .ltype button[aria-pressed=true],.filters .lviews button[aria-pressed=true]{background:light-dark(var(--bg),#2b2d33)}
 </style>
 </head>
 <body>
@@ -694,7 +710,7 @@ dialog .x:hover{background:var(--soft);color:var(--ink)}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-5</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-6</small>
     </div></details>
   </div>
 </header>
@@ -1011,9 +1027,9 @@ function drawLibView(sample){$('#filters').innerHTML=libBar();drawLibBody(sample
 function drawLibBody(sample){const v=$('#view'),sm=$('#sum');if(sample===undefined)sample=st.items.some(i=>i.sample)?`<span class="smp">These are sample items.<button id="clr">Clear samples</button></span>`:'';
   const wl=st.layout==='wall',s0=[st.sort,st.sortRev];if(wl){st.sort='color';st.sortRev=false}const list=sorted(st.items.filter(libMatch));if(wl)[st.sort,st.sortRev]=s0;const segN=st.items.filter(i=>lsOk(i)&&subOk(i,st.lsub)).length,pills=libPills();
   const unr=st.items.filter(i=>inGrp(i,st.grp)&&segOf.done(i)&&!i.rating).length,favs=st.items.filter(i=>inGrp(i,st.grp)&&i.fav);
-  const cta=st.lseg==='done'&&unr?`<button type="button" class="lcta" data-rate>Rate ${unr} unrated →</button>`:st.lseg==='fav'&&favs.length>1?`<button type="button" class="lcta" data-rank>${favs.some(i=>i.fr!=null)?(favs.some(i=>i.fr==null)&&st.grp!=='all'?'Rank '+favs.filter(i=>i.fr==null).length+' new':'Edit ranking'):'Rank them'} →</button>`:st.lseg==='todo'&&list.length>1?`<button type="button" class="lcta" data-lpick>Pick one for me →</button>`:'';
+  const cta=st.lseg==='done'&&unr?`<button type="button" class="lcta" data-rate>Rate ${unr} unrated</button>`:st.lseg==='fav'&&favs.length>1?`<button type="button" class="lcta" data-rank>${favs.some(i=>i.fr!=null)?(favs.some(i=>i.fr==null)&&st.grp!=='all'?'Rank '+favs.filter(i=>i.fr==null).length+' new':'Edit ranking'):'Rank your favorites'}</button>`:st.lseg==='todo'&&list.length>1?`<button type="button" class="lcta" data-lpick>Pick one for me</button>`:'';
   const rankOn=st.sort==='rank'&&st.grp!=='all';
-  sm.innerHTML=`<div class="lsum"><span class="lcount"><b>${list.length}</b> ${list.length===segN?'':'of '+segN+' '}${SEGN[st.lseg]}</span><span class="lsp"></span>${cta}<button class="lk" type="button" data-share>Share</button></div>${sample?`<div>${sample}</div>`:''}${st.layout==='list'&&list.length?'<span class="hint">Swipe a row right for done, left to revisit, or all the way left to remove.</span>':''}`;
+  sm.innerHTML=`<div class="lsum"><span class="lcount"><b>${list.length}</b> ${list.length===segN?'':'of '+segN+' '}${SEGN[st.lseg]}</span><span class="lsp"></span>${cta}<button class="lshr" type="button" data-share>Share</button></div>${sample?`<div>${sample}</div>`:''}${st.layout==='list'&&list.length?'<span class="hint">Swipe a row right for done, left to revisit, or all the way left to remove.</span>':''}`;
   if(!list.length){const why=pills.length?`<b>Nothing matches</b>Try fewer filters.<br><button class="lk" type="button" data-lx="*">Clear filters</button>`:
      st.lseg==='fav'?`<b>No favorites yet</b>Tap ♥ on anything you love. Rating your finished things is a quick way to find them.${unr?`<br><button class="lk" type="button" data-rate>Rate ${unr} unrated</button>`:''}`:
      st.lseg==='done'?`<b>Nothing finished here yet</b>Add things you’ve already seen, heard or played.<br><button class="lk" type="button" data-bulk>Add past favorites</button>`:
