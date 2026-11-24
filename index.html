@@ -587,6 +587,79 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
 .gqb button:hover{color:var(--ink);border-color:var(--mut)}
 .gqr{align-items:center;margin-top:-6px}.gqr b{color:var(--ink)}.gqr .gqb{margin-left:auto}.gqr .gqb button{height:32px;font-size:13px}
 @media(max-width:600px){.gq .gq1{grid-template-columns:120px minmax(0,1fr);gap:14px;padding:12px}.gq .gqc .cv{width:120px;height:68px}.gq .gqi b{font-size:19px}}
+/* library: shelves, find box, sort and filter sheet, rate and rank */
+body[data-view=library] main>.filters{display:block;padding-block:14px 6px}
+.lbar{display:grid;gap:12px}
+.lseg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--rule);border-radius:8px;padding:3px;gap:3px;background:var(--soft);max-width:560px}
+.filters .lseg button{padding:0;min-height:38px;border-radius:6px;color:var(--mut);font-weight:500;font-size:14px;display:flex;align-items:center;justify-content:center;gap:2px;white-space:nowrap}
+.filters .lseg button[aria-pressed=true]{background:var(--bg);color:var(--ink);text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.lseg .hrt{color:#e0245e;margin-right:3px}
+.lseg i{font-size:12px}
+.ltool{display:flex;gap:8px;align-items:center}
+.lfind{flex:1;position:relative;min-width:0;max-width:420px}
+.lfind svg{position:absolute;left:11px;top:50%;width:15px;height:15px;transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.lfind input{width:100%;height:38px;border:1px solid var(--rule);border-radius:8px;background:var(--bg);padding:0 10px 0 33px;font-size:16px;color:var(--ink)}
+.lfind input::placeholder{color:var(--mut)}
+.filters .lfb{height:38px;border:1px solid var(--rule);border-radius:8px;padding:0 11px;display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-size:14px;white-space:nowrap;flex:none}
+.lfb svg{width:18px;height:18px}
+.filters .lfb i{background:var(--acc);color:#fff;border-radius:9px;min-width:18px;height:18px;font-size:11.5px;display:inline-grid;place-items:center;margin:0;opacity:1;padding:0 5px}
+.filters .lly{padding:0;width:38px;justify-content:center}
+.lsub{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * max(4vw,16px));padding-inline:max(4vw,16px)}
+.lsub::-webkit-scrollbar,.ltype::-webkit-scrollbar{display:none}
+.filters .lsub button{flex:none;height:32px;padding:0 12px;border:1px solid var(--rule);border-radius:16px;font-size:13.5px;color:var(--mut)}
+.filters .lsub button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);text-decoration:none}
+.filters .ltype{gap:4px 18px}
+.lsum{display:flex;flex-wrap:wrap;align-items:center;gap:8px 8px;min-height:32px}
+.lsum .lcount{margin-right:4px}
+.lsum .lsp{flex:1}
+.sum .lsum button{margin-left:0}
+.pill{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 6px 0 10px;border-radius:14px;background:color-mix(in srgb,var(--acc) 12%,var(--bg));color:var(--ink)!important;font-size:13px}
+.pill span{font-size:16px;color:var(--mut);line-height:1}
+.lcta{height:32px;padding:0 12px;border-radius:16px;background:var(--ink);color:var(--bg)!important;font-weight:500;font-size:13.5px;white-space:nowrap}
+.wall .cv .lbg{position:absolute;top:6px;right:6px;z-index:3;background:rgba(10,11,14,.66);color:#fff;font-size:12px;font-weight:600;line-height:1;padding:4px 6px;border-radius:10px;pointer-events:none;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wall .cv .lbg .h{color:#ff5c8a}
+.ix .lrk{width:22px;flex:none;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;color:var(--mut)}
+.ix .t span.lrs{display:none;font-size:12px;letter-spacing:1px;color:var(--ink)}
+@media(max-width:720px){.ix .t span.lrs{display:block}.ix td:first-child{width:100%}}
+/* sheet */
+dialog.sheet h4{margin:18px 0 8px;font-size:13px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.shd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.shd h3{margin:0}
+dialog .x{width:36px;height:36px;border-radius:50%;font-size:24px;color:var(--mut);flex:none}
+dialog .x:hover{background:var(--soft);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:34px;padding:0 13px;border:1px solid var(--rule);border-radius:17px;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.chip i{font-style:normal;color:var(--mut);font-size:12px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed=true] i{color:inherit;opacity:.7}
+dialog.sheet .dbtn{position:sticky;bottom:-22px;background:var(--bg);padding:14px 0 4px;margin-top:18px}
+@media(max-width:600px){dialog.sheet{margin:auto 0 0;width:100vw;max-width:100vw;max-height:86vh;border-radius:16px 16px 0 0;border-bottom:0;padding:18px 18px calc(18px + env(safe-area-inset-bottom))}}
+/* rate as you go */
+.rq{text-align:center}
+.rqn{color:var(--mut);font-size:14px}
+.rqc{display:block;margin:6px auto 12px}
+.rqc .cv{margin:auto;border-radius:6px}
+.rqc.rq-p .cv{width:150px;height:225px}.rqc.rq-s .cv{width:190px;height:190px}.rqc.rq-w .cv{width:260px;height:146px}
+.rqt b{display:block;font-size:21px;letter-spacing:-.015em;line-height:1.2}
+.rqt span{color:var(--mut);font-size:14px}
+.rate.rqr{justify-content:center;margin:12px 0 10px}
+.rate.rqr button{width:52px;height:56px;font-size:40px}
+.rqa{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.rqf[aria-pressed=true]{background:#e0245e;border-color:#e0245e;color:#fff}
+.rq .wn{margin-top:12px}
+/* rank */
+.rkp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 4px}
+.rkt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border:1px solid var(--rule);border-radius:10px;text-align:center}
+.rkt:hover,.rkt:active{border-color:var(--ink);background:var(--soft)}
+.rkt .rqc{margin:0 0 6px}
+.rkt .rqc.rq-p .cv{width:110px;height:165px}.rkt .rqc.rq-s .cv{width:130px;height:130px}.rkt .rqc.rq-w .cv{width:140px;height:79px}
+.rkt b{font-size:15px;line-height:1.2}.rkt small{color:var(--mut);font-size:12.5px}
+.rkl{max-height:56vh;overflow:auto}
+.rkl .gqt{cursor:default}
+@media(max-width:480px){.filters .lfb:not(.lly) span{display:none}.filters .lfb:not(.lly){width:auto;padding:0 10px}}
+.lsum .lsort{color:var(--mut)}
+@media(min-width:481px){.lsum .lsort{display:none}}
+@media(max-width:720px){.ix.nost th:nth-child(3),.ix.nost td:nth-child(3){display:none}}
 </style>
 </head>
 <body>
@@ -601,7 +674,7 @@ body[data-view=browse] main>.filters,body[data-view=browse] main>.sum{display:no
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-1</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-2</small>
     </div></details>
   </div>
 </header>
@@ -822,7 +895,7 @@ function tagBlock(it){const on=it.tags||[];if(!(it.status==='done'||it.status===
 const heartSvg=f=>`<svg viewBox="0 0 24 24" fill="${f?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.2-4.5-9.3-9.1A5 5 0 0 1 12 6.4a5 5 0 0 1 9.3 4.5C19.2 15.5 12 20 12 20z"/></svg>`;
 const favMark=it=>it.fav?'<i class="fvm" title="Favorite">♥</i>':'';
 const favBtn=it=>`<button type="button" class="fvt" data-fav aria-pressed="${!!it.fav}" aria-label="${it.fav?'Remove from favorites':'Add to favorites'}" title="Favorite">${heartSvg(it.fav)}</button>`;
-const toggleFav=it=>{if(it.fav)delete it.fav;else it.fav=true;it.touched=new Date().toISOString();delete it.sample};
+const toggleFav=it=>{if(it.fav){delete it.fav;delete it.fr}else it.fav=true;it.touched=new Date().toISOString();delete it.sample};
 const eraY=()=>new Date().getFullYear(),decs=()=>{const D=Math.floor(eraY()/10)*10;return[D,D-10,D-20,D-30]};
 const eraISO=v=>{const Y=eraY(),D=decs();const y=/^\d{4}$/.test(v)?+v:/^\d{4}s$/.test(v)?Math.min(+v.slice(0,4)+5,Y-2):v==='old'?D[3]-5:1970;return new Date(Date.UTC(y,0,v==='?'?2:1,12)).toISOString()};
 const eraLabel=v=>v==='?'?'Not sure when':v==='old'?`Before ${decs()[3]}`:/^\d{4}s$/.test(v)?`The ${v}`:+v===eraY()?'Earlier this year':String(v);
@@ -843,6 +916,10 @@ const sorted=list=>{const l=[...list];
   else if(st.sort==='status'){const o=['prog','check','again','done'],r=i=>o.indexOf(i.status)*2+(i.dnf?1:0);l.sort((a,b)=>r(a)-r(b)||a.title.localeCompare(b.title))}
   else if(st.sort==='by')l.sort((a,b)=>!a.by-!b.by||(a.by||'').localeCompare(b.by||'')||a.title.localeCompare(b.title));
   else if(st.sort==='rating')l.sort((a,b)=>(b.rating||0)-(a.rating||0)||(b.rv||0)-(a.rv||0)||a.title.localeCompare(b.title));
+  else if(st.sort==='done')l.sort((a,b)=>(b.doneAt||'').localeCompare(a.doneAt||'')||b.added.localeCompare(a.added));
+  else if(st.sort==='year')l.sort((a,b)=>relYr(b)-relYr(a)||a.title.localeCompare(b.title));
+  else if(st.sort==='rank')l.sort((a,b)=>(a.fr??1e9)-(b.fr??1e9)||(b.rating||0)-(a.rating||0)||a.title.localeCompare(b.title));
+  else if(st.sort==='next'){const q=new Map(gameQ().map((i,n)=>[i.id,n])),r=i=>i.status==='prog'?0:i.status==='check'?1:2;l.sort((a,b)=>r(a)-r(b)||(a.type==='game'&&b.type==='game'?(q.get(a.id)??1e9)-(q.get(b.id)??1e9):0)||(r(a)===2?(b.rv||0)-(a.rv||0):0)||b.added.localeCompare(a.added))}
   else l.sort((a,b)=>b.added.localeCompare(a.added));if(st.sortRev)l.reverse();return l};
 // List view: tap a column header to sort by it; tap again to reverse. Kept in step with the Sort menu (st.sort, st.sortRev).
 const COLS=[['title','Title',''],['type','Type','hm'],['status','Status',''],['by','Recommended by','hm'],['rating','Rating','hm'],['added','Added','n hm']];
@@ -857,6 +934,155 @@ const setSt2=(it,k)=>{if(k==='dnf'){setSt(it,'done');it.dnf=true}else{setSt(it,k
 const statLab=(k,l)=>st.grp==='game'?({open:'Not played',check:'Want to play',prog:'Playing',done:'Played',dnf:'Didn’t finish'}[k]||l):l;
 const STATS=[['open','Not done'],['check','Check out'],['prog','In progress'],['again','Revisit'],['done','Done'],['dnf','Didn’t finish'],['fav','Favorites'],['all','Everything']];
 const LAYOUTS=[['list','List'],['covers','Covers'],['shelf','Shelf']];
+/* library: shelves (To do, Done, Favorites, All), a find box, a sort and filter sheet, rate-as-you-go and favorite ranking.
+   View state is local (st.lseg, st.lsub, st.sorts, st.lrate, st.ltag, st.lby). it.fr is a favorite's rank within its type group; it syncs. */
+const LSEG=[['todo','To do'],['done','Done'],['fav','Favorites'],['all','All']];
+const LSORT={todo:['next','added','title','year','type','by','color'],done:['done','rating','revisit','title','year','added','type','color'],fav:['rank','rating','done','title','year','type','color'],all:['added','title','rating','status','type','year','by','revisit','color']};
+const SORTL={next:'Up next first',added:'Recently added',done:'Recently finished',rank:'Your ranking',rating:'Your rating',revisit:'Most revisitable',title:'Title',year:'Release year',type:'Type',status:'Status',by:'Recommended by',color:'Color'};
+const segOf={todo:i=>i.status!=='done',done:i=>i.status==='done'||i.status==='again',fav:i=>!!i.fav,all:()=>true};
+const LSUB={todo:[['','Everything'],['prog','In progress'],['check','Check out'],['again','Revisit']],done:[['','Everything'],['unrated','Unrated'],['dnf','Didn’t finish']]};
+const SEGN={todo:'to do',done:'done',fav:'favorites',all:'saved'};
+const lf={q:''};
+const relYr=it=>+(it.extra?.year||String(it.info?.date||'').slice(0,4))||0;
+const rFmt=r=>Math.floor(r)+(r%1?'½':'');
+if(!st.lseg){const s=st.stat;st.lseg=['done','dnf'].includes(s)?'done':s==='fav'?'fav':s==='all'?'all':'todo';st.lsub=['check','prog','again','dnf'].includes(s)?s:'';
+  st.sorts={todo:'next',done:'done',fav:'rank',all:st.sort&&st.sort!=='color'?st.sort:'added'};st.sort=st.sorts[st.lseg];st.sortRev=false}
+if(!Array.isArray(st.ltag))st.ltag=[];if(!st.sorts)st.sorts={};
+const subOk=(i,k)=>!k||(k==='unrated'?!i.rating:k==='dnf'?i.status==='done'&&!!i.dnf:i.status===k);
+const subLab=(k,l)=>st.grp==='game'?({prog:'Playing',check:'Want to play'}[k]||l):l;
+const lsOk=i=>inGrp(i,st.grp)&&segOf[st.lseg](i);
+const hasTag=(i,t)=>(i.tags||[]).some(x=>x.toLowerCase()===t.toLowerCase());
+function libMatch(i){if(!lsOk(i)||!subOk(i,st.lsub))return false;const r=st.lrate;
+  if(r==='none'?!!i.rating:r&&(i.rating||0)<+r)return false;
+  if(st.ltag.length&&!st.ltag.every(t=>hasTag(i,t)))return false;
+  if(st.lby&&(i.by||'')!==st.lby)return false;
+  const q=fold(lf.q.trim());if(q){const h=fold([i.title,i.creator,i.by,i.note,(i.tags||[]).join(' '),T[i.type],relYr(i)||''].join(' '));if(!q.split(/\s+/).every(w=>h.includes(w)))return false}
+  return true}
+const fold=x=>String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const nFilt=()=>(st.lrate?1:0)+st.ltag.length+(st.lby?1:0);
+function setSeg(k){st.sorts[st.lseg]=st.sort+(st.sortRev?'-':'');st.lseg=k;st.lsub='';const s=st.sorts[k]||LSORT[k][0];st.sort=s.replace(/-$/,'');st.sortRev=s.endsWith('-');if(k==='done'&&st.lrate==='none')st.lrate=''}
+const IC={find:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>',
+ filt:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg>',
+ grid:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="5.5" height="5.5" rx="1"/><rect x="11.5" y="3" width="5.5" height="5.5" rx="1"/><rect x="3" y="11.5" width="5.5" height="5.5" rx="1"/><rect x="11.5" y="11.5" width="5.5" height="5.5" rx="1"/></svg>',
+ list:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10"/><circle cx="3.5" cy="5" r=".8" fill="currentColor"/><circle cx="3.5" cy="10" r=".8" fill="currentColor"/><circle cx="3.5" cy="15" r=".8" fill="currentColor"/></svg>'};
+function libBar(){const base=st.items.filter(i=>inGrp(i,st.grp)),segAll=st.items.filter(segOf[st.lseg]),inSeg=st.items.filter(lsOk);
+  const seg=`<div class="lseg" role="group" aria-label="Show">${LSEG.map(([k,l])=>`<button type="button" data-lseg="${k}" aria-pressed="${st.lseg===k}">${k==='fav'?'<span class="hrt" aria-hidden="true">♥</span>':''}${k==='todo'&&st.grp==='game'?'To play':l}<i>${base.filter(segOf[k]).length}</i></button>`).join('')}</div>`;
+  const types=`<div class="fl ltype">${G.map(([k,l])=>[k,l,segAll.filter(i=>inGrp(i,k)).length]).filter(([k,,n])=>k==='all'||n||st.grp===k).map(([k,l,n])=>`<button data-g="${k}" aria-pressed="${st.grp===k}">${l}<i>${n}</i></button>`).join('')}</div>`;
+  const subs=(LSUB[st.lseg]||[]).map(([k,l])=>[k,subLab(k,l),k?inSeg.filter(i=>subOk(i,k)).length:inSeg.length]).filter(([k,,n])=>!k||n||st.lsub===k);
+  const sub=subs.length>2||(subs.length>1&&subs[1][2]!==subs[0][2])?`<div class="lsub">${subs.map(([k,l,n])=>`<button type="button" data-lsub="${k}" aria-pressed="${(st.lsub||'')===k}">${l}<i>${n}</i></button>`).join('')}</div>`:'';
+  const nf=nFilt();
+  const tool=`<div class="ltool"><label class="lfind">${IC.find}<input id="lq" type="search" placeholder="Find in your library" value="${esc(lf.q)}" autocomplete="off" enterkeyhint="search" aria-label="Find in your library"></label><button type="button" class="lfb" data-lf aria-label="Sort and filter">${IC.filt}<span>${SORTL[st.sort]||'Sort'}</span>${nf?`<i>${nf}</i>`:''}</button><button type="button" class="lfb lly" data-lly aria-label="${st.layout==='list'?'Show covers':'Show as a list'}" title="${st.layout==='list'?'Covers':'List'}">${st.layout==='list'?IC.grid:IC.list}</button></div>`;
+  return `<div class="lbar">${seg}${types}${tool}${sub}</div>`}
+function libPills(){const p=[];if(lf.q.trim())p.push(['q',`“${esc(lf.q.trim())}”`]);if(st.lrate)p.push(['rate',st.lrate==='none'?'Unrated':'★ '+st.lrate+'+']);st.ltag.forEach(t=>p.push(['tag:'+t,esc(t)]));if(st.lby)p.push(['by','From '+esc(st.lby)]);return p}
+function drawLibView(sample){$('#filters').innerHTML=libBar();drawLibBody(sample)}
+function drawLibBody(sample){const v=$('#view'),sm=$('#sum');if(sample===undefined)sample=st.items.some(i=>i.sample)?`<span class="smp">These are sample items.<button id="clr">Clear samples</button></span>`:'';
+  const list=sorted(st.items.filter(libMatch)),segN=st.items.filter(i=>lsOk(i)&&subOk(i,st.lsub)).length,pills=libPills();
+  const unr=st.items.filter(i=>inGrp(i,st.grp)&&segOf.done(i)&&!i.rating).length,favs=st.items.filter(i=>inGrp(i,st.grp)&&i.fav);
+  const cta=st.lseg==='done'&&unr?`<button type="button" class="lcta" data-rate>★ Rate ${unr} unrated</button>`:st.lseg==='fav'&&favs.length>1?`<button type="button" class="lcta" data-rank>${favs.some(i=>i.fr!=null)?(favs.some(i=>i.fr==null)&&st.grp!=='all'?'Rank '+favs.filter(i=>i.fr==null).length+' new':'Edit ranking'):'Rank them'}</button>`:st.lseg==='todo'&&list.length>1?`<button type="button" class="lcta" data-lpick>Pick one for me</button>`:'';
+  const rankOn=st.sort==='rank'&&st.grp!=='all';
+  sm.innerHTML=`<div class="lsum"><span class="lcount"><b>${list.length}</b> ${list.length===segN?'':'of '+segN+' '}${SEGN[st.lseg]}<span class="lsort">, ${(SORTL[st.sort]||'').toLowerCase()}${st.sortRev?' (reversed)':''}</span></span>${pills.map(([k,l])=>`<button type="button" class="pill" data-lx="${esc(k)}" aria-label="Remove filter ${l}">${l}<span aria-hidden="true">×</span></button>`).join('')}${pills.length>1?'<button type="button" class="lk" data-lx="*">Clear all</button>':''}<span class="lsp"></span>${cta}<button class="lk" type="button" data-share>Share</button></div>${sample?`<div>${sample}</div>`:''}${st.layout==='list'&&list.length?'<span class="hint">Swipe a row right for done, left to revisit, or all the way left to remove.</span>':''}`;
+  if(!list.length){const why=pills.length?`<b>Nothing matches</b>Try fewer filters.<br><button class="lk" type="button" data-lx="*">Clear filters</button>`:
+     st.lseg==='fav'?`<b>No favorites yet</b>Tap ♥ on anything you love. Rating your finished things is a quick way to find them.${unr?`<br><button class="lk" type="button" data-rate>Rate ${unr} unrated</button>`:''}`:
+     st.lseg==='done'?`<b>Nothing finished here yet</b>Add things you’ve already seen, heard or played.<br><button class="lk" type="button" data-bulk>Add past favorites</button>`:
+     st.lseg==='todo'?`<b>Nothing to do here</b>Find something new in Browse, or search above.`:`<b>Nothing here</b>No items match these filters.`;
+    v.innerHTML=`<div class="empty">${why}</div>`;return}
+  const rk=new Map();if(rankOn){let n=0;for(const i of list)if(i.fr!=null)rk.set(i.id,++n)}
+  const badge=it=>{const r=rk.get(it.id),b=[r?`<b>#${r}</b>`:'',it.fav&&st.lseg!=='fav'?'<span class="h">♥</span>':'',it.rating?`★${rFmt(it.rating)}`:''].filter(Boolean).join(' ');return b?`<span class="lbg">${b}</span>`:''};
+  if(st.layout==='covers'){
+    v.innerHTML=`<div class="wall" id="wall">${list.map(it=>{const c=cover(it,shape(it.type));
+      return c.replace('<div class="cv','<div tabindex="0" data-id="'+it.id+'" class="cv').replace(/<\/div>$/,`${badge(it)}<div class="hv"><b>${esc(it.title)}${favMark(it)}</b>${esc(it.creator||T[it.type])}<br><span class="st ${it.status}">${sLab(it)}</span></div></div>`)}).join('')}</div>`;
+    sizeWall();return}
+  if(st.layout==='shelf'){drawShelf(list);return}
+  const sub=it=>[it.creator,st.grp==='all'||!it.creator?T[it.type]:'',relYr(it)||''].filter(Boolean).map(esc).join(' · ');
+  v.innerHTML=`<table class="ix${st.lseg==='done'?' nost':''}">${thead()}<tbody>${list.map(it=>`<tr class="row${dust(it)>0?' dzr':''}" style="--dust:${dust(it).toFixed(2)}" data-id="${it.id}" tabindex="0">
+    <td><div class="t">${rk.get(it.id)?`<span class="lrk">${rk.get(it.id)}</span>`:''}${cover(it,'mini'+(it.type==='artist'?' round':''))}<div><b>${esc(it.title)}${favMark(it)}</b><span>${sub(it)}</span>${it.rating?`<span class="lrs stars">${stars(it.rating)}</span>`:''}</div></div></td>
+    <td class="m hm">${T[it.type]}${VID.includes(it.type)&&svcs(it).length?`<br><span style="font-size:13px">${esc(svcs(it).slice(0,2).join(', '))}${svcs(it).length>2?' +'+(svcs(it).length-2):''}</span>`:''}</td><td><span class="st ${it.status}">${sLab(it)}</span></td><td class="m hm">${esc(it.by)}</td><td class="hm"><span class="stars">${stars(it.rating)}</span>${rvMini(it.rv)}</td><td class="n hm">${md(it.added)}</td></tr>`).join('')}</tbody></table>`}
+const dlgR=html=>{const d=$('#dlg');if(d.open)d.innerHTML=html;else dlg(html);d.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>d.close()))};
+const dlgOff=()=>{const d=$('#dlg');d.addEventListener('close',()=>{d.onclick=null;d.classList.remove('sheet')},{once:true})};
+function libSheet(){const d=$('#dlg'),pool=st.items.filter(lsOk),opts=[...LSORT[st.lseg]];if(!opts.includes(st.sort))opts.push(st.sort);
+  const cnt=(m,key,lab)=>{const o=new Map();for(const i of pool)for(const g of key(i)){const k=g.toLowerCase();const e=o.get(k)||[g,0];e[1]++;o.set(k,e)}return o};
+  const tags=cnt(0,i=>i.tags||[]),bys=cnt(0,i=>i.by?[i.by]:[]);
+  st.ltag.forEach(t=>{if(!tags.has(t.toLowerCase()))tags.set(t.toLowerCase(),[t,0])});
+  const ch=(a,val,on,label,n)=>`<button type="button" class="chip" data-${a}="${esc(val)}" aria-pressed="${on}">${label}${n!=null?`<i>${n}</i>`:''}</button>`;
+  const n=st.items.filter(libMatch).length,wasOpen=d.open,sc=d.scrollTop;
+  dlgR(`<div class="shd"><h3>Sort and filter</h3><button type="button" class="x" data-close aria-label="Close">×</button></div>
+   <h4>Sort by</h4><div class="chips">${opts.map(k=>ch('fs',k,st.sort===k,SORTL[k]||k)).join('')}${ch('frev','1',!!st.sortRev,'Reverse order')}</div>
+   <h4>Your rating</h4><div class="chips">${[['','Any'],['4.5','★ 4½ and up'],['4','★ 4 and up'],['3','★ 3 and up'],['none','Not rated yet']].map(([k,l])=>ch('frt',k,(st.lrate||'')===k,l)).join('')}</div>
+   ${tags.size?`<h4>Tags</h4><div class="chips">${[...tags.values()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([g,c])=>ch('ft',g,st.ltag.some(t=>t.toLowerCase()===g.toLowerCase()),esc(g),c)).join('')}</div>`:''}
+   ${bys.size?`<h4>Recommended by</h4><div class="chips">${[...bys.values()].sort((a,b)=>b[1]-a[1]).map(([g,c])=>ch('fb',g,st.lby===g,esc(g),c)).join('')}</div>`:''}
+   <h4>Layout</h4><div class="chips">${LAYOUTS.map(([k,l])=>ch('fly',k,st.layout===k,l)).join('')}</div>
+   <div class="dbtn"><button type="button" class="btn" data-fclr ${nFilt()?'':'disabled'}>Clear filters</button><button type="button" class="btn pri" data-close>Show ${n}</button></div>`);
+  d.classList.add('sheet');if(wasOpen)d.scrollTop=sc;else dlgOff();
+  d.onclick=e=>{const b=e.target.closest('button');if(!b||b.hasAttribute('data-close'))return;const x=b.dataset;
+    if(x.fs){st.sort=x.fs;st.sortRev=false}else if(x.frev)st.sortRev=!st.sortRev;else if(x.frt!==undefined)st.lrate=x.frt;
+    else if(x.ft!==undefined){const k=x.ft.toLowerCase();st.ltag=st.ltag.some(t=>t.toLowerCase()===k)?st.ltag.filter(t=>t.toLowerCase()!==k):[...st.ltag,x.ft]}
+    else if(x.fb!==undefined)st.lby=st.lby===x.fb?'':x.fb;else if(x.fly)st.layout=x.fly;else if(b.hasAttribute('data-fclr')){st.lrate='';st.ltag=[];st.lby=''}else return;
+    save();render();libSheet()}}
+/* rate as you go: one unrated finished item at a time */
+let rq=null;
+function rateDlg(){const l=st.items.filter(i=>inGrp(i,st.grp)&&segOf.done(i)&&!i.rating).sort((a,b)=>(b.doneAt||b.added).localeCompare(a.doneAt||a.added));
+  if(!l.length){toast('Everything here is rated');return}rq={ids:l.map(i=>i.id),k:0,n:0,f:0};rateDraw();dlgOff()}
+function rateDraw(){const d=$('#dlg');
+  if(rq.k>=rq.ids.length){dlgR(`<h3>All caught up</h3><p>You rated ${rq.n} ${rq.n===1?'thing':'things'}${rq.f?` and hearted ${rq.f}`:''}. Sort Done by “Your rating” to see the best first${rq.f?', or open Favorites':''}.</p><div class="dbtn">${rq.f?'<button type="button" class="btn" data-rqfav>Open Favorites</button>':''}<button type="button" class="btn pri" data-close>Done</button></div>`);return}
+  const it=st.items.find(i=>i.id===rq.ids[rq.k]);if(!it){rq.ids.splice(rq.k,1);return rateDraw()}
+  dlgR(`<div class="rq"><div class="shd"><span class="rqn">${rq.k+1} of ${rq.ids.length} to rate</span><button type="button" class="x" data-close aria-label="Close">×</button></div>
+   <div class="rqc rq-${shape(it.type)}">${cover(it,'ini '+shape(it.type))}</div>
+   <div class="rqt"><b>${esc(it.title)}</b><span>${esc([it.creator,T[it.type],relYr(it)||''].filter(Boolean).join(' · '))}</span></div>
+   <div class="rate rqr" aria-label="Rating">${[1,2,3,4,5].map(n=>`<button type="button" data-r="${n}" class="${rateCls(n,it.rating||0)}" aria-label="${n} stars. Tap the left half for ${n-.5}">★</button>`).join('')}</div>
+   <div class="rqa"><button type="button" class="btn" data-rqb ${rq.k?'':'disabled'}>← Back</button><button type="button" class="btn rqf" data-rqf aria-pressed="${!!it.fav}">♥ Favorite</button><button type="button" class="btn" data-rqs>Skip →</button></div>
+   <p class="wn">Tap a star and it moves to the next one. Tap the left half of a star for a half.</p></div>`);
+  d.onclick=e=>{const b=e.target.closest('button');if(!b||rq.busy)return;const x=b.dataset;
+    if(x.rqfav!==undefined){d.close();setSeg('fav');save();render();return}
+    if(x.r){const v=e.detail===0?+x.r:rateAt(b,e.clientX);it.rating=v;it.touched=new Date().toISOString();delete it.sample;save();render();ratePaint(b.parentNode,v);rq.n++;rq.busy=1;setTimeout(()=>{rq.busy=0;rq.k++;if(d.open)rateDraw()},420);return}
+    if(x.rqf!==undefined){toggleFav(it);if(it.fav)rq.f++;save();render();b.setAttribute('aria-pressed',!!it.fav);return}
+    if(x.rqs!==undefined){rq.k++;rateDraw()}if(x.rqb!==undefined&&rq.k){rq.k--;rateDraw()}}}
+/* rank favorites: place each one by picking between two (binary insertion), then fine-tune with arrows */
+let rk=null;
+const gLab=g=>({music:'music',set:'live set',movie:'film',show:'TV',game:'game'}[g]||'');
+const byId=id=>st.items.find(i=>i.id===id);
+function rankDlg(g){if(!g&&st.grp!=='all')g=st.grp;
+  if(!g){const o=G.slice(1).map(([k,l])=>[k,l,st.items.filter(i=>i.fav&&inGrp(i,k)).length]).filter(x=>x[2]>1);
+    if(!o.length){toast('Heart at least two things in one type to rank them');return}if(o.length===1)return rankDlg(o[0][0]);
+    dlgR(`<div class="shd"><h3>Rank your favorites</h3><button type="button" class="x" data-close aria-label="Close">×</button></div><p>Rankings are kept per type. Pick one to rank.</p><div class="shr">${o.map(([k,l,n])=>`<button type="button" data-rkg="${k}"><b>${l}</b><span>${n} favorites${st.items.some(i=>i.fav&&i.fr!=null&&inGrp(i,k))?', partly ranked':''}</span></button>`).join('')}</div>`);
+    dlgOff();$('#dlg').onclick=e=>{const b=e.target.closest('[data-rkg]');if(b)rankDlg(b.dataset.rkg)};return}
+  const favs=st.items.filter(i=>i.fav&&inGrp(i,g));
+  rk={g,r:favs.filter(i=>i.fr!=null).sort((a,b)=>a.fr-b.fr).map(i=>i.id),u:favs.filter(i=>i.fr==null).sort((a,b)=>(b.rating||0)-(a.rating||0)).map(i=>i.id),cur:null,lo:0,hi:0,hist:[]};
+  if(!$('#dlg').open)dlgOff();rankNext()}
+function rankSave(){const now=new Date().toISOString();rk.r.forEach((id,n)=>{const it=byId(id);if(it&&it.fr!==n+1){it.fr=n+1;it.touched=now;delete it.sample}});save();render()}
+function rankNext(){
+  if(!rk.cur){if(!rk.u.length)return rankList();rk.cur=rk.u.shift();rk.lo=0;rk.hi=rk.r.length;rk.hist=[]}
+  if(rk.lo>=rk.hi){rk.r.splice(rk.lo,0,rk.cur);rk.cur=null;rankSave();return rankNext()}
+  const mid=(rk.lo+rk.hi)>>1,a=byId(rk.cur),b=byId(rk.r[mid]);if(!a){rk.cur=null;return rankNext()}if(!b){rk.r.splice(mid,1);rk.hi--;return rankNext()}
+  const tile=(it,w)=>`<button type="button" class="rkt" data-rkw="${w}" style="${cs(it)}"><span class="rqc rq-${shape(it.type)}">${cover(it,'ini '+shape(it.type))}</span><b>${esc(it.title)}</b><small>${esc([it.creator,relYr(it)||''].filter(Boolean).join(' · '))}</small></button>`;
+  dlgR(`<div class="shd"><h3>Which do you like more?</h3><button type="button" class="x" data-close aria-label="Close">×</button></div><p>${rk.u.length+1} left to place in your ${gLab(rk.g)} ranking. ${rk.r.length} ranked so far.</p>
+   <div class="rkp">${tile(a,'a')}${tile(b,'b')}</div>
+   <div class="dbtn"><button type="button" class="btn" data-rku ${rk.hist.length?'':'disabled'}>Undo</button><button type="button" class="btn" data-rkt>Too close to call</button><button type="button" class="btn" data-rkl>See ranking</button></div>`);
+  $('#dlg').onclick=e=>{const t=e.target.closest('button');if(!t)return;const x=t.dataset;
+    if(x.rkw){rk.hist.push([rk.lo,rk.hi]);if(x.rkw==='a')rk.hi=mid;else rk.lo=mid+1;rankNext()}
+    else if(x.rkt!==undefined){rk.hist.push([rk.lo,rk.hi]);rk.lo=rk.hi=mid+1;rankNext()}
+    else if(x.rku!==undefined&&rk.hist.length){[rk.lo,rk.hi]=rk.hist.pop();rankNext()}
+    else if(x.rkl!==undefined){if(rk.cur){rk.u.unshift(rk.cur);rk.cur=null}rankList()}}}
+function rankList(){const l=rk.r.map(byId).filter(Boolean);
+  const ar=(it,k)=>`<span class="gqb">${k>0?`<button type="button" data-rkm="up" data-rid="${it.id}" aria-label="Move ${esc(it.title)} up">↑</button>`:''}${k<l.length-1?`<button type="button" data-rkm="down" data-rid="${it.id}" aria-label="Move ${esc(it.title)} down">↓</button>`:''}</span>`;
+  dlgR(`<div class="shd"><h3>Your ${gLab(rk.g)} favorites</h3><button type="button" class="x" data-close aria-label="Close">×</button></div>${rk.u.length?`<p>${rk.u.length} still to place.</p>`:'<p>Use the arrows to fine-tune.</p>'}
+   <ol class="gql rkl">${l.map((it,k)=>`<li><span class="gqn">${k+1}</span><span class="gqt">${cover(it,'mini')}<span><b>${esc(it.title)}</b>${it.creator?`<small>${esc(it.creator)}</small>`:''}</span></span>${ar(it,k)}</li>`).join('')}</ol>
+   <div class="dbtn"><button type="button" class="btn" data-rkr>Start over</button>${rk.u.length?`<button type="button" class="btn" data-rkc>Keep ranking</button>`:''}<button type="button" class="btn pri" data-rkd>Done</button></div>`);
+  $('#dlg').onclick=e=>{const t=e.target.closest('button');if(!t)return;const x=t.dataset;
+    if(x.rkm){const k=rk.r.indexOf(x.rid),j=x.rkm==='up'?k-1:k+1;if(k<0||j<0||j>=rk.r.length)return;[rk.r[k],rk.r[j]]=[rk.r[j],rk.r[k]];rankSave();const sc=$('#dlg').scrollTop;rankList();$('#dlg').scrollTop=sc}
+    else if(x.rkr!==undefined){const now=new Date().toISOString();rk.r.forEach(id=>{const it=byId(id);if(it){delete it.fr;it.touched=now}});save();rankDlg(rk.g)}
+    else if(x.rkc!==undefined)rankNext();
+    else if(x.rkd!==undefined){$('#dlg').close();if(st.view==='library'){if(st.lseg!=='fav')setSeg('fav');st.grp=rk.g;st.sort='rank';st.sortRev=false;save();render()}}}}
+document.addEventListener('input',e=>{if(e.target.id==='lq'){lf.q=e.target.value;drawLibBody()}});
+document.addEventListener('keydown',e=>{if(e.target.id==='lq'&&e.key==='Enter')e.target.blur()});
+document.addEventListener('click',e=>{const t=e.target.closest('[data-lseg],[data-lsub],[data-lf],[data-lly],[data-lx],[data-rate],[data-rank],[data-lpick]');if(!t)return;const x=t.dataset;
+  if(x.lseg){setSeg(x.lseg);save();render();return}
+  if(x.lsub!==undefined){st.lsub=st.lsub===x.lsub?'':x.lsub;save();render();return}
+  if(x.lf!==undefined){libSheet();return}
+  if(x.lly!==undefined){st.layout=st.layout==='list'?'covers':'list';save();render();return}
+  if(x.lx){const k=x.lx;if(k==='*'||k==='q'){lf.q='';const q=$('#lq');if(q)q.value=''}if(k==='*'){st.lrate='';st.ltag=[];st.lby=''}else if(k==='rate')st.lrate='';else if(k==='by')st.lby='';else if(k.startsWith('tag:'))st.ltag=st.ltag.filter(g=>g!==k.slice(4));save();render();return}
+  if(x.rate!==undefined){rateDlg();return}
+  if(x.lpick!==undefined){pk.g=st.grp;pickDlg();return}
+  if(x.rank!==undefined)rankDlg()});
 function render(){
   document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===st.view));
   document.body.dataset.view=st.view;
@@ -870,23 +1096,7 @@ function render(){
     f.innerHTML=`<div class="fl">${G.map(([k,l])=>`<button data-g="${k}" aria-pressed="${st.grp===k}">${l}<i>${fin.filter(i=>inGrp(i,k)).length}</i></button>`).join('')}</div><div class="tl"><button class="lk" type="button" data-bulk>Add past favorites</button><button class="lk" type="button" data-share>Share</button></div>`;
     const ty=fin.filter(i=>new Date(i.doneAt||i.touched||i.added).getFullYear()===yr0).length,back=fin.filter(i=>(i.rv||0)>=4).length,nf=fin.filter(i=>i.fav).length;
     sm.innerHTML=`<b>${fin.length} finished</b>, ${ty} this year, ${back} you would go back to${nf?`, ${nf} favorite${nf>1?'s':''}`:''}.${sample}`;drawStubs();return}
-  const byStat=st.items.filter(i=>inStat(i,st.stat)),byGrp=st.items.filter(i=>inGrp(i,st.grp));
-  f.innerHTML=`<div class="fl">${G.map(([k,l])=>`<button data-g="${k}" aria-pressed="${st.grp===k}">${l}<i>${byStat.filter(i=>inGrp(i,k)).length}</i></button>`).join('')}<span class="sep"></span>${STATS.filter(([k])=>k!=='dnf'||st.grp==='game').map(([k,l])=>`<button data-s="${k}" aria-pressed="${st.stat===k}">${statLab(k,l)}<i>${byGrp.filter(i=>inStat(i,k)).length}</i></button>`).join('')}</div>
-   <div class="tl"><div class="seg lay" role="group" aria-label="Layout">${LAYOUTS.map(([k,l])=>`<button type="button" data-lay="${k}" aria-pressed="${st.layout===k}">${l}</button>`).join('')}</div>
-   <select id="sort" aria-label="Sort"><option value="added">Recently added</option><option value="title">Title</option><option value="type">Type</option><option value="color">Color</option><option value="revisit">Most revisitable</option><option value="status">Status</option><option value="rating">Rating</option><option value="by">Recommended by</option></select>${st.layout==='list'||st.sortRev?`<button type="button" class="lk srev" data-srev aria-label="Reverse order" title="Reverse order">${st.sortRev?'↑':'↓'}</button>`:''}<button class="lk" type="button" data-share>Share</button></div>`;
-  $('#sort').value=st.sort;
-  const match=i=>inGrp(i,st.grp)&&inStat(i,st.stat);
-  const list=sorted(st.items.filter(match));
-  sm.innerHTML=`<b>${list.length} of ${st.items.length}</b> shown.${sample}${st.layout==='list'?'<span class="hint">Swipe a row right for done, left to revisit, or all the way left to remove.</span>':''}`;
-  if(!list.length){v.innerHTML=`<div class="empty"><b>Nothing here</b>No items match these filters.</div>`;return}
-  if(st.layout==='covers'){
-    v.innerHTML=`<div class="wall" id="wall">${list.map(it=>{const c=cover(it,shape(it.type));
-      return c.replace('<div class="cv','<div tabindex="0" data-id="'+it.id+'" class="cv').replace(/<\/div>$/,`${it.fav?'<span class="fvb" aria-hidden="true">♥</span>':''}<div class="hv"><b>${esc(it.title)}${favMark(it)}</b>${esc(it.creator||T[it.type])}<br><span class="st ${it.status}">${sLab(it)}</span></div></div>`)}).join('')}</div>`;
-    sizeWall();return}
-  if(st.layout==='shelf'){drawShelf(list);return}
-  v.innerHTML=`<table class="ix">${thead()}<tbody>${list.map(it=>`<tr class="row${dust(it)>0?' dzr':''}" style="--dust:${dust(it).toFixed(2)}" data-id="${it.id}" tabindex="0">
-    <td><div class="t">${cover(it,'mini'+(it.type==='artist'?' round':''))}<div><b>${esc(it.title)}${favMark(it)}</b><span>${esc(it.creator||(it.note?it.note.slice(0,60):''))}</span></div></div></td>
-    <td class="m hm">${T[it.type]}${VID.includes(it.type)&&svcs(it).length?`<br><span style="font-size:13px">${esc(svcs(it).slice(0,2).join(', '))}${svcs(it).length>2?' +'+(svcs(it).length-2):''}</span>`:''}</td><td><span class="st ${it.status}">${sLab(it)}</span></td><td class="m hm">${esc(it.by)}</td><td class="hm"><span class="stars">${stars(it.rating)}</span>${rvMini(it.rv)}</td><td class="n hm">${md(it.added)}</td></tr>`).join('')}</tbody></table>`;
+  drawLibView(sample);
 }
 /* up next */
 let pickQ=null;
@@ -982,7 +1192,7 @@ const PPAL=[['Ink','#111214','#ffffff','#8396ff'],['Cobalt','#2b4bff','#ffffff',
 const pst={pal:0,title:'Checkit Fest'};
 function shareDlg(){dlg(`<h3>Share</h3><p>${st.view==='diary'?'Your finished list':'The items that match your current filters'}, two ways.</p><div class="shr"><button type="button" id="shp"><b>Festival poster</b><span>An image to post anywhere. Favorites headline.</span></button><button type="button" id="shl"><b>List page</b><span>A read-only page with your notes, to send as a file or host.</span></button></div><div class="dbtn"><button class="btn" data-close>Close</button></div>`);
   $('#shp').onclick=()=>{$('#dlg').close();posterDlg()};$('#shl').onclick=()=>{$('#dlg').close();menu('share')}}
-function posterItems(){const match=st.view==='diary'?i=>(i.status==='done'||i.status==='again')&&inGrp(i,st.grp):i=>inGrp(i,st.grp)&&inStat(i,st.stat);const sc=i=>(i.rv||0)*2+(i.rating||0)+(i.status==='prog'?3:i.status==='again'?2:0)+Math.max(0,3-ageDays(i)/30);
+function posterItems(){const match=st.view==='diary'?i=>(i.status==='done'||i.status==='again')&&inGrp(i,st.grp):i=>libMatch(i);const sc=i=>(i.rv||0)*2+(i.rating||0)+(i.status==='prog'?3:i.status==='again'?2:0)+Math.max(0,3-ageDays(i)/30);
   return st.items.filter(match).sort((a,b)=>sc(b)-sc(a))}
 function posterHtml(){const l=posterItems(),[,bg,ink,acc]=PPAL[pst.pal],t1=l.slice(0,3),t2=l.slice(3,9),t3=l.slice(9,27),more=l.length-27;
   const cnt=G.slice(1).map(([k,lb,ts])=>[lb,l.filter(i=>ts.includes(i.type)).length]).filter(x=>x[1]);
@@ -3189,7 +3399,7 @@ function download(name,text,type){try{const a=document.createElement('a');a.href
 function copyBox(title,desc,text,name,type){dlg(`<h3>${title}</h3><p>${desc}</p><textarea id="dt" readonly>${esc(text)}</textarea><div class="dbtn"><button class="btn" data-close>Close</button><button class="btn" id="dl">Download file</button><button class="btn pri" id="cp">Copy</button></div>`);
   $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(text);$('#cp').textContent='Copied'}catch(e){$('#dt').select()}};
   $('#dl').onclick=()=>download(name,text,type)}
-function shareHtml(){const list=st.view==='diary'?posterItems():sorted(st.items.filter(i=>inGrp(i,st.grp)&&inStat(i,st.stat)));const name=G.find(g=>g[0]===st.grp)[1];
+function shareHtml(){const list=st.view==='diary'?posterItems():sorted(st.items.filter(i=>libMatch(i)));const name=G.find(g=>g[0]===st.grp)[1];
   const rows=list.map(it=>`<article><p class="k">${T[it.type]}${it.extra?.event?', '+esc(it.extra.event):''}</p><h2>${(spot(it)||it.url)?`<a href="${esc(spot(it)||it.url)}">${esc(it.title)}</a>`:esc(it.title)}</h2>${it.creator?`<p class="by">${esc(it.creator)}</p>`:''}${it.note?`<blockquote>${esc(it.note)}</blockquote>`:''}</article>`).join('');
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Checkit: ${esc(name)}</title><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400&display=swap" rel="stylesheet"><style>body{margin:0;background:#fff;color:#111214;font:16px/1.5 "Inter Tight",sans-serif}main{max-width:720px;margin:0 auto;padding:48px 20px}h1{font-size:40px;letter-spacing:-.02em;line-height:1.05;margin:0 0 8px}main>p{color:#686b73;margin:0 0 24px}article{padding:32px 0;border-top:1px solid #e7e8eb;font-family:Newsreader,Georgia,serif}.k{font:13px "Inter Tight",sans-serif;color:#686b73;margin:0}h2{font-weight:500;font-size:34px;line-height:1.08;letter-spacing:-.02em;margin:8px 0 4px}h2 a{color:inherit;text-decoration-thickness:1px;text-underline-offset:5px}.by{color:#686b73;font-size:18px;margin:0}blockquote{margin:16px 0 0;font-size:19px;font-style:italic}@media(prefers-color-scheme:dark){body{background:#0f1013;color:#ececee}article{border-color:#25272c}}</style></head><body><main><h1>Checkit</h1><p>${list.length} picks: ${esc(name.toLowerCase())}, shared ${new Date().toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})}</p>${rows}</main></body></html>`}
 function menu(k){
