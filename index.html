@@ -771,6 +771,158 @@ dialog .x:hover{background:var(--soft);color:var(--ink)}
 .gqb button.epw{color:var(--ink);border-color:color-mix(in srgb,var(--acc) 60%,transparent);background:color-mix(in srgb,var(--acc) 18%,transparent);padding:0 14px;font-weight:500}
 .eprb{flex-wrap:wrap;gap:10px}.eprb .gqb{margin-left:auto}
 @media(max-width:600px){.tvw .tvc{grid-template-columns:72px minmax(0,1fr);gap:14px;padding:12px}.tvw .gqc .cv{width:72px;height:108px}.tvw .gqi b{font-size:19px}.gq-show .gq1{grid-template-columns:72px minmax(0,1fr)}.gq-show .gqc .cv{width:72px;height:108px}}
+/* motion: app-wide transitions, staggered tiles, per-type intros (TV static + dial, film leader, vinyl, game boot, live-set EQ). JS block `/* motion:` before the final render(). Level in localStorage checkit.motion (full|calm|off). */
+:root{--mo-e:cubic-bezier(.2,.8,.2,1);--mo-spring:cubic-bezier(.32,.72,0,1)}
+.mo-t{animation:moUp .46s var(--mo-e) both;animation-delay:calc(var(--mi,0) * 26ms)}
+#view.mo-fast .mo-t{animation-duration:.34s;animation-delay:calc(var(--mi,0) * 16ms)}
+#view.mo-show .mo-t{animation:moTv .5s var(--mo-e) both;animation-delay:calc(var(--mi,0) * 22ms)}
+#view.mo-movie .mo-t{animation:moFilm .62s linear both;animation-delay:calc(var(--mi,0) * 24ms)}
+#view.mo-music .mo-t{animation:moSpin .56s cubic-bezier(.2,1.1,.3,1) both;animation-delay:calc(var(--mi,0) * 26ms)}
+#view.mo-game .mo-t{animation:moPix .42s steps(4,end) both;animation-delay:calc(var(--mi,0) * 30ms)}
+#view.mo-set .mo-t{animation:moBeat .5s cubic-bezier(.2,1.3,.3,1) both;animation-delay:calc(var(--mi,0) * 24ms)}
+@keyframes moUp{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes moTv{0%{opacity:0;transform:scaleY(.04) scaleX(.94);filter:brightness(3) saturate(0)}35%{opacity:1;transform:scaleY(1.03) scaleX(1);filter:brightness(1.8) saturate(.3)}55%{filter:brightness(.8) saturate(1)}70%{filter:brightness(1.25)}100%{opacity:1;transform:none;filter:none}}
+@keyframes moFilm{0%{opacity:0;filter:sepia(1) brightness(1.9)}18%{opacity:.85;transform:translateY(-2px)}30%{opacity:.4;transform:translateY(1px)}46%{opacity:1;filter:sepia(.6) brightness(1.3);transform:translateY(-1px)}60%{opacity:.75}75%{opacity:1;filter:sepia(.15) brightness(1.05);transform:none}100%{opacity:1;filter:none;transform:none}}
+@keyframes moSpin{from{opacity:0;transform:scale(.82) rotate(-7deg)}to{opacity:1;transform:none}}
+@keyframes moPix{from{opacity:0;transform:scale(.55)}50%{opacity:1;transform:scale(1.06)}to{opacity:1;transform:none}}
+@keyframes moBeat{0%{opacity:0;transform:translateY(18px) scaleY(.7)}60%{opacity:1;transform:translateY(-3px) scaleY(1.03)}100%{opacity:1;transform:none}}
+.mo-pg{animation:moPg .34s var(--mo-e) both}
+@keyframes moPg{from{opacity:0;transform:translateX(calc(var(--md,0) * 18px))}to{opacity:1;transform:none}}
+#view.mo-hold{opacity:0}
+/* sliding underline between tabs */
+.mo-gl{position:fixed;height:2px;border-radius:2px;z-index:45;pointer-events:none;transform-origin:0 50%;background:var(--ink)}
+.mo-gl.acc{background:var(--acc);box-shadow:0 0 10px var(--acc)}
+.mo-gh{border-bottom-color:transparent!important}.mo-gh::after{opacity:0!important}
+/* micro-interactions */
+.dr{transition:transform .42s var(--mo-spring)!important}
+dialog[open]{animation:moDlg .3s var(--mo-spring)}
+dialog[open]::backdrop{animation:moFade .3s ease}
+@keyframes moDlg{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes moFade{from{opacity:0}}
+.toast{transition:opacity .25s ease,transform .45s cubic-bezier(.2,1.25,.3,1)!important}
+.tabs button[aria-pressed=true] svg{animation:moPop .42s cubic-bezier(.2,1.6,.4,1)}
+@keyframes moPop{0%{transform:scale(.8)}55%{transform:scale(1.14)}100%{transform:none}}
+.mark{animation:moNeon 1.3s steps(1,end) .15s both}
+@keyframes moNeon{0%{opacity:.15}8%{opacity:1}12%{opacity:.3}18%{opacity:1}24%{opacity:.55}30%,100%{opacity:1}}
+img.mo-ld{opacity:0;transform:scale(1.04);transition:opacity .5s ease,transform .7s var(--mo-e)}
+img.mo-ld.mo-in{opacity:1;transform:none}
+.cv,.stub,.tile,.bt,tr.row{-webkit-tap-highlight-color:transparent}
+.wall>.cv,.stub,.strip>.tile,#bgrid>.bt{transition:transform .28s var(--mo-e),box-shadow .28s var(--mo-e),opacity .25s}
+.wall>.cv:active,.stub:active,.strip>.tile:active,#bgrid>.bt:active{transform:scale(.975);transition-duration:.12s}
+@media(hover:hover){.wall>.cv:hover{transform:scale(1.035);z-index:2;box-shadow:0 10px 28px rgba(0,0,0,.55)}.stub:hover,.strip>.tile:hover{transform:translateY(-3px)}}
+/* intro stage, sized to the visible part of the content */
+.mo-fx{position:fixed;inset:0;z-index:70;overflow:hidden;pointer-events:auto;cursor:pointer;contain:strict;animation:moFade .14s ease both}
+.mo-fx.out{animation:moOut .3s ease forwards}
+@keyframes moOut{to{opacity:0}}
+.mo-fx canvas{position:absolute;inset:0;width:100%;height:100%}
+/* TV */
+.fx-tv{background:#0b0c0e;box-shadow:inset 0 0 18vmin 6vmin rgba(0,0,0,.85)}
+.fx-tv canvas{opacity:.85;filter:contrast(1.25)}
+.mo-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.32) 0 2px,transparent 2px 4px);mix-blend-mode:multiply}
+.mo-roll{position:absolute;left:0;right:0;height:38%;top:-40%;background:linear-gradient(transparent,rgba(255,255,255,.13),transparent);animation:moRoll .5s linear infinite}
+@keyframes moRoll{to{top:105%}}
+.mo-vig{position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 95% at 50% 50%,transparent 55%,rgba(0,0,0,.75));pointer-events:none}
+.mo-osd{position:absolute;top:max(28px,env(safe-area-inset-top));right:32px;font:700 clamp(30px,5vw,48px)/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.06em;color:#7dff9a;text-shadow:0 0 8px rgba(125,255,154,.8),2px 0 rgba(255,0,80,.5),-2px 0 rgba(0,180,255,.5)}
+.mo-osd small{display:block;font-size:.36em;letter-spacing:.24em;margin-top:6px;text-align:right;opacity:.85}
+.mo-dial{position:absolute;right:max(32px,5vw);bottom:max(40px,6vh);width:clamp(64px,9vw,96px);height:clamp(64px,9vw,96px);border-radius:50%;background:radial-gradient(circle at 38% 32%,#5a5d66,#1d1f24 62%);box-shadow:0 6px 18px rgba(0,0,0,.7),inset 0 1px 1px rgba(255,255,255,.25),0 0 0 5px rgba(255,255,255,.05);transition:transform .2s cubic-bezier(.3,1.5,.5,1)}
+.mo-dial::before{content:"";position:absolute;left:50%;top:8%;width:5px;height:28%;margin-left:-2.5px;border-radius:2px;background:#e9e9ea;box-shadow:0 0 6px rgba(255,255,255,.6)}
+.mo-dial::after{content:"";position:absolute;inset:-12px;border-radius:50%;background:repeating-conic-gradient(rgba(255,255,255,.35) 0 2deg,transparent 2deg 30deg);-webkit-mask:radial-gradient(closest-side,transparent 86%,#000 88%);mask:radial-gradient(closest-side,transparent 86%,#000 88%)}
+.mo-line{position:absolute;left:0;right:0;top:50%;height:100%;margin-top:-50%;background:#fff;opacity:0;transform:scaleY(.004)}
+.fx-tv.go .mo-line{animation:moLine .38s var(--mo-e) forwards}
+@keyframes moLine{0%{opacity:1;transform:scaleY(.004) scaleX(.2)}30%{opacity:1;transform:scaleY(.006) scaleX(1)}100%{opacity:0;transform:scaleY(1) scaleX(1)}}
+.fx-tv.go canvas,.fx-tv.go .mo-roll,.fx-tv.go .mo-scan,.fx-tv.go .mo-osd,.fx-tv.go .mo-dial{transition:opacity .22s ease;opacity:0}
+.fx-tv.go{background:transparent;box-shadow:none;transition:background .25s ease}
+/* Film */
+.fx-film{background:radial-gradient(70% 70% at 50% 50%,#3a2f22,#120e0a);color:#f3e7cf}
+.fx-film canvas{opacity:.28;filter:sepia(1)}
+.mo-spk{position:absolute;top:-40px;bottom:-40px;width:clamp(30px,4vw,48px);background:repeating-linear-gradient(180deg,#d9c9a6 0 16px,transparent 16px 28px) 50% 0/45% 100% no-repeat,#0a0806;box-shadow:inset 0 0 6px rgba(0,0,0,.8);animation:moSpk .16s linear infinite}
+.mo-spk.l{left:0}.mo-spk.r{right:0}
+@keyframes moSpk{to{transform:translateY(28px)}}
+.mo-lead{position:absolute;left:50%;top:50%;width:min(62vmin,400px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px solid rgba(243,231,207,.75);box-shadow:0 0 0 14px rgba(243,231,207,.08),0 0 0 15px rgba(243,231,207,.4)}
+.mo-lead::before,.mo-lead::after{content:"";position:absolute;background:rgba(243,231,207,.45)}
+.mo-lead::before{left:-30%;right:-30%;top:50%;height:1px}.mo-lead::after{top:-30%;bottom:-30%;left:50%;width:1px}
+.mo-sw{position:absolute;inset:0;border-radius:50%;background:conic-gradient(rgba(243,231,207,.5) var(--a,0deg),transparent 0)}
+.mo-lead b{position:absolute;inset:0;display:grid;place-items:center;font:400 min(38vmin,240px)/1 Righteous,"Inter Tight",sans-serif;color:#f3e7cf;text-shadow:0 0 20px rgba(255,220,160,.35)}
+.mo-scr{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,245,220,.5);animation:moScr .24s steps(3) infinite}
+@keyframes moScr{0%{left:22%;opacity:.7}33%{left:63%;opacity:.3}66%{left:41%;opacity:.6}}
+.fx-film.go{animation:moFlash .36s ease-out forwards}
+@keyframes moFlash{0%{filter:brightness(1)}25%{filter:brightness(2.6);opacity:1}100%{filter:brightness(3);opacity:0}}
+/* Music */
+.fx-music{--R:min(72vmin,460px);background:radial-gradient(80% 80% at 50% 50%,#1c1d24,#0b0c0f)}
+.mo-rec{position:absolute;left:50%;top:50%;width:var(--R);aspect-ratio:1;margin:calc(var(--R) / -2) 0 0 calc(var(--R) / -2);border-radius:50%;background:conic-gradient(from 30deg,transparent,rgba(255,255,255,.09) 8%,transparent 16%,transparent 50%,rgba(255,255,255,.07) 58%,transparent 66%),repeating-radial-gradient(circle,#121214 0 1.5px,#1b1b1f 1.5px 3px);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.06);animation:moRecIn .3s cubic-bezier(.2,1.2,.3,1) backwards,moRecSpin .9s cubic-bezier(.5,0,.6,1) both}
+.mo-rec i{position:absolute;inset:34%;border-radius:50%;background:radial-gradient(circle,#0b0c0f 0 7%,transparent 8%),linear-gradient(135deg,var(--acc),color-mix(in srgb,var(--acc) 40%,#ff4d8d));box-shadow:inset 0 0 0 2px rgba(255,255,255,.15)}
+.mo-rec i::after{content:"";position:absolute;left:24%;right:24%;top:26%;height:3px;border-radius:2px;background:rgba(255,255,255,.55)}
+@keyframes moRecIn{from{opacity:0;scale:.6}}
+@keyframes moRecSpin{from{rotate:0deg}to{rotate:900deg}}
+.mo-arm{position:absolute;left:calc(50% + var(--R) * .5 - 4px);top:calc(50% - var(--R) * .54);width:8px;height:calc(var(--R) * .68);border-radius:4px;background:linear-gradient(#d8d9de,#8b8d95);transform-origin:50% 8px;transform:rotate(-34deg);box-shadow:0 8px 18px rgba(0,0,0,.6);animation:moArm .3s cubic-bezier(.3,1.3,.5,1) .16s forwards}
+.mo-arm::before{content:"";position:absolute;left:-9px;top:-6px;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#eceef2,#6d7079)}
+.mo-arm::after{content:"";position:absolute;left:-5px;bottom:-6px;width:16px;height:22px;border-radius:3px;background:#cfd1d6;transform:rotate(18deg)}
+@keyframes moArm{to{transform:rotate(14deg)}}
+.fx-music.fast .mo-rec{animation-duration:.2s,.5s}.fx-music.fast .mo-arm{animation-delay:0s;animation-duration:.18s}
+.mo-ring{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px;border-radius:50%;border:2px solid color-mix(in srgb,var(--acc) 70%,#fff);opacity:0}
+.fx-music.go .mo-rec{transition:transform .42s cubic-bezier(.5,0,.2,1),opacity .36s ease;transform:scale(2.6);opacity:0}
+.fx-music.go .mo-arm{transition:opacity .2s;opacity:0}
+.fx-music.go{background:transparent;transition:background .3s ease}
+.fx-music.go .mo-ring{animation:moRing .5s var(--mo-e) forwards}
+@keyframes moRing{from{opacity:.9;transform:scale(1)}to{opacity:0;transform:scale(120)}}
+/* Games */
+.fx-game{background:transparent}
+.mo-px{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--cx),1fr);grid-auto-rows:1fr}
+.mo-px i{background:#0d0f1a}
+.fx-game.go .mo-px i{animation:moOut .01s steps(1) forwards;animation-delay:var(--d)}
+.mo-boot{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:22px;font:700 clamp(22px,5vw,44px)/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.18em;color:#ffe66d;text-shadow:3px 3px 0 #ff3d7f,6px 6px 0 rgba(0,0,0,.4)}
+.mo-boot b{animation:moBlink .24s steps(1) infinite}
+@keyframes moBlink{50%{opacity:.35}}
+.mo-bar{width:min(64vw,380px);height:24px;border:3px solid #ffe66d;padding:2px}
+.mo-bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(90deg,#4df0ff 0 12.5%,transparent 12.5% 13.5%);animation:moFill var(--fd,.4s) steps(8,end) forwards}
+@keyframes moFill{to{width:100%}}
+.fx-game.go .mo-boot{opacity:0;transition:opacity .08s steps(1)}
+.fx-game.go{cursor:default}
+/* Live sets */
+.fx-set{background:radial-gradient(90% 90% at 50% 100%,color-mix(in srgb,var(--acc) 22%,#0b0c0f),#0b0c0f)}
+.mo-eq{position:absolute;left:6%;right:6%;bottom:12%;top:22%;display:flex;align-items:flex-end;gap:2%}
+.mo-eq i{flex:1;height:100%;border-radius:3px 3px 0 0;transform-origin:50% 100%;background:linear-gradient(0deg,var(--acc),#ff4d8d 70%,#ffe66d);animation:moEq var(--q) ease-in-out infinite alternate;box-shadow:0 0 18px color-mix(in srgb,var(--acc) 60%,transparent)}
+@keyframes moEq{from{transform:scaleY(.08)}to{transform:scaleY(var(--h))}}
+.fx-set.go .mo-eq i{animation:none;transform:scaleY(0);transition:transform .25s ease-in}
+.fx-set.go{background:transparent;transition:background .3s}
+.mo-hint{position:absolute;left:0;right:0;bottom:max(16px,env(safe-area-inset-bottom));text-align:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.mo-fx.go .mo-hint{opacity:0}
+.mo-fx.go{cursor:default}
+/* ambience: a whole-app backdrop for the type you're in (layers #mo-amb behind content, #mo-ambt over it) */
+#mo-amb,#mo-ambt{position:fixed;inset:0;pointer-events:none;transition:opacity .6s ease;overflow:hidden}
+#mo-amb{z-index:-1}#mo-ambt{z-index:25}
+#mo-amb.swap,#mo-ambt.swap{opacity:0;transition-duration:.2s}
+#mo-amb::before,#mo-amb::after,#mo-ambt::before,#mo-ambt::after{content:"";position:absolute;inset:0}
+#mo-amb[data-t=show]::before{background:radial-gradient(110% 70% at 50% 0%,rgba(110,255,180,.12),transparent 65%)}
+#mo-amb[data-t=show]::after{background:radial-gradient(ellipse at 50% 45%,transparent 50%,rgba(0,0,0,.7))}
+#mo-ambt[data-t=show]::before{background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px)}
+#mo-ambt[data-t=show]::after{inset:auto 0;top:0;height:28vh;background:linear-gradient(transparent,rgba(255,255,255,.022),transparent);animation:moAroll 8s linear infinite}
+@keyframes moAroll{from{transform:translateY(-30vh)}to{transform:translateY(110vh)}}
+#mo-amb[data-t=movie]::before{background:radial-gradient(55% 95% at 50% -12%,rgba(255,214,150,.18),transparent 72%)}
+#mo-amb[data-t=movie]::after{background:radial-gradient(ellipse at 50% 40%,transparent 50%,rgba(25,12,0,.5))}
+#mo-ambt[data-t=movie]::before{inset:-64px;background:var(--mo-grain) 0 0/128px 128px;opacity:.07;animation:moGrain .48s steps(4) infinite}
+#mo-ambt[data-t=movie]::after{background:rgba(255,236,200,.025);animation:moFlick 2.4s steps(1) infinite}
+@keyframes moGrain{25%{transform:translate(-31px,17px)}50%{transform:translate(23px,-41px)}75%{transform:translate(-13px,-29px)}100%{transform:translate(37px,11px)}}
+@keyframes moFlick{0%,100%{opacity:1}13%{opacity:.3}17%{opacity:1}61%{opacity:.6}64%{opacity:1}}
+#mo-amb[data-t=music]::after{background:radial-gradient(60vmax 60vmax at 88% 108%,color-mix(in srgb,var(--acc) 26%,transparent),transparent 70%)}
+@keyframes moSpinBg{to{transform:rotate(1turn)}}
+#mo-amb[data-t=game]::before{background:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px) 0 0/24px 24px,linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px) 0 0/24px 24px;-webkit-mask:linear-gradient(transparent,#000 40%);mask:linear-gradient(transparent,#000 40%)}
+#mo-amb[data-t=game]::after{background:radial-gradient(50vmax 40vmax at 0 0,rgba(255,61,127,.17),transparent 70%),radial-gradient(50vmax 40vmax at 100% 100%,rgba(77,240,255,.15),transparent 70%)}
+@property --mo-a{syntax:"<angle>";inherits:false;initial-value:0deg}
+#mo-amb[data-t=set]::before{background:radial-gradient(80% 45% at 50% 112%,color-mix(in srgb,var(--acc) 46%,transparent),transparent 70%);animation:moPulse 1s ease-in-out infinite alternate}
+#mo-amb[data-t=set]::after{background:conic-gradient(from calc(-12deg + var(--mo-a)) at 18% 112%,transparent 0deg,rgba(255,77,141,.12) 7deg,transparent 14deg),conic-gradient(from calc(-2deg - var(--mo-a)) at 82% 112%,transparent 0deg,rgba(131,150,255,.13) 7deg,transparent 14deg);animation:moBeam 7s ease-in-out infinite alternate}
+@keyframes moPulse{from{opacity:.55}to{opacity:1}}
+@keyframes moBeam{from{--mo-a:-14deg}to{--mo-a:14deg}}
+@media(prefers-reduced-motion:reduce){#mo-amb,#mo-ambt{display:none}}
+#mo-eco,#mo-burst{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;transition:opacity .6s ease}
+#mo-eco{z-index:-1}#mo-burst{z-index:65}
+body[data-world=show]{--acc:#66f0a8}body[data-world=movie]{--acc:#ffbf70}body[data-world=music]{--acc:#ff6fb5}body[data-world=game]{--acc:#4df0ff}body[data-world=set]{--acc:#b98bff}
+body.mo-glitch #view{animation:moGlitch .24s steps(3) 1}
+@keyframes moGlitch{0%{transform:none}33%{transform:translateX(-5px) skewX(-3deg);filter:drop-shadow(3px 0 rgba(255,0,90,.55)) drop-shadow(-3px 0 rgba(0,210,255,.55))}66%{transform:translateX(4px);filter:drop-shadow(-2px 0 rgba(255,0,90,.4))}100%{transform:none;filter:none}}
+@media(prefers-reduced-motion:reduce){#mo-eco,#mo-burst{display:none}}
+body.mo-off .mo-t,body.mo-off .mo-pg,body.mo-off .mark,body.mo-off .tabs svg,body.mo-off dialog[open]{animation:none!important}
+body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
+@media(prefers-reduced-motion:reduce){.mo-t,.mo-pg,.mark,.tabs button svg,dialog[open],dialog[open]::backdrop{animation:none!important}img.mo-ld{opacity:1;transform:none}.mo-fx{display:none}#view.mo-hold{opacity:1}.wall>.cv,.stub,.strip>.tile,#bgrid>.bt{transition:none}}
 </style>
 </head>
 <body>
@@ -785,7 +937,7 @@ dialog .x:hover{background:var(--soft);color:var(--ink)}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-11</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-12</small>
     </div></details>
   </div>
 </header>
@@ -3688,6 +3840,138 @@ if(sbOn()&&hasSession())sbLoad().catch(()=>{});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&sbUser)syncSoon(300)});
 addEventListener('online',()=>{if(sbUser)syncSoon(300)});
 setInterval(()=>{if(sbUser&&document.visibilityState==='visible')sync()},120000);
+/* motion: page transitions (slide toward the tab you picked), a gliding underline between tabs, staggered tile entrances themed per type, and short per-type intros when you switch type in Library, Diary or Browse: TV static with a channel dial, a film-leader countdown, a spinning record, a pixel game boot, live-set EQ bars. Full intro the first time per type each visit, a quick one after; tap skips. Level in localStorage checkit.motion: full | calm (no intros) | off. prefers-reduced-motion turns it all off. Wraps render, drawBrowse and brGrid. CSS block `/* motion:` at end of style. */
+const MO={lv:localStorage.getItem('checkit.motion')||'full',key:null,seen:{},fx:null,tm:[],rm:matchMedia('(prefers-reduced-motion: reduce)'),noise:null};
+const moOn=()=>MO.lv!=='off'&&!MO.rm.matches;
+const moBody=()=>document.body.classList.toggle('mo-off',!moOn());
+const moType=()=>{const t=st.view==='browse'?(st.br&&st.br.t):st.view==='next'?'all':st.grp;return /^(album|artist|song|music)$/.test(t)?'music':/^(movie|show|game|set)$/.test(t)?t:'all'};
+const moKey=()=>({v:st.view,t:moType(),s:st.view==='library'?[st.lseg,st.lsub,st.layout].join('|'):st.view==='browse'?String(st.br&&st.br.l||''):''});
+const MOG=[['header .views',0,2,''],['#filters .lseg',0,2,'acc'],['#filters .ltype',12,4,'acc']];
+const moId=b=>b.dataset.v||b.dataset.g||b.dataset.lseg||b.textContent;
+const moSnap=()=>MOG.map(([q])=>{const b=document.querySelector(q+' button[aria-pressed=true]');return b&&b.offsetParent?{id:moId(b),r:b.getBoundingClientRect()}:null});
+function moGlide(snap){MOG.forEach(([q,ix,bo,c],i)=>{const o=snap[i];if(!o)return;const b=document.querySelector(q+' button[aria-pressed=true]');if(!b||!b.offsetParent||moId(b)===o.id)return;
+  const r=b.getBoundingClientRect();if(Math.abs(r.top-o.r.top)>4||r.width<2*ix+4)return;const w=r.width-2*ix,w0=Math.max(4,o.r.width-2*ix);
+  const g=document.createElement('div');g.className='mo-gl '+c;Object.assign(g.style,{left:r.left+ix+'px',top:r.bottom-bo+'px',width:w+'px'});document.body.append(g);b.classList.add('mo-gh');
+  const a=g.animate([{transform:`translateX(${o.r.left-r.left}px) scaleX(${w0/w})`},{transform:'none'}],{duration:360,easing:'cubic-bezier(.3,.7,.1,1)'});a.onfinish=a.oncancel=()=>{g.remove();b.classList.remove('mo-gh')}})}
+const MOS='#view>section,#view .wall>.cv,#view tr.row,#view .stubs h3,#view .stub,#view .bw>:not(#bgrid):not(.bg),#bgrid>*,#view>.empty,#view>.ix';
+function moStagger(theme,fast,list){const v=$('#view');if(theme!==undefined){v.classList.remove('mo-show','mo-movie','mo-music','mo-game','mo-set','mo-fast');if(theme&&theme!=='all')v.classList.add('mo-'+theme);if(fast)v.classList.add('mo-fast')}
+  const els=list||v.querySelectorAll(MOS),H=innerHeight+40,hit=[];let n=0;
+  for(const e of els){if(n>=24)break;if(e.matches('#view>.ix')&&e.querySelector('tr.row'))continue;const r=e.getBoundingClientRect();if(!r.height||r.bottom<0)continue;if(r.top>H)break;e.style.setProperty('--mi',n++);e.classList.add('mo-t');hit.push(e)}
+  if(hit.length)MO.tm.push(setTimeout(()=>hit.forEach(e=>e.classList.remove('mo-t')),n*30+800))}
+function moPage(d){['#filters','#sum'].forEach(q=>{const e=$(q);if(e&&e.firstElementChild)e.animate([{opacity:0,transform:`translateX(${d*18}px)`},{opacity:1,transform:'none'}],{duration:340,easing:'cubic-bezier(.2,.8,.2,1)'})})}
+function moCancel(){MO.tm.forEach(clearTimeout);MO.tm=[];document.querySelectorAll('.mo-fx').forEach(x=>x.remove());MO.fx=null;$('#view').classList.remove('mo-hold')}
+function moFrames(){if(MO.noise)return MO.noise;const c=document.createElement('canvas').getContext('2d'),W=160,H=90;MO.noise=[];
+  for(let f=0;f<6;f++){const d=c.createImageData(W,H),u=new Uint32Array(d.data.buffer);for(let y=0;y<H;y++){const band=Math.random()<.08?60:0;for(let x=0;x<W;x++){const g=Math.min(255,(Math.random()*215|0)+band);u[y*W+x]=0xff000000|g<<16|g<<8|g}}MO.noise.push(d)}return MO.noise}
+function moNoise(fx){const cv=fx.querySelector('canvas');if(!cv)return;const x=cv.getContext('2d'),fr=moFrames();let i=0,k=0;const tick=()=>{if(!fx.isConnected)return;if(k++%2===0)x.putImageData(fr[i++%fr.length],0,0);requestAnimationFrame(tick)};tick()}
+const MOT={show:[780,330],movie:[660,340],music:[620,300],game:[540,260],set:[540,280]};
+function moIntro(t){moCancel();const v=$('#view'),fast=!!MO.seen[t];MO.seen[t]=1;const[full,quick]=MOT[t],dur=fast?quick:full;
+  const w=innerWidth,h=innerHeight,fx=document.createElement('div');fx.className='mo-fx fx-'+({show:'tv',movie:'film'}[t]||t)+(fast?' fast':'');
+  MO.post=null;const hint=fast?'':'<div class="mo-hint">Tap to skip</div>',at=(ms,f)=>MO.tm.push(setTimeout(f,ms));
+  if(t==='show'){const ch=2+Math.floor(Math.random()*6);fx.innerHTML=`<canvas width="160" height="90"></canvas><div class="mo-roll"></div><div class="mo-scan"></div><div class="mo-vig"></div><div class="mo-osd">CH ${String(ch).padStart(2,'0')}<small>TV</small></div><div class="mo-dial"></div><div class="mo-line"></div>${hint}`;
+    const dial=fx.querySelector('.mo-dial'),osd=fx.querySelector('.mo-osd');(fast?[40]:[70,280,490]).forEach((ms,i)=>at(ms,()=>{dial.style.transform=`rotate(${(i+1)*30}deg)`;osd.firstChild.textContent='CH '+String(ch+i+1).padStart(2,'0')}))}
+  else if(t==='movie'){fx.innerHTML=`<canvas width="160" height="90"></canvas><div class="mo-spk l"></div><div class="mo-spk r"></div><div class="mo-scr"></div><div class="mo-lead"><div class="mo-sw"></div><b></b></div>${hint}`;
+    const sw=fx.querySelector('.mo-sw'),b=fx.querySelector('.mo-lead b'),nums=fast?[1]:[3,2,1],per=dur/nums.length,t0=performance.now();
+    const tick=()=>{if(!fx.isConnected||fx.classList.contains('go'))return;const e=performance.now()-t0,k=Math.min(nums.length-1,e/per|0);b.textContent=nums[k];sw.style.setProperty('--a',((e%per)/per*360).toFixed(1)+'deg');requestAnimationFrame(tick)};MO.post=tick}
+  else if(t==='music')fx.innerHTML=`<div class="mo-ring"></div><div class="mo-rec"><i></i></div><div class="mo-arm"></div>${hint}`;
+  else if(t==='game'){const s=w>600?56:40,cx=Math.max(6,Math.round(w/s)),cy=Math.max(4,Math.round(h/s)),sp=fast?150:230;
+    fx.innerHTML=`<div class="mo-px" style="--cx:${cx}">${Array.from({length:cx*cy},()=>`<i style="--d:${Math.random()*sp|0}ms"></i>`).join('')}</div><div class="mo-boot"><b>PLAYER 1</b><div class="mo-bar"><i style="--fd:${dur-60}ms"></i></div></div>${hint}`}
+  else if(t==='set'){fx.innerHTML=`<div class="mo-eq">${Array.from({length:w>900?32:w>600?24:16},()=>`<i style="--q:${(.14+Math.random()*.18).toFixed(2)}s;--h:${(.35+Math.random()*.65).toFixed(2)}"></i>`).join('')}</div>${hint}`}
+  document.body.append(fx);MO.fx=fx;v.classList.add('mo-hold');if(t==='show'||t==='movie')moNoise(fx);if(MO.post)MO.post();
+  let done=0;const go=()=>{if(done)return;done=1;MO.fx=null;MO.tm.forEach(clearTimeout);MO.tm=[];fx.classList.add('go');v.classList.remove('mo-hold');moStagger(t,0);moSettle();
+    setTimeout(()=>{fx.style.pointerEvents='none'},260);setTimeout(()=>fx.remove(),600)};
+  fx.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();go()});fx.addEventListener('click',e=>{e.preventDefault();e.stopPropagation()});
+  fx.addEventListener('wheel',go,{passive:true});MO.skip=go;at(dur,go)}
+addEventListener('keydown',()=>{if(MO.fx&&MO.skip)MO.skip()},true);
+const MOA=document.createElement('div'),MOAT=document.createElement('div');MOA.id='mo-amb';MOAT.id='mo-ambt';document.body.prepend(MOA);document.body.append(MOAT);
+function moAmb(t){const want=moOn()&&MOT[t]&&st.view!=='next'?t:'';if(typeof ecoWorld==='function')ecoWorld(moOn()?(want||'all'):'');if((MOA.dataset.t||'')===want)return;if(want==='movie'&&!MO.grain){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),d=x.createImageData(128,128),u=new Uint32Array(d.data.buffer);for(let i=0;i<u.length;i++){const g=Math.random()*255|0;u[i]=(Math.random()*90|0)<<24|g<<16|g<<8|g}x.putImageData(d,0,0);MO.grain=1;document.documentElement.style.setProperty('--mo-grain',`url(${c.toDataURL()})`)}
+  const sw=()=>{MOA.dataset.t=MOAT.dataset.t=want;MOA.classList.remove('swap');MOAT.classList.remove('swap')};if(MO.fx||!MOA.dataset.t)sw();else{MOA.classList.add('swap');MOAT.classList.add('swap');clearTimeout(MO.at);MO.at=setTimeout(sw,220)}}
+function moSettle(){['header','#filters'].forEach(q=>{const e=$(q);if(e)e.animate([{opacity:.35,filter:'brightness(1.6)'},{opacity:1,filter:'none'}],{duration:420,easing:'ease-out'})})}
+function moBefore(){return moOn()?moSnap():null}
+function moAfter(snap){const k=moKey(),o=MO.key;MO.key=k;moAmb(k.t);if(!moOn()){if(MO.fx)moCancel();return}
+  if(snap)moGlide(snap);
+  if(!o){moStagger(k.t==='all'?'all':k.t,0);return}
+  if(o.v!==k.v){moCancel();moPage(Math.sign(VIEWS.indexOf(k.v)-VIEWS.indexOf(o.v)));moStagger(k.t,0)}
+  else if(o.t!==k.t){if(MO.lv==='full'&&k.t!=='all'&&MOT[k.t]&&k.v!=='next')moIntro(k.t);else{moCancel();moStagger(k.t,0)}}
+  else if(o.s!==k.s){moCancel();moStagger(k.t,1)}}
+const moWrap=f=>function(){if(MO.in)return f.apply(this,arguments);MO.in=1;let s=null;try{s=moBefore()}catch(e){}try{return f.apply(this,arguments)}finally{MO.in=0;try{moAfter(s)}catch(e){console.warn('motion',e)}}};
+render=moWrap(render);drawBrowse=moWrap(drawBrowse);
+{const bg=brGrid;brGrid=function(){const g=$('#bgrid'),n=g?g.querySelectorAll('.bt').length:0,r=bg.apply(this,arguments);if(moOn()&&!MO.in&&!$('#view').classList.contains('mo-hold')){const a=[...($('#bgrid')?.querySelectorAll('.bt')||[])].slice(n);if(a.length)moStagger(undefined,1,a)}return r}}
+const moImg=i=>{if(i.complete||i.classList.contains('mo-ld'))return;i.classList.add('mo-ld');const f=()=>requestAnimationFrame(()=>i.classList.add('mo-in'));i.addEventListener('load',f,{once:true});i.addEventListener('error',f,{once:true})};
+{const mo=new MutationObserver(ms=>{if(!moOn())return;for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1)continue;if(n.tagName==='IMG')moImg(n);else n.querySelectorAll('img').forEach(moImg)}});['#view','#dr','#res'].forEach(q=>{const e=$(q);if(e)mo.observe(e,{childList:true,subtree:true})})}
+new MutationObserver(()=>{const d=$('#dlg');if(!d.querySelector('#ts')||!d.querySelector('#tk')||d.querySelector('#moSel'))return;const tl=d.querySelector('#tl'),a=tl&&tl.previousElementSibling||tl;if(!a)return;
+  const w=document.createElement('div');w.style.margin='12px 0 4px';w.innerHTML=`<label for="moSel" style="font-size:13px;color:var(--mut);display:block">Animation</label><select id="moSel" style="margin-top:4px;min-height:40px;padding:0 10px;border-radius:6px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);font:inherit"><option value="full">Full: living worlds and intros</option><option value="calm">Calm: smooth transitions only</option><option value="off">Off</option></select>`;
+  a.before(w);const s=w.querySelector('select');s.value=MO.lv;s.onchange=()=>{MO.lv=s.value;try{localStorage.setItem('checkit.motion',MO.lv)}catch(e){}moBody();if(!moOn())moCancel();moAmb(moType())}}).observe($('#dlg'),{childList:true});
+MO.rm.addEventListener?.('change',moBody);moBody();
+/* motion: living worlds. In Full, a canvas behind the content (#mo-eco) keeps each type's world alive: TV phosphor dust, static when you scroll fast and an odd signal glitch; film dust motes that light up in a projector beam aimed at your pointer; music's background record turning (scroll scratches it) with beat ripples and rising motes; game starfield with parallax and sparkles; live-set beams, haze and a 122 bpm pulse. Actions that save something (toasts like Added, Done, Marked) and star taps set off a themed burst on a top canvas (#mo-burst). Each world also tints the accent (body[data-world]). Pauses when the tab is hidden. */
+const ECO={c:document.createElement('canvas'),w:0,h:0,dpr:1,t:0,last:0,run:0,world:'',p:[],rings:[],sp:[],px:innerWidth/2,py:innerHeight*.35,tx:null,ty:null,lx:innerWidth/2,ly:innerHeight/2,sv:0,sy:scrollY,nextG:4,g:null,rot:0,beat:0,fl:1,flT:0};
+ECO.c.id='mo-eco';MOA.after(ECO.c);const EX=ECO.c.getContext('2d'),ER=Math.random;
+const moEco=()=>moOn()&&MO.lv==='full';
+function ecoSize(){ECO.dpr=Math.min(devicePixelRatio||1,innerWidth<700?1.25:1.5);ECO.w=innerWidth;ECO.h=innerHeight;ECO.c.width=ECO.w*ECO.dpr|0;ECO.c.height=ECO.h*ECO.dpr|0;BU.c.width=ECO.c.width;BU.c.height=ECO.c.height}
+function ecoSeed(){const w=ECO.world,W=ECO.w,H=ECO.h,n=W<700?.6:1,add=(k,f)=>{for(let i=0;i<Math.round(k*n);i++)ECO.p.push(f())};ECO.p=[];ECO.rings=[];ECO.sp=[];
+  if(w==='show')add(50,()=>({x:ER()*W,y:ER()*H,vx:(ER()-.5)*7,vy:(ER()-.5)*7,r:ER()*1.3+.5,ph:ER()*6}));
+  else if(w==='movie')add(95,()=>({x:ER()*W,y:ER()*H,vx:(ER()-.5)*8,vy:(ER()-.5)*8,r:ER()*1.7+.5,ph:ER()*6}));
+  else if(w==='music')add(40,()=>({x:ER()*W,y:ER()*H,vy:-(8+ER()*16),r:ER()*2+1,ph:ER()*6,k:ER()<.5}));
+  else if(w==='game')add(120,()=>({x:ER()*W,y:ER()*H,z:[.25,.5,1][ER()*3|0],s:ER()<.12?3:ER()<.4?2:1,ph:ER()*6,c:ER()*4|0}));
+  else if(w==='set')add(10,()=>({x:ER()*W,y:H*(.35+ER()*.65),vx:(ER()-.5)*14,r:140+ER()*240,k:ER()<.5}));
+  else add(28,()=>({x:ER()*W,y:ER()*H,vy:-(ER()*4+1),r:ER()*1.2+.4,ph:ER()*6}))}
+const ewrap=(p,W,H,m=10)=>{if(p.x<-m)p.x+=W+2*m;else if(p.x>W+m)p.x-=W+2*m;if(p.y<-m)p.y+=H+2*m;else if(p.y>H+m)p.y-=H+2*m};
+const eAcc=()=>getComputedStyle(document.body).getPropertyValue('--acc').trim()||'#8396ff';
+function eSheen(x,W,H,a,spd){const cx=W*.88,cy=H*1.08;ECO.rot+=spd;if(!x.createConicGradient)return;x.save();x.translate(cx,cy);const g=x.createConicGradient(ECO.rot,0,0),c=v=>`rgba(255,255,255,${v})`;[[0,0],[.09,a],[.18,0],[.5,0],[.59,a*.8],[.68,0],[1,0]].forEach(([o,v])=>g.addColorStop(o,c(v)));x.fillStyle=g;x.beginPath();x.arc(0,0,Math.hypot(W,H)*1.15,0,7);x.fill();x.restore()}
+function eCone(x,sx,sy,ang,spread,len,col,a){const g=x.createLinearGradient(sx,sy,sx+Math.cos(ang)*len,sy+Math.sin(ang)*len);g.addColorStop(0,col(a));g.addColorStop(1,col(0));x.fillStyle=g;x.beginPath();x.moveTo(sx,sy);x.lineTo(sx+Math.cos(ang-spread)*len,sy+Math.sin(ang-spread)*len);x.lineTo(sx+Math.cos(ang+spread)*len,sy+Math.sin(ang+spread)*len);x.closePath();x.fill()}
+function moGlitch(){if(MO.fx||document.querySelector('#dr.on'))return;document.body.classList.add('mo-glitch');setTimeout(()=>document.body.classList.remove('mo-glitch'),240)}
+const ECOD={
+  show(x,W,H,t,dt,ds){let g=x.createRadialGradient(ECO.px,ECO.py,0,ECO.px,ECO.py,Math.max(W,H)*.6);g.addColorStop(0,'rgba(110,255,180,.08)');g.addColorStop(1,'rgba(110,255,180,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
+    x.fillStyle='#c8ffe0';for(const p of ECO.p){p.x+=p.vx*dt;p.y+=p.vy*dt-ds*.2;ewrap(p,W,H);x.globalAlpha=.18+.22*Math.sin(t*2.5+p.ph);x.fillRect(p.x,p.y,p.r*1.5,p.r*1.5)}x.globalAlpha=1;
+    if(t>ECO.nextG){ECO.nextG=t+7+ER()*10;ECO.g={y:ER()*H,h:8+ER()*50,end:t+.24};moGlitch()}
+    const gl=ECO.g&&t<ECO.g.end,amt=Math.min(1,ECO.sv/35)*.7+(gl?.8:0);
+    if(amt>.03){const n=70*amt|0;for(let i=0;i<n;i++){const yy=gl&&i<n*.75?ECO.g.y+ER()*ECO.g.h:ER()*H;x.fillStyle=`rgba(255,255,255,${(ER()*.16*amt).toFixed(3)})`;x.fillRect(ER()*W-40,yy,40+ER()*W*.45,1+ER()*2)}}},
+  movie(x,W,H,t,dt,ds){if(t>ECO.flT){ECO.flT=t+1/24;ECO.fl=.82+ER()*.18}const sx=W/2,sy=-H*.18,ang=Math.atan2(H*1.1-sy,ECO.px+(ECO.px-W/2)*.6-sx),sp=.3,len=H*1.7;
+    eCone(x,sx,sy,ang,sp,len,a=>`rgba(255,220,160,${a})`,.15*ECO.fl);
+    for(const p of ECO.p){p.vx+=(ER()-.5)*30*dt;p.vy+=(ER()-.5)*30*dt;p.vx*=.98;p.vy*=.98;p.x+=p.vx*dt;p.y+=p.vy*dt-ds*.25;ewrap(p,W,H);
+      const d=Math.atan2(p.y-sy,p.x-sx)-ang,lit=Math.abs(d)<sp?1-Math.abs(d)/sp:0;x.globalAlpha=(.05+.6*lit*ECO.fl)*(.7+.3*Math.sin(t*2+p.ph));x.fillStyle='#ffe6bd';x.beginPath();x.arc(p.x,p.y,p.r*(1+lit*.6),0,7);x.fill()}x.globalAlpha=1},
+  music(x,W,H,t,dt,ds){const dir=ds<0?-1:1;eSheen(x,W,H,.085,dt*(.35+Math.min(4,ECO.sv*.12))*dir);const acc=eAcc();
+    const bp=60/96;if(t-ECO.beat>bp*2){ECO.beat=t;ECO.rings.push({x:W*.88,y:H*1.08,r:40,a:.32,v:150})}
+    x.strokeStyle=acc;x.lineWidth=1.5;ECO.rings=ECO.rings.filter(r=>{r.r+=r.v*dt;r.a-=dt*(r.v>150?.5:.09);if(r.a<=0)return false;x.globalAlpha=r.a;x.beginPath();x.arc(r.x,r.y,r.r,0,7);x.stroke();return true});
+    for(const p of ECO.p){p.y+=p.vy*dt-ds*.3;p.x+=Math.sin(t*.8+p.ph)*10*dt;ewrap(p,W,H,20);x.globalAlpha=.12+.2*Math.sin(t*1.6+p.ph)**2;x.fillStyle=p.k?acc:'#ffd1ea';x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()}x.globalAlpha=1},
+  game(x,W,H,t,dt,ds){const C=['#ffffff','#4df0ff','#ff3d7f','#ffe66d'];for(const p of ECO.p){p.y+=14*p.z*dt-ds*p.z*.5;ewrap(p,W,H);if(Math.sin(t*5+p.ph)<-.6)continue;
+      const near=Math.hypot(p.x-ECO.px,p.y-ECO.py)<140,s=p.s+(near?1:0);x.globalAlpha=(.25+.5*p.z)*(near?1.4:1);x.fillStyle=C[p.c];x.fillRect(Math.round(p.x),Math.round(p.y),s,s)}
+    if(ER()<dt*1.2)ECO.sp.push({x:ER()*W,y:ER()*H,a:0,c:C[ER()*4|0]});x.globalAlpha=1;
+    ECO.sp=ECO.sp.filter(s=>{s.a+=dt;if(s.a>.7)return false;const k=[1,2,3,2,1][Math.min(4,s.a/.14|0)];x.fillStyle=s.c;x.globalAlpha=.7;x.fillRect(s.x-k*2,s.y,k*4+2,2);x.fillRect(s.x,s.y-k*2,2,k*4+2);return true});x.globalAlpha=1},
+  set(x,W,H,t,dt,ds){const pulse=Math.exp(-((t*122/60)%1)*4),acc=eAcc();
+    for(const p of ECO.p){p.x+=p.vx*dt;ewrap(p,W,H,p.r);const g=x.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);g.addColorStop(0,p.k?'rgba(185,139,255,.07)':'rgba(255,77,141,.05)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(p.x-p.r,p.y-p.r,p.r*2,p.r*2)}
+    const bm=[[.12,'255,77,141',.0],[.5,'185,139,255',1],[.88,'77,240,255',2]];bm.forEach(([fx,c,i])=>{const sx=W*fx,sy=H+30,base=-Math.PI/2+(fx-.5)*.5;let a=base+Math.sin(t*.6+i*2.1)*.38;if(i===1)a=Math.atan2(ECO.py-sy,ECO.px-sx);eCone(x,sx,sy,a,.09,H*1.5,v=>`rgba(${c},${v})`,.1+.07*pulse)});
+    const g=x.createRadialGradient(W/2,H*1.1,0,W/2,H*1.1,H*.7);g.addColorStop(0,`rgba(185,139,255,${(.08+.1*pulse).toFixed(3)})`);g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,W,H)},
+  all(x,W,H,t,dt,ds){eSheen(x,W,H,.04,dt*(.08+Math.min(2,ECO.sv*.05))*(ds<0?-1:1));x.fillStyle='#ffffff';for(const p of ECO.p){p.y+=p.vy*dt-ds*.15;ewrap(p,W,H);x.globalAlpha=.1+.12*Math.sin(t*1.5+p.ph)**2;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()}x.globalAlpha=1}};
+function ecoTick(now){if(!ECO.run)return;requestAnimationFrame(ecoTick);if(ECO.w<700&&now-ECO.last<31)return;const dt=Math.min(.05,ECO.last?(now-ECO.last)/1000:.016);ECO.last=now;ECO.t+=dt;
+  const tx=ECO.tx??ECO.w/2,ty=ECO.ty??ECO.h*.35,k=Math.min(1,dt*3);ECO.px+=(tx-ECO.px)*k;ECO.py+=(ty-ECO.py)*k;const sy=scrollY,ds=sy-ECO.sy;ECO.sy=sy;ECO.sv=ECO.sv*.88+Math.abs(ds)*.12;
+  const x=EX;x.setTransform(ECO.dpr,0,0,ECO.dpr,0,0);x.clearRect(0,0,ECO.w,ECO.h);(ECOD[ECO.world]||ECOD.all)(x,ECO.w,ECO.h,ECO.t,dt,ds)}
+function ecoRun(){const on=moEco()&&!document.hidden&&!!ECO.world;ECO.c.style.opacity=on?1:0;if(on&&!ECO.run){ECO.run=1;ECO.last=0;ECO.sy=scrollY;requestAnimationFrame(ecoTick)}else if(!on)ECO.run=0}
+function ecoWorld(w){document.body.dataset.world=moOn()?w:'';if(ECO.world!==w){ECO.world=w;if(!ECO.w)ecoSize();ecoSeed()}ecoRun()}
+/* bursts on a top canvas */
+const BU={c:document.createElement('canvas'),p:[],run:0,last:0};BU.c.id='mo-burst';document.body.append(BU.c);const BX=BU.c.getContext('2d');
+function moBurst(x0,y0,small){if(!moEco())return;const w=ECO.world,n=small?.45:1,acc=eAcc(),P=(k,f)=>{for(let i=0;i<Math.round(k*n);i++)BU.p.push(f(i))};
+  if(w==='show')P(46,()=>({k:'dash',x:x0+(ER()-.5)*140,y:y0+(ER()-.5)*90,w:10+ER()*50,life:.18+ER()*.25,c:'255,255,255'}));
+  else if(w==='movie')P(28,()=>{const a=ER()*7,v=30+ER()*90;return{k:'dot',x:x0,y:y0,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:1+ER()*2,life:.7+ER()*.5,c:'255,226,180'}});
+  else if(w==='music')P(3,i=>({k:'ring',x:x0,y:y0,r:6,v:220-i*40,dl:i*.1,life:.75,c:acc}));
+  else if(w==='game')P(26,()=>{const a=ER()*7,v=90+ER()*180;return{k:'px',x:x0,y:y0,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,g:520,s:[3,4,5][ER()*3|0],life:.8+ER()*.3,c:['#4df0ff','#ff3d7f','#ffe66d','#ffffff'][ER()*4|0]}});
+  else if(w==='set')P(30,()=>{const a=ER()*7,v=120+ER()*220;return{k:'spark',x:x0,y:y0,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.5+ER()*.35,c:['#ff4d8d','#b98bff','#4df0ff'][ER()*3|0]}});
+  else P(18,()=>{const a=ER()*7,v=80+ER()*140;return{k:'spark',x:x0,y:y0,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.5+ER()*.3,c:acc}});
+  BU.p.forEach(p=>p.age=p.age||0);if(!BU.run){BU.run=1;BU.last=0;requestAnimationFrame(buTick)}}
+function buTick(now){const dt=Math.min(.05,BU.last?(now-BU.last)/1000:.016);BU.last=now;const x=BX;x.setTransform(ECO.dpr,0,0,ECO.dpr,0,0);x.clearRect(0,0,ECO.w,ECO.h);
+  BU.p=BU.p.filter(p=>{p.age+=dt;if(p.dl&&p.age<p.dl)return true;const a=p.age-(p.dl||0),f=1-a/p.life;if(f<=0)return false;x.globalAlpha=f;
+    if(p.k==='dash'){x.fillStyle=`rgba(${p.c},${(ER()*.8).toFixed(2)})`;x.fillRect(p.x+(ER()-.5)*6,p.y,p.w,2)}
+    else if(p.k==='ring'){p.r+=p.v*dt;x.strokeStyle=p.c;x.lineWidth=2;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.stroke()}
+    else{p.vx*=.97;p.vy=p.vy*.97+(p.g||0)*dt;const ox=p.x,oy=p.y;p.x+=p.vx*dt;p.y+=p.vy*dt;
+      if(p.k==='px'){x.fillStyle=p.c;x.fillRect(Math.round(p.x),Math.round(p.y),p.s,p.s)}
+      else if(p.k==='spark'){x.strokeStyle=p.c;x.lineWidth=2;x.beginPath();x.moveTo(ox-(p.x-ox)*2,oy-(p.y-oy)*2);x.lineTo(p.x,p.y);x.stroke()}
+      else{x.fillStyle=`rgb(${p.c})`;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()}}
+    return true});x.globalAlpha=1;if(BU.p.length)requestAnimationFrame(buTick);else{BU.run=0;x.clearRect(0,0,ECO.w,ECO.h)}}
+addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){ECO.tx=e.clientX;ECO.ty=e.clientY}},{passive:true});
+addEventListener('pointerdown',e=>{ECO.lx=e.clientX;ECO.ly=e.clientY;ECO.tx=e.clientX;ECO.ty=e.clientY;if(e.target.closest?.('[data-r]'))setTimeout(()=>moBurst(e.clientX,e.clientY,1),30)},{passive:true,capture:true});
+addEventListener('resize',()=>{ecoSize();ecoSeed()});document.addEventListener('visibilitychange',ecoRun);
+{const t0=toast;toast=function(m){const r=t0.apply(this,arguments);if(/^(Done|Marked|Added|Started|Finished|Watched|Playing|Imported|Saved)|in your diary|to Up next|back in Up next/i.test(m||''))moBurst(ECO.lx,ECO.ly);return r}}
+ecoSize();
+moAmb(moType());
 render();
 setTimeout(()=>st.items.filter(i=>!i.sample).forEach(i=>findSpotify(i)),3000);
 setTimeout(artSoon,5000);
