@@ -938,6 +938,7 @@ body.mo-live[data-world=set] #view .wall>.cv.mo-vis:not(.mo-t){animation:moBounc
 body.mo-live[data-world=set] #view .wall>.cv.mo-vis:nth-child(even):not(.mo-t){animation-delay:-.24s}
 @media(prefers-reduced-motion:reduce){#mo-ecot,#mo-grade,#mo-hud{display:none}}
 @media(max-width:600px){body[data-lgrp=game] .wall .w{grid-column:span 3;grid-row:span 2}.bg.w{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}}
+#stage{touch-action:pan-y;-webkit-user-select:none;user-select:none}
 body.mo-off .mo-t,body.mo-off .mo-pg,body.mo-off .mark,body.mo-off .tabs svg,body.mo-off dialog[open]{animation:none!important}
 body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 @media(prefers-reduced-motion:reduce){.mo-t,.mo-pg,.mark,.tabs button svg,dialog[open],dialog[open]::backdrop{animation:none!important}img.mo-ld{opacity:1;transform:none}.mo-fx{display:none}#view.mo-hold{opacity:1}.wall>.cv,.stub,.strip>.tile,#bgrid>.bt{transition:none}}
@@ -962,7 +963,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-19</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-20</small>
     </div></details>
   </div>
 </header>
@@ -4070,6 +4071,35 @@ const ECOD2={
 Object.assign(ECOD,ECOD2);
 {const r0=moAfter;moAfter=function(){const r=r0.apply(this,arguments);try{moHud();moWatch()}catch(e){}return r}}
 moAmb(moType());
+/* motion: Up next crate. The top cover follows your finger or mouse as you drag (tilting as it goes) while the next cover rises to meet it. Let go past 50px, or flick, to change: forward throws the cover off the side you swiped toward and the stack slides up; back drops the previous cover in from the left and tucks the current one under. A short drag springs back. The info panel and the crate's color glide to the next item too. Arrow buttons and keys use the same motion. Wraps crateGo. */
+const CR={d:null};
+const crLerp=(p)=>`translate(${16*(1-p)}px,${-14*(1-p)}px) rotate(${3*(1-p)}deg) scale(${.95+.05*p})`;
+function crSnap(){const st0=$('#stage');if(!st0)return null;const c0=st0.querySelector('.card.c0'),sec=st0.closest('.crate');return{c0,r:c0?.getBoundingClientRect(),tf:c0?.style.transform||'',bg:sec?getComputedStyle(sec).backgroundColor:''}}
+{const cg=crateGo;crateGo=function(d){if(!moOn()){CR.d=null;return cg.apply(this,arguments)}const s=crSnap(),drag=CR.d;CR.d=null;let clone=null;
+  if(s&&s.c0&&d>0){clone=s.c0.cloneNode(true);clone.classList.remove('in');Object.assign(clone.style,{position:'fixed',left:s.r.left+'px',top:s.r.top+'px',width:s.r.width+'px',height:s.r.height+'px',inset:'auto',zIndex:50,pointerEvents:'none',margin:0,transform:s.tf||'none'});document.body.append(clone)}
+  const r=cg.apply(this,arguments);const st1=$('#stage');if(!st1){clone?.remove();return r}const E='cubic-bezier(.2,.9,.25,1)',SP='cubic-bezier(.25,1.25,.4,1)',c=k=>st1.querySelector('.card.c'+k);st1.querySelectorAll('.card.in').forEach(x=>x.classList.remove('in'));
+  if(clone){const dir=drag&&drag.dx>0?1:-1,W=innerWidth;clone.animate([{transform:s.tf||'none',opacity:1},{transform:`translate(${dir*(W*.75+s.r.width*.6)}px,${(drag?.dy||0)+60}px) rotate(${dir*22}deg)`,opacity:.2}],{duration:drag?360:420,easing:'cubic-bezier(.35,.55,.4,1)',fill:'forwards'}).onfinish=()=>clone.remove();
+    c(0)?.animate([{transform:crLerp(drag?Math.min(1,Math.abs(drag.dx)/140):0),filter:'brightness(.88)'},{transform:'none',filter:'none'}],{duration:460,easing:SP});
+    c(1)?.animate([{transform:'translate(30px,-26px) rotate(6deg) scale(.9)',filter:'brightness(.76)'},{transform:'translate(16px,-14px) rotate(3deg) scale(.95)',filter:'brightness(.88)'}],{duration:460,easing:E});
+    c(2)?.animate([{transform:'translate(40px,-34px) rotate(8deg) scale(.85)',opacity:0},{transform:'translate(30px,-26px) rotate(6deg) scale(.9)',opacity:1}],{duration:460,delay:60,easing:E,fill:'backwards'})}
+  else if(d<0){c(0)?.animate([{transform:'translate(-115%,30px) rotate(-14deg)',opacity:0},{transform:'translate(6%,0) rotate(2deg)',opacity:1,offset:.7},{transform:'none',opacity:1}],{duration:520,easing:E});
+    c(1)?.animate([{transform:s?.tf||'none',filter:'none'},{transform:'translate(16px,-14px) rotate(3deg) scale(.95)',filter:'brightness(.88)'}],{duration:480,easing:SP});
+    c(2)?.animate([{transform:'translate(16px,-14px) rotate(3deg) scale(.95)'},{transform:'translate(30px,-26px) rotate(6deg) scale(.9)'}],{duration:480,easing:E})}
+  const sec=st1.closest('.crate');if(sec&&s?.bg){const nb=getComputedStyle(sec).backgroundColor;if(nb!==s.bg)sec.animate([{backgroundColor:s.bg},{backgroundColor:nb}],{duration:500,easing:'ease-out'})}
+  const info=sec?.querySelector('.cinfo');if(info)[...info.children].forEach((e,i)=>e.animate([{opacity:0,transform:`translateX(${d*22}px)`},{opacity:1,transform:'none'}],{duration:380,delay:40+i*28,easing:E,fill:'backwards'}));
+  return r}}
+{let g=null;const st0=()=>$('#stage');
+  document.addEventListener('pointerdown',e=>{if(!moOn()||e.button>0)return;const s=e.target.closest?.('#stage');if(!s||e.clientX<28||e.clientX>innerWidth-28)return;const c0=s.querySelector('.card.c0');if(!c0)return;
+    g={id:e.pointerId,x:e.clientX,y:e.clientY,t:performance.now(),dx:0,dy:0,c0,c1:s.querySelector('.card.c1'),buzz:0,mouse:e.pointerType==='mouse',vx:0,lt:performance.now(),lx:e.clientX};c0.getAnimations().forEach(a=>a.cancel())},{passive:true});
+  document.addEventListener('pointermove',e=>{if(!g||e.pointerId!==g.id)return;g.dx=e.clientX-g.x;g.dy=e.clientY-g.y;const now=performance.now();g.vx=(e.clientX-g.lx)/Math.max(1,now-g.lt);g.lx=e.clientX;g.lt=now;
+    if(Math.abs(g.dx)<4&&!g.on)return;g.on=1;const p=Math.min(1,Math.abs(g.dx)/140);g.c0.style.transition='none';g.c0.style.transform=`translate(${g.dx}px,${g.dy*.15}px) rotate(${g.dx*.05}deg) scale(1.02)`;
+    if(g.c1){g.c1.style.transition='none';g.c1.style.transform=crLerp(p);g.c1.style.filter=`brightness(${.88+.12*p})`}
+    if(!g.buzz&&Math.abs(g.dx)>50){g.buzz=1;try{navigator.vibrate?.(6)}catch(x){}}if(Math.abs(g.dx)<50)g.buzz=0},{passive:true});
+  const end=e=>{if(!g||e.pointerId!==g.id)return;const G=g;g=null;if(!G.on)return;swiped=Date.now();const fast=Math.abs(G.vx)>.55&&Math.abs(G.dx)>20,go=e.type!=='pointercancel'&&(Math.abs(G.dx)>50||fast);
+    if(go){CR.d={dx:G.dx,dy:G.dy*.15};const d=G.dx<0?1:-1;if(G.mouse||Math.abs(G.dx)<=50)crateGo(d);else setTimeout(()=>{if(CR.d)crateGo(d)},0);return}
+    const from=G.c0.style.transform;G.c0.style.transform='';G.c0.style.transition='';G.c0.animate([{transform:from},{transform:'none'}],{duration:420,easing:'cubic-bezier(.25,1.4,.4,1)'});
+    if(G.c1){const f1=G.c1.style.transform,b1=G.c1.style.filter;G.c1.style.transform=G.c1.style.filter=G.c1.style.transition='';G.c1.animate([{transform:f1,filter:b1},{transform:'translate(16px,-14px) rotate(3deg) scale(.95)',filter:'brightness(.88)'}],{duration:380,easing:'cubic-bezier(.2,.9,.25,1)'})}};
+  document.addEventListener('pointerup',end,{passive:true});document.addEventListener('pointercancel',end,{passive:true})}
 /* games two to a row on phones: Library covers and Browse (CSS `body[data-lgrp=game]`, `.bg.w`). */
 {const r1=moAfter;moAfter=function(){document.body.dataset.lgrp=st.view==='library'?st.grp:'';return r1.apply(this,arguments)}}
 render();
