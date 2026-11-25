@@ -973,7 +973,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-24</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-25</small>
     </div></details>
   </div>
 </header>
@@ -1838,7 +1838,7 @@ function showTrend(){if($('#q').value.trim())return;const k=st.tmdb+'|'+st.rawg;
   const sc=$('#res').scrollTop;showRes(g,note);$('#res').classList.add('on');$('#res').scrollTop=sc}
 /* browse: quick lists of top films, TV, music and games, one tap to Up next or Done */
 const BRT=[['movie','Films'],['show','TV'],['album','Music'],['game','Games'],['set','Live sets']];
-const BRL={set:[['hot','Trending'],['pop','Popular'],['new','New'],['yt','On YouTube']],movie:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],show:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],album:[['classic','Top rated'],['tag','By genre'],['chart','Charts now'],['songs','Top songs']],game:[['top','Top rated'],['pop','Popular'],['new','New']]};
+const BRL={set:[['pop','Popular'],['new','New'],['yt','On YouTube']],movie:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],show:[['top','Top rated'],['pop','Popular'],['trend','Trending'],['new','New']],album:[['classic','Top rated'],['tag','By genre'],['chart','Charts now'],['songs','Top songs']],game:[['top','Top rated'],['pop','Popular'],['new','New']]};
 const BRG={movie:[[28,'Action'],[12,'Adventure'],[16,'Animation'],[35,'Comedy'],[80,'Crime'],[99,'Documentary'],[18,'Drama'],[10751,'Family'],[14,'Fantasy'],[36,'History'],[27,'Horror'],[10402,'Music'],[9648,'Mystery'],[10749,'Romance'],[878,'Science fiction'],[53,'Thriller'],[10752,'War'],[37,'Western']],
  show:[[10759,'Action and adventure'],[16,'Animation'],[35,'Comedy'],[80,'Crime'],[99,'Documentary'],[18,'Drama'],[10751,'Family'],[10762,'Kids'],[9648,'Mystery'],[10765,'Sci-fi and fantasy'],[10768,'War and politics'],[37,'Western']],
  album:[[132,'Pop'],[116,'Hip hop'],[152,'Rock'],[165,'R&B'],[85,'Alternative'],[113,'Dance'],[106,'Electronic'],[84,'Country'],[197,'Latin'],[464,'Metal'],[169,'Soul and funk'],[129,'Jazz'],[98,'Classical'],[144,'Reggae'],[466,'Folk'],[153,'Blues']],
@@ -3562,11 +3562,11 @@ const brGL=(t,l)=>t==='set'?(l==='yt'?BRYT:BRMT):t==='album'&&l==='classic'?BRGA
 function brMix(l){const by={};l.forEach(a=>{const d=Math.floor(a[0]/10);(by[d]=by[d]||[]).push(a)});const ks=Object.keys(by).sort(),o=[];for(let i=0;o.length<l.length;i++)ks.forEach(k=>{if(by[k][i])o.push(by[k][i])});return o}
 const BCOV=(()=>{try{['checkit.bcov','checkit.bcov2'].forEach(k=>localStorage.removeItem(k));return JSON.parse(localStorage.getItem('checkit.bcov3'))||{}}catch(e){return{}}})();
 const bcSave=()=>{try{localStorage.setItem('checkit.bcov3',JSON.stringify(BCOV))}catch(e){}};
-const brF=(t,l)=>t==='set'?(l==='hot'?'':'g'):t==='album'?(l==='classic'?'gd':'g'):l==='trend'?'':l==='new'?'g':'gd';
+const brF=(t,l)=>t==='set'?'g':t==='album'?(l==='classic'?'gd':'g'):l==='trend'?'':l==='new'?'g':'gd';
 const brDec=f=>{const a=[];for(let y=2020;y>=f;y-=10)a.push(y);return a};
 const BRC={};let brIx=new Map(),bcBusy=0;
 function brState(){if(!st.br||!BRL[st.br.t])st.br={t:'movie'};const t=st.br.t,s=st.br[t]||(st.br[t]={l:BRL[t][0][0],g:'',d:''});if(!BRL[t].some(x=>x[0]===s.l))s.l=BRL[t][0][0];return[t,s]}
-function brKey(){const[t,s]=brState(),f=brF(t,s.l);let g=f.includes('g')&&brGL(t,s.l).some(x=>String(x[0])===String(s.g))?s.g:'';if(s.l==='tag'&&!g)g='rock';return[t,s.l,g,f.includes('d')?s.d:'',st.tmdb?1:0,st.rawg?1:0,st.lfm?1:0,st.yt?1:0].join('|')}
+function brKey(){const[t,s]=brState(),f=brF(t,s.l);let g=f.includes('g')&&brGL(t,s.l).some(x=>String(x[0])===String(s.g))?s.g:'';if(s.l==='tag'&&!g)g='rock';if(t==='set'&&s.l!=='yt'&&!g)g='house';return[t,s.l,g,f.includes('d')?s.d:'',st.tmdb?1:0,st.rawg?1:0,st.lfm?1:0,st.yt?1:0].join('|')}
 const brN=s=>(s||'').toLowerCase().replace(/\(.*?\)|\[.*?\]/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,'');
 const brK=(type,title,by)=>type+'|'+brN(title)+(type==='album'||type==='song'?'|'+brN(by):'');
 function brIndex(){brIx=new Map();for(const i of st.items){if(i.url)brIx.set('u'+i.url,i);brIx.set(brK(i.type,i.title,i.creator),i)}}
@@ -3577,8 +3577,9 @@ async function brFetch(t,l,g,d,p,c){const now=new Date(),iso=x=>x.toISOString().
       return{more:!!j.nextPageToken&&p<6,tok:j.nextPageToken,items:(j.items||[]).filter(r=>r.id?.videoId).map(r=>{const sn=r.snippet||{},tt=(sn.title||'').replace(/&amp;/g,'&').replace(/&#39;/g,"'").replace(/&quot;/g,'"'),y=yr(sn.publishedAt);
         return{type:'set',title:tt,creator:sn.channelTitle||'',art:sn.thumbnails?.high?.url||sn.thumbnails?.medium?.url||'',thumb:sn.thumbnails?.medium?.url||'',url:`https://www.youtube.com/watch?v=${r.id.videoId}`,extra:{event:'YouTube',date:y},sub:[sn.channelTitle,y].filter(Boolean).join(', ')}})}}
     /* Mixcloud's API is CORS-only (no JSONP). Genre lists try the genres path, then the older discover path, then a plain search */
-    const n=40,qs=`limit=${n}&offset=${(p-1)*n}`,w=l==='new'?'latest':'popular',tries=l==='hot'?['popular/hot/']:g?[`genres/${g}/${w}/`,`discover/${g}/${w}/`,`search/?q=${encodeURIComponent(g.replace(/-/g,' '))}&type=cloudcast&`]:[l==='new'?'new/':'popular/'];
-    let j=null;for(const t of tries){try{const r=await getJSON(`https://api.mixcloud.com/${t}${t.includes('?')?'':'?'}${qs}`);if(r&&!r.error&&Array.isArray(r.data)){j=r;break}}catch(e){}}if(!j)throw 0;const dd=j.data;
+    const n=40,qs=`limit=${n}&offset=${(p-1)*n}`,w=l==='new'?'latest':'popular',sq=x=>`search/?q=${encodeURIComponent(x)}&type=cloudcast&`,tries=[`discover/${g||'house'}/${w}/`,sq((g||'house').replace(/-/g,' '))];
+    let j=null,why='';for(const t of tries){try{const res=await fetch(`https://api.mixcloud.com/${t}${t.includes('?')?'':'?'}${qs}`);if(!res.ok){why=`Mixcloud answered ${res.status}`;continue}const r=await res.json();if(r&&!r.error&&Array.isArray(r.data)){j=r;break}why=r?.error?.message||'Mixcloud sent no sets'}catch(e){why=why||'Mixcloud couldn’t be reached from this page'}}
+    if(!j)throw{msg:why};const dd=j.data;
     return{more:!!j.paging?.next&&dd.length>0&&p<10,items:dd.map(r=>{const m=r.audio_length?Math.round(r.audio_length/60):'',y=yr(r.created_time);
       return{type:'set',title:r.name,creator:r.user?.name||'',art:r.pictures?.extra_large||r.pictures?.large||'',thumb:r.pictures?.large||r.pictures?.extra_large||'',url:r.url,extra:{event:'Mixcloud',date:y,mins:m},sub:[r.user?.name,m?m+' min':''].filter(Boolean).join(', ')}})}}
   if(t==='movie'||t==='show'){if(!st.tmdb)throw'tmdb';const tv=t==='show',k=tv?'tv':'movie',dk=tv?'first_air_date':'primary_release_date';let path;
@@ -3614,7 +3615,7 @@ async function brLoad(k,more){let c=BRC[k];if(c?.busy)return;
   if(!c)c=BRC[k]={items:[],p:0,more:true};else if(!c.more)return;c.busy=1;c.err=0;brFoot();if(!c.items.length)brSkel();
   const [t,l,g,d]=k.split('|');
   try{const r=await brFetch(t,l,g,d?+d:0,c.p+1,c),seen=new Set(c.items.map(x=>x.url).filter(Boolean));c.items.push(...r.items.filter(x=>x.title&&!(x.url&&seen.has(x.url))));c.p++;c.more=r.more;c.tok=r.tok;if(c.p===1&&l!=='classic')brLSput(k,c)}
-  catch(e){c.err=['tmdb','rawg','lfm','lfmkey','yt'].includes(e)?e:1}
+  catch(e){c.err=['tmdb','rawg','lfm','lfmkey','yt'].includes(e)?e:1;c.why=e?.msg||''}
   c.busy=0;if(st.view==='browse'&&$('#view').dataset.bk===k){brGrid();brFoot();brCovers()}}
 const brAct=r=>{const h=brHave(r),nx=!!h&&h.status!=='done',dn=!!h&&(h.status==='done'||h.status==='again'),v={movie:'seen',show:'seen',game:'played'}[r.type]||'heard';
   return`<button type="button" data-ba="next" aria-pressed="${nx}" aria-label="${nx?'In Up next, open it':'Add to Up next'}" title="${nx?'In Up next':'Add to Up next'}">${nx?'✓':'+'}<span> Up next</span></button><button type="button" data-ba="done" aria-pressed="${dn}" aria-label="${dn?'Done, open it':'Already '+v+' it, mark done'}" title="${dn?'Done':'Already '+v+' it'}">✓<span> Done</span></button>`};
@@ -3628,7 +3629,7 @@ function brFoot(){const f=$('#bfoot'),c=BRC[$('#view').dataset.bk];if(!f)return;
    :c.err==='yt'?`<div class="bf">Add a free YouTube API key to browse sets on YouTube. Mixcloud lists work without one.<br><button class="btn" type="button" data-bset>Open settings</button></div>`
    :c.err==='lfm'?`<div class="bf">Add a free Last.fm key to browse albums by genre.<br><button class="btn" type="button" data-bset>Open settings</button></div>`
    :c.err==='lfmkey'?`<div class="bf">Last.fm didn’t accept the key. Check it in Settings.<br><button class="btn" type="button" data-bset>Open settings</button></div>`
-   :c.err?`<div class="bf">${c.items.length?'Couldn’t load more.':'Couldn’t load this list.'}<br><button class="btn" type="button" data-bretry>Try again</button></div>`
+   :c.err?`<div class="bf">${c.items.length?'Couldn’t load more.':'Couldn’t load this list.'}${c.why?`<br><small>${esc(c.why)}</small>`:''}<br><button class="btn" type="button" data-bretry>Try again</button></div>`
    :!c.items.length?`<div class="bf">Nothing here. Try another genre or decade.</div>`:c.more?`<div class="bf"><button class="btn" type="button" data-bmore>Show more</button></div>`:''}
 function brPaint(){const c=BRC[$('#view').dataset.bk];if(!c)return;brIndex();document.querySelectorAll('#bgrid .bt').forEach(el=>{const r=c.items[+el.dataset.bi];if(r)el.querySelector('.ba').innerHTML=brAct(r)})}
 /* last resort for covers: MusicBrainz + Cover Art Archive, one lookup a second as MusicBrainz asks */
@@ -3658,7 +3659,7 @@ async function brCovers(){if(bcBusy)return;bcBusy=1;try{for(;;){if(st.view!=='br
 function drawBrowse(){const v=$('#view'),k=brKey();if(v.dataset.bk===k&&v.querySelector('.bw')){brPaint();return}
   v.dataset.bk=k;const[t,s]=brState(),f=brF(t,s.l),vb={movie:'seen',show:'seen',game:'played'}[t]||'heard';
   v.innerHTML=`<div class="bw"><div class="bty" role="group" aria-label="Browse">${BRT.map(([x,n])=>`<button type="button" data-bt="${x}" aria-pressed="${x===t}">${n}</button>`).join('')}</div>
-  <div class="bct"><div class="bch" role="group" aria-label="List">${BRL[t].map(([x,n])=>`<button type="button" data-bl="${x}" aria-pressed="${x===s.l}">${n}</button>`).join('')}</div>${f?`<div class="bsel">${f.includes('g')?`<select data-bf="g" aria-label="Genre">${s.l==='tag'?'':'<option value="">'+(t==='set'&&s.l==='yt'?'All live sets':'All genres')+'</option>'}${brGL(t,s.l).map(([id,n])=>`<option value="${id}"${String(brKey().split('|')[2])===String(id)?' selected':''}>${n}</option>`).join('')}</select>`:''}${f.includes('d')?`<select data-bf="d" aria-label="Decade"><option value="">${t==='album'?'All decades':'All time'}</option>${brDec(t==='game'?1980:1950).map(y=>`<option value="${y}"${+s.d===y?' selected':''}>${y}s</option>`).join('')}</select>`:''}</div>`:''}</div>
+  <div class="bct"><div class="bch" role="group" aria-label="List">${BRL[t].map(([x,n])=>`<button type="button" data-bl="${x}" aria-pressed="${x===s.l}">${n}</button>`).join('')}</div>${f?`<div class="bsel">${f.includes('g')?`<select data-bf="g" aria-label="Genre">${s.l==='tag'||(t==='set'&&s.l!=='yt')?'':'<option value="">'+(t==='set'&&s.l==='yt'?'All live sets':'All genres')+'</option>'}${brGL(t,s.l).map(([id,n])=>`<option value="${id}"${String(brKey().split('|')[2])===String(id)?' selected':''}>${n}</option>`).join('')}</select>`:''}${f.includes('d')?`<select data-bf="d" aria-label="Decade"><option value="">${t==='album'?'All decades':'All time'}</option>${brDec(t==='game'?1980:1950).map(y=>`<option value="${y}"${+s.d===y?' selected':''}>${y}s</option>`).join('')}</select>`:''}</div>`:''}</div>
   <p class="bh">+ adds it to Up next. ✓ marks it done if you’ve already ${vb} it.</p><div class="bg${t==='album'?' sq':t==='game'||(t==='set'&&s.l==='yt')?' w':t==='set'?' sq':''}" id="bgrid"></div><div id="bfoot"></div></div>`;
   if(BRC[k]?.items.length||BRC[k]?.busy){brGrid();brFoot();brCovers()}else brLoad(k)}
 function brObj(r){const o={type:r.type,title:r.title,creator:r.creator||'',art:r.art||'',url:r.url||'',extra:{...(r.extra||{})}};if(r.tmdbId)o.tmdbId=r.tmdbId;
