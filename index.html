@@ -226,7 +226,9 @@ table.ix{width:100%;border-collapse:collapse}
 .trk ol{list-style:none;margin:4px 0 0;padding:0;font-size:14px;counter-reset:t}
 .trk li{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--rule);counter-increment:t}
 .trk li::before{content:counter(t);min-width:18px;color:var(--mut);font-size:12.5px;font-variant-numeric:tabular-nums}
-.trk li span{flex:1;min-width:0}.trk li i{font-style:normal;color:var(--mut);font-variant-numeric:tabular-nums}.trk small{color:var(--mut)}
+.trk li span{flex:1;min-width:0}.trk.tf li{align-items:center}.trk.tf li::before{align-self:baseline;padding-top:2px}
+.tfb{flex:none;width:32px;height:32px;margin:-6px -6px -6px -2px;display:grid;place-items:center;background:none;border:0;border-radius:6px;color:var(--mut);opacity:.45;cursor:pointer;padding:0}
+.tfb svg{width:17px;height:17px}.tfb:hover,.tfb:focus-visible{opacity:1}.trk li.on .tfb{color:var(--acc);opacity:1}.trk li.on span{font-weight:600}.tfn{font-weight:500;color:var(--mut)}.trk li i{font-style:normal;color:var(--mut);font-variant-numeric:tabular-nums}.trk small{color:var(--mut)}
 
 .info .wr div{display:block}
 .sea{margin-top:12px}.sea>summary{font-size:15px}
@@ -973,7 +975,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-25</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-1</small>
     </div></details>
   </div>
 </header>
@@ -1143,9 +1145,11 @@ async function loadGameInfo(it){if(!st.rawg)return;const k='key='+encodeURICompo
     if(!it.creator&&it.info.dev[0])it.creator=it.info.dev[0];if(!it.art&&d.background_image)it.art=d.background_image;
     save();render();if(cur===it)drawItem()}catch(e){}}
 const hm=m=>m>=60?`${Math.floor(m/60)} h${m%60?' '+m%60+' min':''}`:`${m} min`;
+const tkey=t=>(t.t||'').toLowerCase().replace(/\s+/g,' ').trim();
 function infoBlock(it){const f=it.info,row=(l,v)=>v?`<div class="wr"><span>${l}</span><div>${v}</div></div>`:'';
   if(it.type==='album'||it.type==='song'){if(!f)return`<div class="info"><p class="wn">Loading details…</p></div>`;if(f.none)return'';
-    const tl=it.type==='album'&&f.tracks?.length?`<details class="trk"><summary>Tracklist, ${f.n||f.tracks.length} tracks</summary><ol>${f.tracks.map(t=>`<li><span>${esc(t.t)}${t.a&&simp(t.a)!==simp(it.creator)?` <small>${esc(t.a)}</small>`:''}</span><i>${mmss(t.s)}</i></li>`).join('')}</ol></details>`:'';
+    const own=st.items.includes(it),fv=own?new Set(it.ft||[]):null,nf=own?f.tracks.filter(t=>fv.has(tkey(t))).length:0;
+    const tl=it.type==='album'&&f.tracks?.length?`<details class="trk${own?' tf':''}" data-trk${SOPEN.has(it.id+'/trk')?' open':''}><summary>Tracklist, ${f.n||f.tracks.length} tracks${nf?`<span class="tfn"> · ♥ ${nf}</span>`:''}</summary><ol>${f.tracks.map(t=>{const on=own&&fv.has(tkey(t));return`<li${on?' class="on"':''}><span>${esc(t.t)}${t.a&&simp(t.a)!==simp(it.creator)?` <small>${esc(t.a)}</small>`:''}</span><i>${mmss(t.s)}</i>${own?`<button type="button" class="tfb" data-tf="${esc(tkey(t))}" aria-pressed="${on}" aria-label="${on?'Unfavorite':'Favorite'} ${esc(t.t)}">${heartSvg(on)}</button>`:''}</li>`}).join('')}</ol></details>`:'';
     return `<div class="info">${row('Released',esc(fdate(f.date)))}${row(it.type==='album'?'Runtime':'Length',f.secs?(it.type==='album'?esc(hm(Math.round(f.secs/60))):mmss(f.secs)):'')}${it.type==='album'?row('Type',esc(f.kind==='ep'?'EP':f.kind?f.kind[0].toUpperCase()+f.kind.slice(1):''))+row('Label',esc(f.label))+row('Genre',esc(f.genres.join(', '))):row('Album',esc(f.album))+row('Credits',esc(f.who.join(', ')))+row('BPM',f.bpm?Math.round(f.bpm):'')}${tl}</div>`}
   if(it.type==='game'){if(!st.rawg)return'';if(!f)return`<div class="info"><p class="wn">Loading details…</p></div>`;if(f.none)return'';
     return `<div class="info">${f.overview?`<p class="syn" tabindex="0">${esc(f.overview)}</p>`:''}${row('Developer',esc(f.dev.join(', ')))}${row('Publisher',esc(f.pub.join(', ')))}${row('Released',esc(fdate(f.date)))}${row('Platforms',esc(f.plat.join(', ')))}${row('Genres',esc(f.genres.join(', ')))}${row('Average play',f.hours?`${f.hours} hours`:'')}${row('Reviews',[f.meta?`<span class="sc"><b>${f.meta}</b> Metacritic</span>`:'',f.ur?`<span class="sc"><b>${f.ur} / 5</b> RAWG players</span>`:''].join(''))}
@@ -1609,7 +1613,7 @@ function drawItem(){const it=cur,sh=shape(it.type),simX=[...document.querySelect
   </div>`;
   const n=$('#f-note');if(n){n.style.height='auto';n.style.height=n.scrollHeight+'px'};
   if($('#dr').dataset.more===it.id)$('#dr .more').open=true;document.querySelectorAll('#dr .simr').forEach((x,i)=>x.scrollLeft=simX[i]||0)}
-$('#dr').addEventListener('toggle',e=>{const t=e.target;if(cur&&t.matches?.('details.sea,details.sn')){const k=cur.id+'/'+(t.dataset.sn??'all');if(t.open){SOPEN.add(k);if(t.dataset.sn!=null)loadSeason(cur,+t.dataset.sn)}else SOPEN.delete(k);return}if(e.target.classList?.contains('more'))$('#dr').dataset.more=e.target.open&&cur?cur.id:''},true);
+$('#dr').addEventListener('toggle',e=>{const t=e.target;if(cur&&t.matches?.('details[data-trk]')){t.open?SOPEN.add(cur.id+'/trk'):SOPEN.delete(cur.id+'/trk');return}if(cur&&t.matches?.('details.sea,details.sn')){const k=cur.id+'/'+(t.dataset.sn??'all');if(t.open){SOPEN.add(k);if(t.dataset.sn!=null)loadSeason(cur,+t.dataset.sn)}else SOPEN.delete(k);return}if(e.target.classList?.contains('more'))$('#dr').dataset.more=e.target.open&&cur?cur.id:''},true);
 const upd=(fn,msg)=>{const before=JSON.stringify(st.items);fn();if(cur)delete cur.sample;save();render();if(msg)toast(msg,()=>{st.items=JSON.parse(before);save();render();if(cur){cur=st.items.find(i=>i.id===cur.id);cur?drawItem():closeItem()}})};
 $('#dr').addEventListener('keydown',e=>{if(e.target.id!=='tgin'||!cur)return;if(e.key==='Escape'){e.stopPropagation();drawItem();return}if(e.key!=='Enter')return;e.preventDefault();addTag(e.target.value)});
 $('#dr').addEventListener('focusout',e=>{if(e.target.id==='tgin'&&cur)setTimeout(()=>{if(document.activeElement?.id!=='tgin')addTag($('#tgin')?.value||'')},0)});
@@ -1624,6 +1628,10 @@ $('#dr').addEventListener('click',e=>{const eo=e.target.closest('.eo');if(eo){eo
   else if(b.dataset.tagadd!=null){b.hidden=true;const i=$('#tgin');i.hidden=false;i.focus()}
   else if(b.dataset.rv){const n=+b.dataset.rv;upd(()=>{cur.rv=cur.rv===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
   else if(b.dataset.r){const n=e.detail===0?+b.dataset.r:rateAt(b,e.clientX);upd(()=>{cur.rating=cur.rating===n?0:n;cur.touched=new Date().toISOString()});drawItem()}
+  else if(b.dataset.tf!=null){const k=b.dataset.tf,l=cur.ft||[],on=!l.includes(k);cur.ft=on?[...l,k]:l.filter(x=>x!==k);if(!cur.ft.length)delete cur.ft;cur.touched=new Date().toISOString();save();
+    b.setAttribute('aria-pressed',on);b.innerHTML=heartSvg(on);b.setAttribute('aria-label',(on?'Unfavorite ':'Favorite ')+b.closest('li').querySelector('span').firstChild.textContent);b.closest('li').classList.toggle('on',on);
+    const sm=b.closest('details').querySelector('summary'),n=(cur.ft||[]).length;let c=sm.querySelector('.tfn');if(!n)c?.remove();else{if(!c){c=document.createElement('span');c.className='tfn';sm.append(c)}c.textContent=' · ♥ '+n}
+    if(on&&b.animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches)b.animate([{transform:'scale(1)'},{transform:'scale(1.35)'},{transform:'scale(1)'}],{duration:260,easing:'ease-out'})}
   else if(b.hasAttribute('data-fav')){const on=!cur.fav;upd(()=>toggleFav(cur),on?'Added to favorites':'Removed from favorites');drawItem()}
   else if(b.hasAttribute('data-del')){removeItem(cur);closeItem()}});
 function removeItem(it){const t=it.title||'item';upd(()=>{st.items=st.items.filter(i=>i.id!==it.id)},`Removed ${t}`)}
