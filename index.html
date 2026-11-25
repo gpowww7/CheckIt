@@ -961,6 +961,51 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 .simr .ba button span{display:none}.simr .ba button{font-size:14px}
 .sim .wn .sp{font:inherit;color:var(--acc);text-decoration:underline}
 @media(max-width:760px){.simr{grid-auto-columns:118px;gap:12px}}
+/* upnext: Up next extras (upnext thread, 2026.11.25-2). Cover wall behind the crate (.unwall), Spin reel (.unreel, #unspin), bento grid below the crate on computers (.unbento). Remove this block and the JS block `/* upnext:` to revert. */
+.crate{position:relative;overflow:hidden;overflow:clip;isolation:isolate}
+.crate>*:not(.unwall):not(.unreel){position:relative;z-index:1}
+.unwall{--uw:150px;position:absolute;inset:-35%;z-index:0;pointer-events:none;opacity:.24;mix-blend-mode:luminosity;overflow:hidden;overflow:clip}
+.unwall .uwi{display:grid;grid-template-columns:repeat(14,var(--uw));gap:14px;width:max-content;transform:rotate(-14deg);animation:unDrift 90s linear infinite alternate;will-change:transform}
+.unwall .uwi>div{width:var(--uw);height:var(--uw)}.unwall .uwi>div:nth-child(even){transform:translateY(calc(var(--uw) * .3))}
+.unwall .cv{width:100%;height:100%;border-radius:5px}
+.unwall.still .uwi{animation:none}
+@keyframes unDrift{from{transform:rotate(-14deg) translate(0,0)}to{transform:rotate(-14deg) translate(-22%,-12%)}}
+.crate::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 34% 48% at 27% 50%,var(--ic) 35%,transparent 80%),radial-gradient(ellipse 34% 52% at 72% 50%,color-mix(in srgb,var(--ic) 70%,transparent) 20%,transparent 85%)}
+.crate.none::after,.crate.none .unwall{display:none}
+.cnav .unspin{font-weight:700}
+.crate .cnav .unspin{background:color-mix(in srgb,var(--on) 16%,transparent)}
+.unreel{position:absolute;left:0;right:0;overflow:clip;z-index:3;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)}
+.unreel .rail{position:absolute;top:20px;left:0;display:flex;gap:18px;will-change:transform}
+.unreel .rc{flex:none;width:var(--rs);height:var(--rs)}
+.unreel .rc .cv{width:100%;height:100%;border-radius:8px;box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.unreel .frame{position:absolute;left:50%;top:8px;width:calc(var(--rs) + 24px);height:calc(var(--rs) + 24px);transform:translateX(-50%);border:3px solid var(--on);border-radius:14px;box-shadow:0 0 30px color-mix(in srgb,var(--on) 45%,transparent)}
+.unreel .ptr{position:absolute;left:50%;top:-8px;transform:translateX(-50%);color:var(--on);font-size:16px;line-height:1}
+.crate.unspinning #stage{visibility:hidden}.crate.unspinning .cinfo{opacity:.06;transition:opacity .2s}
+.unbento{display:contents}.unbento>.unx{display:none}
+@media(min-width:900px){
+ .unbento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:dense;gap:14px;padding:30px 0 10px}
+ .unbento>section,.unbento>.unx{--tc:var(--rule);border:1px solid var(--rule);border-radius:16px;padding:18px 18px 14px;min-width:0;background:linear-gradient(160deg,color-mix(in srgb,var(--tc) 20%,var(--soft)),var(--soft) 65%)}
+ .unbento>.nrow{border-bottom:1px solid var(--rule)}
+ .unbento>.s1{grid-column:span 1}.unbento>.s2{grid-column:span 2}.unbento>.s4{grid-column:span 4}.unbento>.r2{grid-row:span 2}
+ .unbento .nrow h2{font-size:15px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+ .unbento .strip{flex-wrap:wrap;gap:6px;overflow:visible;margin:0;padding:0}
+ .unbento .tile{height:128px}.unbento .tile.s{width:128px}.unbento .tile.p{width:86px}.unbento .tile.w{width:228px}
+ .unbento .tile .cv{border-radius:6px}.unbento .tile .ct b{font-size:14px}
+ .unbento .tvw .tvc:last-child,.unbento .gql li:last-child{margin-bottom:0}
+ .unbento .gq .gq1{background:color-mix(in srgb,var(--ic) 14%,transparent)}
+ .unbento>.unx{display:block}
+ .unx h2{font:400 15px Righteous,"Inter Tight",sans-serif;text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px}
+ .unx .big{font:400 52px/1 Righteous,sans-serif}.unx .big span{font:500 14px "Inter Tight",sans-serif;color:var(--mut);margin-left:6px}
+ .unx .ubar{display:flex;height:12px;border-radius:9px;overflow:hidden;gap:2px;margin:14px 0 10px}
+ .unx ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;font-size:13px}
+ .unx li i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px}.unx li b{color:var(--mut);font-weight:500}
+ .unx p{margin:12px 0 0;color:var(--mut);font-size:13.5px;line-height:1.45}.unx p b{color:var(--ink);font-weight:600}
+ .unx h3{font:400 26px Righteous,sans-serif;margin:0 0 4px}
+ .unx .btn{margin-top:14px}
+ .unx.uhr{--tc:#6a4fd0}
+}
+@media(max-width:760px){.unwall{--uw:96px;opacity:.2}.crate::after{background:radial-gradient(ellipse 60% 34% at 50% 30%,var(--ic) 35%,transparent 85%),radial-gradient(ellipse 70% 40% at 50% 75%,color-mix(in srgb,var(--ic) 70%,transparent) 20%,transparent 85%)}}
+@media(prefers-reduced-motion:reduce){.unwall .uwi{animation:none}}
 </style>
 </head>
 <body>
@@ -975,7 +1020,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-1</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-2</small>
     </div></details>
   </div>
 </header>
@@ -4179,6 +4224,58 @@ document.addEventListener('dragstart',e=>{if(e.target.closest?.('#stage'))e.prev
 {let acc=0,lock=0,idle=0;document.addEventListener('wheel',e=>{if(!e.target.closest?.('#stage')||Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;e.preventDefault();clearTimeout(idle);idle=setTimeout(()=>{acc=0;lock=0},180);if(lock)return;acc+=e.deltaX;if(Math.abs(acc)>60){lock=1;swiped=Date.now();crateGo(acc>0?1:-1);acc=0}},{passive:false})}
 /* games two to a row on phones: Library covers and Browse (CSS `body[data-lgrp=game]`, `.bg.w`). */
 {const r1=moAfter;moAfter=function(){document.body.dataset.lgrp=st.view==='library'?st.grp:'';return r1.apply(this,arguments)}}
+/* upnext: Up next extras (upnext thread, 2026.11.25-2). Wraps drawNext. 1) Cover wall: your covers as a tilted wall drifting behind the crate (unWall). 2) Spin: a 🎲 Spin button runs a slot reel of covers that lands on a pick (unSpin). 3) Bento: on computers the rows below the crate become a tile grid, plus "Your pile" and "Got an hour?" tiles (unBento). Remove this block and the CSS block `/* upnext:` to revert. */
+const UN={t0:performance.now(),spin:0};
+const unH=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))|0;return h>>>0};
+function unWall(sec){if(!sec||sec.classList.contains('none'))return;
+  let pool=st.items.filter(i=>i.art);if(pool.length<8)pool=st.items.slice();if(!pool.length)return;
+  pool=[...pool].sort((a,b)=>unH(a.id)-unH(b.id)).slice(0,60);
+  const N=14*8;let h='';for(let k=0;k<N;k++){const it=pool[(k*7+Math.floor(k/14))%pool.length];h+=`<div>${cover(it,'ini')}</div>`}
+  const w=document.createElement('div');w.className='unwall'+(moOn()?'':' still');w.setAttribute('aria-hidden','true');w.innerHTML=`<div class="uwi">${h}</div>`;
+  w.querySelectorAll('img').forEach(i=>{i.loading='eager';i.decoding='async';i.alt=''});
+  w.firstChild.style.animationDelay=-((performance.now()-UN.t0)/1000)+'s';sec.prepend(w)}
+function unSpinBtn(sec){const nx=sec?.querySelector('#cnext');if(!nx||(pickQ?.length||0)<3)return;
+  nx.insertAdjacentHTML('beforebegin','<button type="button" id="unspin" class="unspin" title="Let the reel pick one">🎲 Spin</button>')}
+function unSpin(again){if(UN.spin||!pickQ||pickQ.length<2)return;
+  {const s0=$('#stage');if(!again&&s0&&moOn()){const r=s0.getBoundingClientRect();if(r.top<64||r.bottom>innerHeight-70){UN.spin=1;scrollBy({top:r.top-80,behavior:'smooth'});setTimeout(()=>{UN.spin=0;unSpin(1)},450);return}}}
+  const q=pickQ.slice(),n=q.length;
+  let t=-1;const p=pickOne();if(p)t=q.indexOf(p.id);if(t<=0)t=1+Math.floor(Math.random()*(n-1));pk.last=q[t];
+  const land=()=>{pickQ=[...q.slice(t),...q.slice(0,t)];crate.dir=0;render()};
+  const sec=$('.crate'),stage=$('#stage');if(!moOn()||!sec||!stage){land();return}
+  const r=stage.getBoundingClientRect(),sr=sec.getBoundingClientRect(),S=Math.round(Math.max(120,Math.min(r.width*.6,240))),G=18,K=26;
+  const seq=[];for(let k=0;k<K;k++){let id=q[Math.floor(Math.random()*n)];if(id===q[t]&&n>2)id=q[(t+1+k)%n];seq.push(id)}seq.push(q[t]);for(let k=1;k<=4;k++)seq.push(q[(t+k)%n]);
+  const items=seq.map(id=>st.items.find(i=>i.id===id)).filter(Boolean);
+  const reel=document.createElement('div');reel.className='unreel';reel.setAttribute('aria-hidden','true');reel.style.setProperty('--rs',S+'px');
+  reel.style.top=Math.round(r.top-sr.top+r.height/2-S/2-20)+'px';reel.style.height=(S+40)+'px';
+  reel.innerHTML=`<div class="rail">${items.map(it=>`<div class="rc">${cover(it,'ini')}</div>`).join('')}</div><div class="frame"></div><div class="ptr">▼</div>`;
+  sec.appendChild(reel);sec.classList.add('unspinning');UN.spin=1;const btn=$('#unspin');if(btn)btn.disabled=true;
+  const W=sr.width,x=k=>W/2-(k*(S+G)+S/2),rail=reel.firstChild,D=2700;
+  const a=rail.animate([{transform:`translateX(${x(1)}px)`},{transform:`translateX(${x(K)}px)`}],{duration:D,easing:'cubic-bezier(.1,.65,.1,1)',fill:'forwards'});
+  rail.animate([{filter:'blur(5px)'},{filter:'blur(5px)',offset:.35},{filter:'blur(0)',offset:.8},{filter:'blur(0)'}],{duration:D,fill:'forwards'});
+  let last=-1;const tick=()=>{if(!UN.spin)return;const m=new DOMMatrixReadOnly(getComputedStyle(rail).transform),k=Math.round((W/2-S/2-m.m41)/(S+G));if(k!==last){last=k;try{navigator.vibrate?.(3)}catch(e){}}requestAnimationFrame(tick)};requestAnimationFrame(tick);
+  const done=()=>{if(!UN.spin)return;UN.spin=0;land();const c=$('#stage .card.c0');if(c){const b=c.getBoundingClientRect();try{moBurst(b.left+b.width/2,b.top+b.height/2)}catch(e){}
+      c.animate([{transform:'scale(1.08)'},{transform:'none'}],{duration:420,easing:'cubic-bezier(.25,1.4,.4,1)'})}};
+  a.finished.then(()=>{const hit=rail.children[K];hit?.animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1.05)'}],{duration:320,easing:'ease-out',fill:'forwards'});setTimeout(done,380)}).catch(()=>{UN.spin=0});
+  setTimeout(()=>{if(UN.spin)done()},D+1500)}
+function unBento(v){if(!matchMedia('(min-width:900px)').matches)return;const secs=[...v.querySelectorAll(':scope>section.nrow')];
+  const wrap=document.createElement('div');wrap.className='unbento';(secs[0]||v.querySelector('.crate'))?.after?.(wrap);if(!secs.length&&!v.querySelector('.crate'))return;
+  secs.forEach(s=>{let c='s2';const tl=[...s.querySelectorAll('.strip .tile')];if(tl.length)c=tl.reduce((a,t)=>a+(t.classList.contains('w')?234:t.classList.contains('p')?92:134),0)<=290?'s1':'s2';s.classList.add(c);
+    const cv=s.querySelector('[style*="--ic"]')||s.querySelector('.cv');const m=cv?.getAttribute('style')?.match(/--(?:ic|c):([^;]+)/);if(m)s.style.setProperty('--tc',m[1]);wrap.appendChild(s)});
+  const open=st.items.filter(i=>i.status!=='done');
+  if(open.length){const CL={music:'#d08a2c',set:'#7a5af0',movie:'#d9584a',show:'#4c8fd6',game:'#3fa65e'};
+    const gs=G.filter(g=>g[0]!=='all').map(([k,l])=>[k,l,open.filter(i=>inGrp(i,k)).length]).filter(g=>g[2]);
+    const hrs=Math.round(open.reduce((a,i)=>a+mins(i),0)/60),chk=open.filter(i=>i.status==='check'),old=[...chk].sort((a,b)=>ageDays(b)-ageDays(a))[0];
+    const m0=new Date();m0.setDate(1);m0.setHours(0,0,0,0);const fin=st.items.filter(i=>i.status==='done'&&new Date(i.doneAt||i.touched||0)>=m0).length;
+    (wrap.children[0]?wrap.children[0].insertAdjacentHTML.bind(wrap.children[0],'afterend'):wrap.insertAdjacentHTML.bind(wrap,'beforeend'))(`<div class="unx ust s1"><h2>Your pile</h2><div class="big">${open.length}<span>things, about ${hrs} hour${hrs===1?'':'s'}</span></div>
+      <div class="ubar">${gs.map(g=>`<i style="flex:${g[2]};background:${CL[g[0]]}"></i>`).join('')}</div><ul>${gs.map(g=>`<li><i style="background:${CL[g[0]]}"></i>${g[1]} <b>${g[2]}</b></li>`).join('')}</ul>
+      ${old?`<p><b>${esc(old.title)}</b> has waited the longest, ${ago(old)}.</p>`:''}<p>${fin?`You finished <b>${fin}</b> this month.`:'Nothing finished yet this month.'}</p></div>`)}
+  const hr=st.items.filter(i=>pkOk(i)&&mins(i)<=60);
+  if(hr.length>1){const at=wrap.querySelector('.ust');(at?at.insertAdjacentHTML.bind(at,'afterend'):wrap.insertAdjacentHTML.bind(wrap,'beforeend'))(`<div class="unx uhr s1"><h2>Got an hour?</h2><h3>${hr.length} things fit</h3><p>${hr.slice(0,3).map(i=>esc(i.title)).join(', ')}${hr.length>3?', and more':''}</p><button type="button" class="btn pri" id="unhour">Spin one under an hour</button></div>`)}
+  if(!wrap.children.length)wrap.remove()}
+{const dn=drawNext;drawNext=function(){const r=dn.apply(this,arguments);try{const v=$('#view'),sec=v.querySelector('.crate');unWall(sec);unSpinBtn(sec);unBento(v)}catch(e){console.warn('upnext',e)}return r}}
+document.addEventListener('click',e=>{if(e.target.closest?.('#unspin')){unSpin();return}
+  if(e.target.closest?.('#unhour')){pk.t='short';pk.g='all';pickQ=null;render();window.scrollTo({top:0,behavior:moOn()?'smooth':'auto'});setTimeout(()=>unSpin(),moOn()?450:0)}});
+{let w=matchMedia('(min-width:900px)').matches;addEventListener('resize',()=>{const m=matchMedia('(min-width:900px)').matches;if(m!==w){w=m;if(st.view==='next'&&!UN.spin)render()}})}
 render();
 setTimeout(()=>st.items.filter(i=>!i.sample).forEach(i=>findSpotify(i)),3000);
 setTimeout(artSoon,5000);
