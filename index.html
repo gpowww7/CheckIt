@@ -939,6 +939,7 @@ body.mo-live[data-world=set] #view .wall>.cv.mo-vis:nth-child(even):not(.mo-t){a
 @media(prefers-reduced-motion:reduce){#mo-ecot,#mo-grade,#mo-hud{display:none}}
 @media(max-width:600px){body[data-lgrp=game] .wall .w{grid-column:span 3;grid-row:span 2}.bg.w{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}}
 #stage{touch-action:pan-y;-webkit-user-select:none;user-select:none}
+#stage img{-webkit-user-drag:none;pointer-events:none}
 body.mo-off .mo-t,body.mo-off .mo-pg,body.mo-off .mark,body.mo-off .tabs svg,body.mo-off dialog[open]{animation:none!important}
 body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 @media(prefers-reduced-motion:reduce){.mo-t,.mo-pg,.mark,.tabs button svg,dialog[open],dialog[open]::backdrop{animation:none!important}img.mo-ld{opacity:1;transform:none}.mo-fx{display:none}#view.mo-hold{opacity:1}.wall>.cv,.stub,.strip>.tile,#bgrid>.bt{transition:none}}
@@ -963,7 +964,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-22</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-23</small>
     </div></details>
   </div>
 </header>
@@ -4113,6 +4114,9 @@ function crSnap(){const st0=$('#stage');if(!st0)return null;const c0=st0.querySe
     const from=G.c0.style.transform;G.c0.style.transform='';G.c0.style.transition='';G.c0.animate([{transform:from},{transform:'none'}],{duration:420,easing:'cubic-bezier(.25,1.4,.4,1)'});
     if(G.c1){const f1=G.c1.style.transform,b1=G.c1.style.filter;G.c1.style.transform=G.c1.style.filter=G.c1.style.transition='';G.c1.animate([{transform:f1,filter:b1},{transform:'translate(16px,-14px) rotate(3deg) scale(.95)',filter:'brightness(.88)'}],{duration:380,easing:'cubic-bezier(.2,.9,.25,1)'})}};
   document.addEventListener('pointerup',end,{passive:true});document.addEventListener('pointercancel',end,{passive:true})}
+/* motion: crate: trackpad and image-drag fixes. Cover images no longer start a browser image drag (which cancelled mouse drags). A two-finger sideways swipe on a trackpad over the covers flips them, one per gesture. */
+document.addEventListener('dragstart',e=>{if(e.target.closest?.('#stage'))e.preventDefault()},true);
+{let acc=0,lock=0,idle=0;document.addEventListener('wheel',e=>{if(!e.target.closest?.('#stage')||Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;e.preventDefault();clearTimeout(idle);idle=setTimeout(()=>{acc=0;lock=0},180);if(lock)return;acc+=e.deltaX;if(Math.abs(acc)>60){lock=1;swiped=Date.now();crateGo(acc>0?1:-1);acc=0}},{passive:false})}
 /* games two to a row on phones: Library covers and Browse (CSS `body[data-lgrp=game]`, `.bg.w`). */
 {const r1=moAfter;moAfter=function(){document.body.dataset.lgrp=st.view==='library'?st.grp:'';return r1.apply(this,arguments)}}
 render();
