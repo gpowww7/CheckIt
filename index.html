@@ -950,6 +950,15 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 .crate .pkall[aria-checked=true] i{background:var(--acc)}.crate .pkall[aria-checked=true] i::after{transform:translateX(16px);background:#fff}
 /* perf: off-screen covers and Browse tiles skip layout and paint until they scroll near. */
 /*cv*/.wall>.cv,#bgrid>.bt{content-visibility:auto;contain-intrinsic-size:auto 180px}
+/* similar: album page rows */
+.sim{margin:20px 0 4px}
+.simh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:16px 0 10px}
+.simh b{font-weight:600;font-size:14px}.simh small{color:var(--mut);font-size:12px}
+.simr{display:grid;grid-auto-flow:column;grid-auto-columns:132px;gap:14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-bottom:8px;scrollbar-width:thin}
+.simr .bt{scroll-snap-align:start}.simr .bp{aspect-ratio:1}
+.simr .ba button span{display:none}.simr .ba button{font-size:14px}
+.sim .wn .sp{font:inherit;color:var(--acc);text-decoration:underline}
+@media(max-width:760px){.simr{grid-auto-columns:118px;gap:12px}}
 </style>
 </head>
 <body>
@@ -964,7 +973,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-23</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.24-24</small>
     </div></details>
   </div>
 </header>
@@ -1561,7 +1570,7 @@ new MutationObserver(()=>{const open=$('#res').classList.contains('on')||$('.add
   if(open&&!(top&&top.k==='search'&&!top.dead)&&!LS.some(x=>x.k==='search'&&!x.dead))layer('search');else if(!open)unlayer('search')}).observe($('#res'),{attributes:true,attributeFilter:['class']});
 const HN={youtube:'YouTube','youtu':'YouTube',soundcloud:'SoundCloud',mixcloud:'Mixcloud',twitch:'Twitch',vimeo:'Vimeo',bandcamp:'Bandcamp',apple:'Apple TV',tvmaze:'TVmaze',imdb:'IMDb',letterboxd:'Letterboxd',themoviedb:'TMDB',musicbrainz:'MusicBrainz'};
 const hostName=h=>{const k=h.split('.').slice(-2,-1)[0]||h;return HN[k]||k[0].toUpperCase()+k.slice(1)};
-function drawItem(){const it=cur,sh=shape(it.type);
+function drawItem(){const it=cur,sh=shape(it.type),simX=[...document.querySelectorAll('#dr .simr')].map(x=>x.scrollLeft);
   const cr=it.type==='set'?'DJ or artist':it.type==='movie'?'Director':it.type==='show'?'Network':it.type==='game'?'Studio':'Artist';
   const meta=[T[it.type],it.extra?.event,it.extra?.date||it.extra?.year,it.extra?.platforms].filter(Boolean).map(esc).join(', ');
   const host=it.url&&!/deezer\.com|spotify\.com/.test(it.url)?(()=>{try{return new URL(it.url).hostname.replace(/^www\./,'')}catch(e){return''}})():'';
@@ -1585,6 +1594,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
    <textarea id="f-note" class="nt" rows="1" placeholder="Why is this on your list?">${esc(it.note)}</textarea>
    <label class="rb">Recommended by <input id="f-by" value="${esc(it.by)}" placeholder="Add a name"></label>
    ${watchBlock(it)}
+   ${simBlock(it)}
    <details class="more"><summary>Edit details</summary><form id="ef" onsubmit="return false">
     <label>Title<input id="f-title" value="${esc(it.title)}"></label>
     <div class="two"><label>${cr}<input id="f-creator" value="${esc(it.creator)}"></label>
@@ -1598,7 +1608,7 @@ function drawItem(){const it=cur,sh=shape(it.type);
    <p class="ad">Added ${md(it.added)}${dust(it)>.15?`. Untouched for ${ago(it)}, so it is starting to gather dust.`:''}</p>
   </div>`;
   const n=$('#f-note');if(n){n.style.height='auto';n.style.height=n.scrollHeight+'px'};
-  if($('#dr').dataset.more===it.id)$('#dr .more').open=true}
+  if($('#dr').dataset.more===it.id)$('#dr .more').open=true;document.querySelectorAll('#dr .simr').forEach((x,i)=>x.scrollLeft=simX[i]||0)}
 $('#dr').addEventListener('toggle',e=>{const t=e.target;if(cur&&t.matches?.('details.sea,details.sn')){const k=cur.id+'/'+(t.dataset.sn??'all');if(t.open){SOPEN.add(k);if(t.dataset.sn!=null)loadSeason(cur,+t.dataset.sn)}else SOPEN.delete(k);return}if(e.target.classList?.contains('more'))$('#dr').dataset.more=e.target.open&&cur?cur.id:''},true);
 const upd=(fn,msg)=>{const before=JSON.stringify(st.items);fn();if(cur)delete cur.sample;save();render();if(msg)toast(msg,()=>{st.items=JSON.parse(before);save();render();if(cur){cur=st.items.find(i=>i.id===cur.id);cur?drawItem():closeItem()}})};
 $('#dr').addEventListener('keydown',e=>{if(e.target.id!=='tgin'||!cur)return;if(e.key==='Escape'){e.stopPropagation();drawItem();return}if(e.key!=='Enter')return;e.preventDefault();addTag(e.target.value)});
@@ -3664,7 +3674,7 @@ function brPvDraw(){const it=brPv;if(!it||cur||!$('#dr').classList.contains('on'
   const keep=[...$('#dr').querySelectorAll('.syn.open')].length;
   $('#dr').innerHTML=`<div class="ip ${sh}" style="${cs(it)}"><button class="x" data-bpx aria-label="Close">×</button>
    <div class="hero">${cover(it,'big ini'+(sh==='p'?' pp':sh==='w'?' ww':''))}<div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)}</h2>${it.creator?`<p>${esc(it.creator)}</p>`:''}</div></div>
-   <div class="ba bpa">${brAct(it.pv)}</div>${infoBlock({...it,info:it.info&&{...it.info,sl:null}})}${watchBlock(it)}</div>`;
+   <div class="ba bpa">${brAct(it.pv)}</div>${infoBlock({...it,info:it.info&&{...it.info,sl:null}})}${watchBlock(it)}${simBlock(it)}</div>`;
   if(keep)$('#dr .syn')?.classList.add('open')}
 $('#dr').addEventListener('click',e=>{if(cur||!brPv)return;if(e.target.closest('[data-bpx]')){closeItem();return}const a=e.target.closest('[data-ba]');if(!a)return;
   const r=brPv.pv;brIndex();const h=brHave(r);closeItem();if(h){openItem(h.id);return}brDo(r,a.dataset.ba)});
@@ -3685,6 +3695,47 @@ $('#view').addEventListener('click',e=>{if(st.view!=='browse')return;const k=$('
   const bo=b('#bgrid .bp,#bgrid .bm');if(bo){const r=BRC[k]?.items[+bo.closest('[data-bi]').dataset.bi];if(r)brOpen(r)}});
 $('#view').addEventListener('change',e=>{const f=e.target.closest('[data-bf]');if(!f||st.view!=='browse')return;brState()[1][f.dataset.bf]=f.value;saveLocal();drawBrowse()});
 $('#dlg').addEventListener('close',()=>{if(st.view==='browse')drawBrowse()});
+/* similar: album pages show "More by <artist>" (Deezer discography) and "Similar albums" (Last.fm similar artists when a key is set, otherwise Deezer related artists), one album per similar artist. Kept in memory and in localStorage checkit.sim for 7 days (25 albums max). Tiles reuse the Browse tile, + and ✓ */
+const SIML='checkit.sim',SIM=(()=>{try{return JSON.parse(localStorage.getItem(SIML))||{}}catch(e){return{}}})();
+const simK=it=>brN(it.creator)+'|'+brN(it.title)+'|'+(st.lfm?1:0);
+function simSave(){const o={};Object.entries(SIM).filter(([,v])=>v.at&&!v.busy&&!v.err).sort((a,b)=>b[1].at-a[1].at).slice(0,25).forEach(([k,v])=>o[k]={at:v.at,by:v.by,like:v.like});try{localStorage.setItem(SIML,JSON.stringify(o))}catch(e){}}
+const simAl=(title,artist,art,thumb,url,y)=>({type:'album',title,creator:artist,art:art||'',thumb:thumb||art||'',url:url||'',extra:y?{year:y}:{},sub:[artist,y].filter(Boolean).join(', ')});
+async function simDzArtist(name){const j=await jsonp(`https://api.deezer.com/search/artist?q=${encodeURIComponent(name)}&limit=5&output=jsonp`),l=j.data||[];return(l.find(a=>brN(a.name)===brN(name))||l[0])?.id}
+async function simBy(it,aid){if(!aid)return[];const j=await jsonp(`https://api.deezer.com/artist/${aid}/albums?limit=100&output=jsonp`),l=(j.data||[]).filter(a=>a.title);
+  const pick=t=>l.filter(a=>t.includes(a.record_type));let a=pick(['album']);if(a.length<4)a=pick(['album','ep']);
+  const seen=new Set([brN(it.title)]),o=[];for(const x of a){const k=brN(x.title);if(!k||seen.has(k))continue;seen.add(k);o.push(simAl(x.title,it.creator,x.cover_xl||x.cover_big,x.cover_big||x.cover_medium,x.link||`https://www.deezer.com/album/${x.id}`,yr(x.release_date)))}
+  return o.slice(0,24)}
+async function simLikeLfm(it){const k=encodeURIComponent(st.lfm),j=await getJSON(`https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${encodeURIComponent(it.creator)}&autocorrect=1&limit=16&api_key=${k}&format=json`);if(j.error)throw 0;
+  const ar=(j.similarartists?.artist||[]).map(a=>a.name).filter(Boolean).slice(0,14),img=x=>{const u=(x.image||[]).slice(-1)[0]?.['#text']||'';return/2a96cbd8b46e442fc41c2b86b821562f/.test(u)?'':u},o=[];
+  for(let i=0;i<ar.length;i+=4)o.push(...await Promise.all(ar.slice(i,i+4).map(async n=>{try{const t=await getJSON(`https://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${encodeURIComponent(n)}&limit=4&api_key=${k}&format=json`);
+    const x=(t.topalbums?.album||[]).find(a=>a.name&&a.name!=='(null)'&&img(a))||null;return x?simAl(x.name,x.artist?.name||n,img(x),img(x),x.url):null}catch(e){return null}})));
+  return o.filter(Boolean).slice(0,12)}
+async function simLikeDz(aid){if(!aid)return[];const j=await jsonp(`https://api.deezer.com/artist/${aid}/related?limit=14&output=jsonp`),ar=(j.data||[]).slice(0,12),o=[];
+  for(let i=0;i<ar.length;i+=4)o.push(...await Promise.all(ar.slice(i,i+4).map(async a=>{try{const t=await jsonp(`https://api.deezer.com/artist/${a.id}/top?limit=6&output=jsonp`),n={};let b=null;
+    (t.data||[]).forEach(s=>{const x=s.album;if(!x?.title)return;n[x.id]=(n[x.id]||0)+1;if(!b||n[x.id]>n[b.id])b=x});
+    return b?simAl(b.title,a.name,b.cover_xl||b.cover_big,b.cover_big||b.cover_medium,`https://www.deezer.com/album/${b.id}`):null}catch(e){return null}})));
+  return o.filter(Boolean)}
+async function simLoad(it){const key=simK(it);if(SIM[key]&&(SIM[key].busy||(!SIM[key].err&&Date.now()-SIM[key].at<7*864e5)))return;const s=SIM[key]={busy:1,at:Date.now()};
+  let aid=null;try{aid=await simDzArtist(it.creator)}catch(e){}
+  const[by,like]=await Promise.all([simBy(it,aid).catch(()=>null),(st.lfm?simLikeLfm(it).catch(()=>simLikeDz(aid)):simLikeDz(aid)).catch(()=>null)]);
+  s.busy=0;s.by=by||[];s.like=like||[];s.err=by===null&&like===null?1:0;s.at=Date.now();if(!s.err)simSave();simPaint()}
+const simTile=(r,i)=>`<div class="bt" data-si="${i}"><div class="bp">${brImg(r)}</div><div class="bm"><b>${esc(r.title)}</b><small>${esc(r.sub||'')}</small></div><div class="ba">${brAct(r)}</div></div>`;
+const simSk='<div class="bt sk"><div class="bp"></div><div class="bm"><b>&nbsp;</b><small>&nbsp;</small></div></div>'.repeat(4);
+function simInner(it){const s=SIM[simK(it)];brIndex();if(!s||s.busy)return`<div class="simh"><b>More by ${esc(it.creator)}</b></div><div class="simr">${simSk}</div>`;
+  if(s.err)return`<p class="wn">Couldn’t load similar albums. <button type="button" class="sp" data-simre>Try again</button></p>`;
+  const row=(h,l,p,n)=>l.length?`<div class="simh"><b>${h}</b>${n?`<small>${n}</small>`:''}</div><div class="simr" data-sl="${p}">${l.map((r,i)=>simTile(r,p+i)).join('')}</div>`:'';
+  return row(`More by ${esc(it.creator)}`,s.by,'b','')+row('Similar albums',s.like,'l',st.lfm?'From Last.fm':'')}
+function simBlock(it){if(it?.type!=='album'||!it.creator)return'';const s=SIM[simK(it)];if(!s||(!s.busy&&!s.err&&Date.now()-s.at>7*864e5))setTimeout(()=>simLoad(it),0);
+  if(s&&!s.busy&&!s.err&&!s.by.length&&!s.like.length)return'';return`<section class="sim" aria-label="More albums">${simInner(it)}</section>`}
+const simIt=()=>cur||brPv;
+function simPaint(){const it=simIt(),el=$('#dr .sim');if(!it||!$('#dr').classList.contains('on'))return;
+  if(!el){if(cur)drawItem();else brPvDraw();return}const sx=[...el.querySelectorAll('.simr')].map(x=>x.scrollLeft);const h=simBlock(it);if(!h){el.remove();return}el.outerHTML=h;$('#dr').querySelectorAll('.sim .simr').forEach((x,i)=>x.scrollLeft=sx[i]||0)}
+const simGet=i=>{const s=SIM[simK(simIt()||{})];return s?(i[0]==='b'?s.by:s.like)[+i.slice(1)]:null};
+$('#dr').addEventListener('click',e=>{const box=e.target.closest('#dr .sim');if(!box)return;e.stopImmediatePropagation();const it=simIt();if(!it)return;
+  if(e.target.closest('[data-simre]')){delete SIM[simK(it)];simPaint();return}
+  const t=e.target.closest('[data-si]');if(!t)return;const r=simGet(t.dataset.si);if(!r)return;const a=e.target.closest('[data-ba]');
+  if(a){brDo(r,a.dataset.ba);render();if(cur)brIndex();box.querySelectorAll('[data-si]').forEach(x=>{const q=simGet(x.dataset.si);if(q)x.querySelector('.ba').innerHTML=brAct(q)});return}
+  if(e.target.closest('.bp,.bm')){brIndex();const h=brHave(r);if(h)openItem(h.id);else{brOpen(r);$('#dr').scrollTop=0}}},true);
 function localGroups(q){const ql=q.toLowerCase();
   const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${sLab(i).toLowerCase()}`,open:i.id,it:i}));
   const have=new Set(st.items.map(i=>i.url).filter(Boolean));
