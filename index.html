@@ -1006,6 +1006,27 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 }
 @media(max-width:760px){.unwall{--uw:96px;opacity:.2}.crate::after{background:radial-gradient(ellipse 60% 34% at 50% 30%,var(--ic) 35%,transparent 85%),radial-gradient(ellipse 70% 40% at 50% 75%,color-mix(in srgb,var(--ic) 70%,transparent) 20%,transparent 85%)}}
 @media(prefers-reduced-motion:reduce){.unwall .uwi{animation:none}}
+/* spotify: Play and Add to queue buttons on album tracklist rows (spotify thread, 2026.11.25-3) */
+.trk.spt li>span[data-spp]{cursor:pointer}.trk.spt li>span[data-spp]:hover{color:var(--acc)}
+.spb{flex:none;width:30px;height:32px;margin:-6px -4px -6px 0;display:grid;place-items:center;background:none;border:0;border-radius:6px;color:var(--mut);opacity:.55;cursor:pointer;padding:0}
+.spb svg{width:16px;height:16px}.spb:hover,.spb:focus-visible{opacity:1;color:var(--acc)}.spb:active{transform:scale(.9)}
+.spb.busy{opacity:1;color:var(--acc);animation:spbz .8s ease-in-out infinite}@keyframes spbz{50%{opacity:.35}}
+.trk li.spnow>span{color:var(--acc)}.trk li.spnow [data-spp]{opacity:1;color:var(--acc)}
+@media (hover:none){.spb{width:34px}}
+@media (prefers-reduced-motion:reduce){.spb.busy{animation:none}}
+/* spotify: Now playing mini player (#npb) */
+#npb{position:fixed;z-index:32;left:12px;right:82px;bottom:calc(68px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:6px;padding:7px 8px 9px;border-radius:12px;color:var(--ink);background:color-mix(in srgb,var(--bg) 70%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,.09);box-shadow:0 10px 28px rgba(0,0,0,.45);font-size:13px;line-height:1.25;animation:npin .35s cubic-bezier(.2,1.2,.3,1)}
+#npb[hidden]{display:none}@keyframes npin{from{opacity:0;transform:translateY(14px)}}
+.npw{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.npa{flex:none;width:40px;height:40px;border-radius:5px;object-fit:cover;background:rgba(255,255,255,.08);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.npt{flex:1;min-width:0}.npt b{display:flex;align-items:center;font-weight:600;white-space:nowrap}.npt b span{overflow:hidden;text-overflow:ellipsis}.npt small{display:block;color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.npeq{display:none;flex:none;gap:2px;align-items:flex-end;height:10px;margin-right:6px}.npeq i{width:2px;height:4px;background:#1ed760;border-radius:1px;animation:npeq 1s ease-in-out infinite}.npeq i:nth-child(2){animation-delay:-.4s}.npeq i:nth-child(3){animation-delay:-.7s}#npb.play .npeq{display:inline-flex}@keyframes npeq{50%{height:10px}}
+.npc{display:flex;gap:2px;flex:none}.npc button{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:none;border:0;color:var(--ink);cursor:pointer;padding:0}.npc button svg{width:18px;height:18px}.npc .nppp{background:var(--ink);color:var(--bg)}.npc button:active{transform:scale(.9)}.npc button:not(.nppp):hover{background:rgba(255,255,255,.08)}
+.npc .nppv{display:none}
+.npg{position:absolute;left:10px;right:10px;bottom:0;height:2px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}.npg i{display:block;height:100%;width:0;background:var(--acc)}
+body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(safe-area-inset-bottom,0px))}
+@media(min-width:761px){#npb{left:20px;right:auto;bottom:20px;width:360px}.npc .nppv{display:grid}body.npon main{padding-bottom:96px}body.npon .toast{bottom:24px}}
+@media(prefers-reduced-motion:reduce){#npb,.npeq i{animation:none}}
 </style>
 </head>
 <body>
@@ -1020,7 +1041,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-2</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-3</small>
     </div></details>
   </div>
 </header>
@@ -1086,7 +1107,7 @@ const OLD={index:['library','list'],wall:['library','covers'],notes:['library','
 const setSt=(it,s)=>{it.status=s;it.touched=new Date().toISOString();if((s==='done'||s==='again')&&!it.doneAt)it.doneAt=it.touched};
 const route=h=>{if(VIEWS.includes(h))st.view=h;else if(OLD[h]){st.view=OLD[h][0];if(OLD[h][1])st.layout=OLD[h][1]}};
 if(!VIEWS.includes(st.view))route(st.view);
-const applySetup=()=>{const h=location.hash;if(!h.startsWith('#setup='))return false;try{const j=JSON.parse(decodeURIComponent(h.slice(7)));if(typeof j.t==='string')st.tmdb=j.t;if(typeof j.r==='string'&&j.r)st.region=j.r.toUpperCase();if(typeof j.g==='string')st.rawg=j.g;if(typeof j.y==='string')st.yt=j.y;if(typeof j.o==='string')st.omdb=j.o;if(typeof j.l==='string')st.lfm=j.l;save();setTimeout(()=>toast('Keys added from your setup link'),400)}catch(e){setTimeout(()=>toast('That setup link didn’t work'),400)}history.replaceState(null,'',location.pathname+location.search);return true};
+const applySetup=()=>{const h=location.hash;if(!h.startsWith('#setup='))return false;try{const j=JSON.parse(decodeURIComponent(h.slice(7)));if(typeof j.t==='string')st.tmdb=j.t;if(typeof j.r==='string'&&j.r)st.region=j.r.toUpperCase();if(typeof j.g==='string')st.rawg=j.g;if(typeof j.y==='string')st.yt=j.y;if(typeof j.o==='string')st.omdb=j.o;if(typeof j.l==='string')st.lfm=j.l;if(typeof j.s==='string'&&j.s)st.spc=j.s;save();setTimeout(()=>toast('Keys added from your setup link'),400)}catch(e){setTimeout(()=>toast('That setup link didn’t work'),400)}history.replaceState(null,'',location.pathname+location.search);return true};
 applySetup();
 route(location.hash.slice(1));
 
@@ -1190,11 +1211,12 @@ async function loadGameInfo(it){if(!st.rawg)return;const k='key='+encodeURICompo
     if(!it.creator&&it.info.dev[0])it.creator=it.info.dev[0];if(!it.art&&d.background_image)it.art=d.background_image;
     save();render();if(cur===it)drawItem()}catch(e){}}
 const hm=m=>m>=60?`${Math.floor(m/60)} h${m%60?' '+m%60+' min':''}`:`${m} min`;
+const SPPLAY='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a.8.8 0 0 0 1.2.7l10.4-6.5a.8.8 0 0 0 0-1.4L9.2 4.8A.8.8 0 0 0 8 5.5z"/></svg>',SPQ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 6h12M4 11h12M4 16h7M17 14v6M14 17h6"/></svg>';
 const tkey=t=>(t.t||'').toLowerCase().replace(/\s+/g,' ').trim();
 function infoBlock(it){const f=it.info,row=(l,v)=>v?`<div class="wr"><span>${l}</span><div>${v}</div></div>`:'';
   if(it.type==='album'||it.type==='song'){if(!f)return`<div class="info"><p class="wn">Loading details…</p></div>`;if(f.none)return'';
     const own=st.items.includes(it),fv=own?new Set(it.ft||[]):null,nf=own?f.tracks.filter(t=>fv.has(tkey(t))).length:0;
-    const tl=it.type==='album'&&f.tracks?.length?`<details class="trk${own?' tf':''}" data-trk${SOPEN.has(it.id+'/trk')?' open':''}><summary>Tracklist, ${f.n||f.tracks.length} tracks${nf?`<span class="tfn"> · ♥ ${nf}</span>`:''}</summary><ol>${f.tracks.map(t=>{const on=own&&fv.has(tkey(t));return`<li${on?' class="on"':''}><span>${esc(t.t)}${t.a&&simp(t.a)!==simp(it.creator)?` <small>${esc(t.a)}</small>`:''}</span><i>${mmss(t.s)}</i>${own?`<button type="button" class="tfb" data-tf="${esc(tkey(t))}" aria-pressed="${on}" aria-label="${on?'Unfavorite':'Favorite'} ${esc(t.t)}">${heartSvg(on)}</button>`:''}</li>`}).join('')}</ol></details>`:'';
+    const tl=it.type==='album'&&f.tracks?.length?`<details class="trk${own?' tf':''}${own&&st.spc?' spt':''}" data-trk${SOPEN.has(it.id+'/trk')?' open':''}><summary>Tracklist, ${f.n||f.tracks.length} tracks${nf?`<span class="tfn"> · ♥ ${nf}</span>`:''}</summary><ol>${f.tracks.map((t,ti)=>{const on=own&&fv.has(tkey(t)),sp=own&&st.spc;return`<li${on?' class="on"':''}><span${sp?` data-spp="${ti}" title="Play in Spotify"`:''}>${esc(t.t)}${t.a&&simp(t.a)!==simp(it.creator)?` <small>${esc(t.a)}</small>`:''}</span><i>${mmss(t.s)}</i>${sp?`<button type="button" class="spb" data-spp="${ti}" aria-label="Play ${esc(t.t)} in Spotify" title="Play in Spotify">${SPPLAY}</button><button type="button" class="spb" data-spq="${ti}" aria-label="Add ${esc(t.t)} to Spotify queue" title="Add to Spotify queue">${SPQ}</button>`:''}${own?`<button type="button" class="tfb" data-tf="${esc(tkey(t))}" aria-pressed="${on}" aria-label="${on?'Unfavorite':'Favorite'} ${esc(t.t)}">${heartSvg(on)}</button>`:''}</li>`}).join('')}</ol></details>`:'';
     return `<div class="info">${row('Released',esc(fdate(f.date)))}${row(it.type==='album'?'Runtime':'Length',f.secs?(it.type==='album'?esc(hm(Math.round(f.secs/60))):mmss(f.secs)):'')}${it.type==='album'?row('Type',esc(f.kind==='ep'?'EP':f.kind?f.kind[0].toUpperCase()+f.kind.slice(1):''))+row('Label',esc(f.label))+row('Genre',esc(f.genres.join(', '))):row('Album',esc(f.album))+row('Credits',esc(f.who.join(', ')))+row('BPM',f.bpm?Math.round(f.bpm):'')}${tl}</div>`}
   if(it.type==='game'){if(!st.rawg)return'';if(!f)return`<div class="info"><p class="wn">Loading details…</p></div>`;if(f.none)return'';
     return `<div class="info">${f.overview?`<p class="syn" tabindex="0">${esc(f.overview)}</p>`:''}${row('Developer',esc(f.dev.join(', ')))}${row('Publisher',esc(f.pub.join(', ')))}${row('Released',esc(fdate(f.date)))}${row('Platforms',esc(f.plat.join(', ')))}${row('Genres',esc(f.genres.join(', ')))}${row('Average play',f.hours?`${f.hours} hours`:'')}${row('Reviews',[f.meta?`<span class="sc"><b>${f.meta}</b> Metacritic</span>`:'',f.ur?`<span class="sc"><b>${f.ur} / 5</b> RAWG players</span>`:''].join(''))}
@@ -1687,7 +1709,7 @@ $('#shade').onclick=closeItem;
 
 /* toast */
 let tt,undoFn;
-function toast(m,u){$('#tmsg').textContent=m;undoFn=u;$('#tundo').style.display=u?'':'none';$('#toast').classList.add('on');clearTimeout(tt);tt=setTimeout(()=>$('#toast').classList.remove('on'),5000)}
+function toast(m,u){$('#tmsg').textContent=m;$('#tundo').textContent='Undo';undoFn=u;$('#tundo').style.display=u?'':'none';$('#toast').classList.add('on');clearTimeout(tt);tt=setTimeout(()=>$('#toast').classList.remove('on'),5000)}
 $('#tundo').onclick=()=>{undoFn?.();$('#toast').classList.remove('on')};
 
 /* events */
@@ -3790,6 +3812,112 @@ $('#dr').addEventListener('click',e=>{const box=e.target.closest('#dr .sim');if(
   const t=e.target.closest('[data-si]');if(!t)return;const r=simGet(t.dataset.si);if(!r)return;const a=e.target.closest('[data-ba]');
   if(a){brDo(r,a.dataset.ba);render();if(cur)brIndex();box.querySelectorAll('[data-si]').forEach(x=>{const q=simGet(x.dataset.si);if(q)x.querySelector('.ba').innerHTML=brAct(q)});return}
   if(e.target.closest('.bp,.bm')){brIndex();const h=brHave(r);if(h)openItem(h.id);else{brOpen(r);$('#dr').scrollTop=0}}},true);
+/* spotify: play and queue album tracks in Spotify (spotify thread, 2026.11.25-3). Authorization Code + PKCE with the client ID in st.spc (Settings, setup link key `s`). Tokens stay in this browser (localStorage checkit.spa), never synced. Needs Spotify Premium and Spotify open on a device. Revert: notes/spotify/README.md. */
+const SPK='checkit.spa',SPV='checkit.spv',SPR=()=>location.origin+location.pathname.replace(/index\.html$/,'');
+const spA=()=>{try{return JSON.parse(localStorage.getItem(SPK))||{}}catch(e){return{}}};
+const spSet=o=>{try{o?localStorage.setItem(SPK,JSON.stringify(o)):localStorage.removeItem(SPK)}catch(e){}};
+const spOn=()=>!!(st.spc&&spA().rt);
+const spB64=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+async function spLogin(pend){if(!st.spc){toast('Add your Spotify client ID in Settings first');return}
+  const v=spB64(crypto.getRandomValues(new Uint8Array(48))),s=spB64(crypto.getRandomValues(new Uint8Array(12)));
+  const ch=spB64(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));
+  try{localStorage.setItem(SPV,JSON.stringify({v,s,pend:pend||null,h:location.hash}))}catch(e){}
+  location.href='https://accounts.spotify.com/authorize?'+new URLSearchParams({client_id:st.spc,response_type:'code',redirect_uri:SPR(),code_challenge_method:'S256',code_challenge:ch,state:s,scope:'user-modify-playback-state user-read-playback-state user-read-currently-playing'})}
+async function spTok(body){const r=await fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:st.spc,...body})});
+  let j={};try{j=await r.json()}catch(e){}if(!r.ok)throw{st:r.status,error:j.error||''};const o={at:j.access_token,rt:j.refresh_token||spA().rt,exp:Date.now()+((j.expires_in||3600)-60)*1e3};spSet(o);return o}
+let spRef=null;
+async function spToken(){const a=spA();if(!a.rt)return null;if(a.at&&a.exp>Date.now())return a.at;
+  spRef=spRef||spTok({grant_type:'refresh_token',refresh_token:a.rt}).then(o=>o.at,e=>{if(e.error==='invalid_grant'||e.error==='invalid_client')spSet(null);return null}).finally(()=>{spRef=null});return spRef}
+async function spApi(path,opt={}){const t=await spToken();if(!t)throw{st:401};
+  const r=await fetch('https://api.spotify.com/v1'+path,{...opt,headers:{Authorization:'Bearer '+t,...(opt.body?{'Content-Type':'application/json'}:{})}});
+  if(r.status===204||r.status===202)return{};let j={};try{j=await r.json()}catch(e){}
+  if(r.status===401)spSet({...spA(),at:'',exp:0});
+  if(!r.ok)throw{st:r.status,reason:j.error?.reason||'',msg:j.error?.message||''};return j}
+const spN=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\(.*?\)|\[.*?\]|feat\..*$| - .*$/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').trim();
+const SPAL=new Map();
+async function spAlbum(it){if(SPAL.has(it.id))return SPAL.get(it.id);
+  let id=(it.spotify||'').match(/album\/([A-Za-z0-9]{22})/)?.[1];
+  if(!id){const n=it.info?.tracks?.length||0,tn=spN(it.title),an=spN(it.creator);
+    const j=await spApi('/search?type=album&limit=10&market=from_token&q='+encodeURIComponent(`album:${it.title} artist:${it.creator||''}`));
+    const L=j.albums?.items||[],ok=a=>spN(a.name)===tn&&(!an||a.artists.some(x=>spN(x.name)===an));
+    const p=L.find(a=>ok(a)&&(!n||a.total_tracks===n))||L.find(ok);
+    if(!p){SPAL.set(it.id,null);return null}id=p.id;if(!it.spotify&&st.items.includes(it)){it.spotify='https://open.spotify.com/album/'+id;delete it.spTry;save()}}
+  const T=[];let u=`/albums/${id}/tracks?limit=50&market=from_token`;
+  while(u){const j=await spApi(u);T.push(...(j.items||[]));u=j.next?j.next.replace('https://api.spotify.com/v1',''):''}
+  const o={id,T};SPAL.set(it.id,o);return o}
+function spMatch(al,t,i,n){const k=spN(t.t),T=al.T;return T.find(x=>spN(x.name)===k)||T.find(x=>{const n=spN(x.name);return n&&k&&(n.startsWith(k)||k.startsWith(n))})||(T.length===n?T[i]:null)}
+function spLinkT(m,label,url){toast(m,url?()=>spOpen(url):null);if(url)$('#tundo').textContent=label}
+async function spDo(it,i,act,btn){const t=it?.info?.tracks?.[i];if(!t)return;
+  if(!st.spc){spSetup();return}
+  if(!spA().rt){spLogin([it.id,i,act]);return}
+  if(btn){if(btn.classList.contains('busy'))return;btn.classList.add('busy')}
+  let tr=null,al=null;
+  try{al=await spAlbum(it).catch(e=>{if(e.st===401)throw e;return null});tr=al&&spMatch(al,t,i,it.info.tracks.length);
+    if(!tr){al=null;const j=await spApi('/search?type=track&limit=5&market=from_token&q='+encodeURIComponent(`track:${t.t} artist:${t.a||it.creator||''}`));tr=j.tracks?.items?.[0]||null}
+    if(!tr){toast('Couldn’t find that track on Spotify');return}
+    const body=JSON.stringify(al?{context_uri:'spotify:album:'+al.id,offset:{uri:tr.uri}}:{uris:[tr.uri]});
+    const go=d=>act==='q'?spApi('/me/player/queue?uri='+encodeURIComponent(tr.uri)+(d?'&device_id='+d:''),{method:'POST'}):spApi('/me/player/play'+(d?'?device_id='+d:''),{method:'PUT',body});
+    try{await go()}catch(e){if(e.st!==404)throw e;const D=(await spApi('/me/player/devices')).devices||[];const d=D.find(x=>x.is_active&&!x.is_restricted)||D.find(x=>!x.is_restricted);if(!d)throw{st:404};await go(d.id)}
+    toast(act==='q'?`Queued in Spotify: ${t.t}`:`Playing in Spotify: ${t.t}`);npSoon(700);
+    if(act!=='q'&&btn){document.querySelectorAll('#dr .trk li.spnow').forEach(x=>x.classList.remove('spnow'));btn.closest('li')?.classList.add('spnow')}
+  }catch(e){const url=tr?.external_urls?.spotify||(tr?'https://open.spotify.com/track/'+tr.id:spot(it));
+    if(e.st===401){spSet(null);spLogin([it.id,i,act]);return}
+    if(e.st===404)spLinkT('Spotify isn’t open anywhere. Open it, then try again','Open Spotify',url);
+    else if(e.st===403)spLinkT(e.reason==='PREMIUM_REQUIRED'||/premium/i.test(e.msg)?'Playing from Checkit needs Spotify Premium':'Spotify didn’t allow that. This account may not be added to the app yet','Open track',url);
+    else if(e.st===429)toast('Spotify is busy. Try again in a moment');
+    else toast('Spotify didn’t respond. Try again')}
+  finally{btn?.classList.remove('busy')}}
+function spSetup(){dlg(`<h3>Play in Spotify</h3><p>To play tracks and add them to your queue from Checkit, connect Spotify. You need Spotify Premium, and Spotify open on your phone or computer.</p><p style="font-size:13px;color:var(--mut)">First add a Spotify client ID in Settings (free at developer.spotify.com).</p><div class="dbtn"><button class="btn" data-close>Not now</button><button class="btn pri" id="spgo" type="button">Open settings</button></div>`);$('#spgo').onclick=()=>{$('#dlg').close();setTimeout(()=>menu('settings'),50)}}
+/* sign-in return: Spotify sends the person back here with ?code=…&state=… */
+(async()=>{const q=new URLSearchParams(location.search);if(!q.has('state')||!(q.has('code')||q.has('error')))return;
+  let p={};try{p=JSON.parse(localStorage.getItem(SPV))||{}}catch(e){}try{localStorage.removeItem(SPV)}catch(e){}
+  history.replaceState(null,'',location.pathname+(p.h||location.hash));
+  if(!p.s||q.get('state')!==p.s)return;
+  if(q.has('error')){setTimeout(()=>toast(q.get('error')==='access_denied'?'Spotify wasn’t connected':'Spotify sign-in didn’t work'),400);return}
+  try{await spTok({grant_type:'authorization_code',code:q.get('code'),redirect_uri:SPR(),code_verifier:p.v})}catch(e){setTimeout(()=>toast('Spotify sign-in didn’t work. Check the redirect URI'),400);return}
+  const pd=p.pend,it=pd&&st.items.find(x=>x.id===pd[0]);
+  npSoon(500);if(!it){setTimeout(()=>toast('Spotify connected'),400);return}
+  SOPEN.add(it.id+'/trk');setTimeout(()=>{openItem(it.id);spDo(it,pd[1],pd[2],document.querySelector(`#dr button[data-sp${pd[2]==='q'?'q':'p'}="${pd[1]}"]`))},300)})();
+$('#dr').addEventListener('click',e=>{const b=e.target.closest('[data-spp],[data-spq]');if(!b||!cur)return;const q=b.dataset.spq!=null;spDo(cur,+(q?b.dataset.spq:b.dataset.spp),q?'q':'p',b.matches('button')?b:b.closest('li')?.querySelector('button[data-spp]'))});
+/* spotify: Now playing mini player (option A: glass pill above the phone tabs, card bottom-left on computers). Polls currently-playing every 10s while playing, 30s otherwise, only while the page is visible. */
+const NP={d:null,at:0,tm:0,anim:null};
+const NPI={prev:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6zM19 6.5v11a.8.8 0 0 1-1.2.7l-8.3-5.5a.8.8 0 0 1 0-1.4l8.3-5.5a.8.8 0 0 1 1.2.7z"/></svg>',next:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 6h2v12h-2zM5 6.5v11a.8.8 0 0 0 1.2.7l8.3-5.5a.8.8 0 0 0 0-1.4L6.2 5.8A.8.8 0 0 0 5 6.5z"/></svg>',pause:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>',play:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a.8.8 0 0 0 1.2.7l10.4-6.5a.8.8 0 0 0 0-1.4L9.2 4.8A.8.8 0 0 0 8 5.5z"/></svg>'};
+function npEl(){let e=$('#npb');if(e)return e;e=document.createElement('div');e.id='npb';e.hidden=true;e.setAttribute('role','region');e.setAttribute('aria-label','Now playing in Spotify');
+  e.innerHTML=`<button type="button" class="npw" data-npk="open"><img class="npa" alt=""><span class="npt"><b><i class="npeq" aria-hidden="true"><i></i><i></i><i></i></i><span></span></b><small></small></span></button><span class="npc"><button type="button" class="nppv" data-npk="prev" aria-label="Previous track">${NPI.prev}</button><button type="button" class="nppp" data-npk="pp" aria-label="Pause">${NPI.pause}</button><button type="button" data-npk="next" aria-label="Next track">${NPI.next}</button></span><i class="npg"><i></i></i>`;
+  document.body.append(e);e.addEventListener('click',npClick);return e}
+function npSoon(ms){clearTimeout(NP.tm);NP.tm=setTimeout(npPoll,ms||0)}
+async function npPoll(){clearTimeout(NP.tm);if(!spOn()||document.hidden){if(!spOn())npShow(null);return}
+  try{const j=await spApi('/me/player/currently-playing?market=from_token');NP.d=j&&j.item&&j.currently_playing_type!=='ad'?j:null;NP.at=Date.now()}catch(e){if(e.st===401||e.st===403)NP.d=null}
+  npShow(NP.d);const d=NP.d;let w=d?.is_playing?10000:30000;if(d?.is_playing&&d.item.duration_ms)w=Math.min(w,Math.max(1500,d.item.duration_ms-(d.progress_ms||0)+800));NP.tm=setTimeout(npPoll,w)}
+function npShow(d){const e=npEl();if(!d){if(!e.hidden){e.hidden=true;document.body.classList.remove('npon')}return}
+  const it=d.item,im=it.album?.images||[],art=(im.find(x=>x.width&&x.width<=300)||im[im.length-1]||{}).url||'';
+  const a=e.querySelector('.npa');if(a.getAttribute('src')!==art){art?a.src=art:a.removeAttribute('src')}
+  e.querySelector('.npt b span').textContent=it.name.replace(/\s+-\s+((\d{4} )?(digital )?remaster(ed)?( \d{4})?( version)?)$/i,'');e.querySelector('.npt small').textContent=[(it.artists||[]).map(x=>x.name).join(', '),it.album?.name].filter(Boolean).join(' · ');
+  e.classList.toggle('play',!!d.is_playing);const pp=e.querySelector('.nppp');pp.innerHTML=d.is_playing?NPI.pause:NPI.play;pp.setAttribute('aria-label',d.is_playing?'Pause':'Play');
+  const bar=e.querySelector('.npg i'),dur=it.duration_ms||1,p0=Math.min(1,(d.progress_ms||0)/dur);NP.anim?.cancel();bar.style.width=(p0*100)+'%';
+  if(d.is_playing&&bar.animate)NP.anim=bar.animate([{width:p0*100+'%'},{width:'100%'}],{duration:Math.max(0,dur-(d.progress_ms||0)),easing:'linear',fill:'forwards'});
+  if(e.hidden){e.hidden=false;document.body.classList.add('npon')}npMark()}
+function npAlbum(d){const al=d?.item?.album;if(!al)return null;const an=spN(al.name),ar=spN(d.item.artists?.[0]?.name);
+  return st.items.find(i=>i.type==='album'&&(i.spotify||'').includes(al.id))||st.items.find(i=>i.type==='album'&&spN(i.title)===an&&(!ar||spN(i.creator)===ar))||null}
+function npMark(){const L=document.querySelectorAll('#dr .trk.spt li');if(!L.length)return;const d=NP.d,on=d&&cur&&npAlbum(d)===cur,k=on&&spN(d.item.name);
+  L.forEach(li=>li.classList.toggle('spnow',!!on&&spN(li.querySelector('span')?.firstChild?.textContent)===k))}
+async function npClick(e){const b=e.target.closest('[data-npk]');if(!b)return;const k=b.dataset.npk,d=NP.d;
+  if(k==='open'){const it=npAlbum(d);if(it)openItem(it.id);else if(d?.item?.external_urls?.spotify)spOpen(d.item.external_urls.spotify);return}
+  try{if(k==='pp'){const p=!!d?.is_playing;if(d){d.is_playing=!p;d.progress_ms=(d.progress_ms||0)+(p?Date.now()-NP.at:0);NP.at=Date.now();npShow(d)}await spApi('/me/player/'+(p?'pause':'play'),{method:'PUT'})}
+    else await spApi('/me/player/'+(k==='prev'?'previous':'next'),{method:'POST'});npSoon(k==='pp'?1500:600)}
+  catch(er){npSoon(300);if(er.st===403)toast('Spotify didn’t allow that. Controls need Premium');else if(er.st===404)toast('Spotify isn’t playing on any device right now');else toast('Spotify didn’t respond. Try again')}}
+{const d0=drawItem;drawItem=function(){const r=d0.apply(this,arguments);npMark();return r}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&spOn())npSoon(200)});
+if(spOn())npSoon(600);
+/* spotify: on computers, open.spotify.com links open in the Spotify desktop app (spotify: URIs). Settings toggle st.spApp (local); default on for computers. */
+const spDesk=()=>matchMedia('(pointer:fine)').matches&&!/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)&&!(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent));
+const spApp=()=>spDesk()&&st.spApp!==false;
+function spUri(u){try{const x=new URL(u);if(!/(^|\.)spotify\.com$/.test(x.hostname))return'';const P=x.pathname.split('/').filter(Boolean).filter(p=>!/^intl-/.test(p));
+  if(P[0]==='search'&&P[1])return'spotify:search:'+P.slice(1).join('/');
+  if(['album','artist','track','playlist','show','episode'].includes(P[0])&&/^[A-Za-z0-9]{22}$/.test(P[1]||''))return`spotify:${P[0]}:${P[1]}`}catch(e){}return''}
+function spOpen(u){const r=spApp()&&spUri(u);if(r)location.href=r;else window.open(u,'_blank','noopener')}
+document.addEventListener('click',e=>{if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||!spApp())return;const a=e.target.closest?.('a[href*="spotify.com"]');if(!a)return;const r=spUri(a.href);if(!r)return;e.preventDefault();location.href=r},true);
+
 function localGroups(q){const ql=q.toLowerCase();
   const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${sLab(i).toLowerCase()}`,open:i.id,it:i}));
   const have=new Set(st.items.map(i=>i.url).filter(Boolean));
@@ -3846,9 +3974,10 @@ function menu(k){
   if(k==='poster')posterDlg();
   if(k==='account')accountDlg();
   if(k==='lbx')lbDlg();
-  if(k==='settings'){dlg(`<h3>Settings</h3><p>Free API keys turn on extra lookups. They stay in this browser. TMDB powers film search and where to watch (themoviedb.org, Settings, API). RAWG powers game search. YouTube adds YouTube results to live set search.</p><label for="tk" style="font-size:13px;color:var(--mut)">TMDB API key</label><input id="tk" value="${esc(st.tmdb)}" autocomplete="off"><label for="rg" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Country</label><input id="rg" value="${esc(st.region)}" maxlength="2" style="width:80px;text-transform:uppercase"><label for="rk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">RAWG API key, for game search (free at rawg.io/apidocs)</label><input id="rk" value="${esc(st.rawg||'')}" autocomplete="off"><label for="yk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">YouTube API key, for live set search on YouTube</label><input id="yk" value="${esc(st.yt||'')}" autocomplete="off"><label for="ok" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">OMDb API key, for Rotten Tomatoes, IMDb and Metacritic scores (free at omdbapi.com)</label><input id="ok" value="${esc(st.omdb||'')}" autocomplete="off"><label for="lk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Last.fm API key, for albums by genre in Browse (free at last.fm/api)</label><input id="lk" value="${esc(st.lfm||'')}" autocomplete="off"><p style="font-size:13px;color:var(--mut);margin-top:16px">Setting up another device? Copy a setup link, send it to yourself, and open it there. It holds your keys, so keep it private.</p><button class="btn" id="tl" type="button">Copy setup link</button><input id="tlo" readonly style="display:none;margin-top:8px"><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn pri" id="ts">Save</button></div>`);
-    $('#tl').onclick=async()=>{const u=location.origin+location.pathname+'#setup='+encodeURIComponent(JSON.stringify({t:$('#tk').value.trim(),r:($('#rg').value.trim()||'US').toUpperCase(),g:$('#rk').value.trim(),y:$('#yk').value.trim(),o:$('#ok').value.trim(),l:$('#lk').value.trim()}));const o=$('#tlo');o.value=u;o.style.display='block';o.select();try{await navigator.clipboard.writeText(u);toast('Setup link copied')}catch(e){toast('Copy the link shown below')}};
-    $('#ts').onclick=()=>{st.tmdb=$('#tk').value.trim();st.region=($('#rg').value.trim()||'US').toUpperCase();st.rawg=$('#rk').value.trim();st.yt=$('#yk').value.trim();st.omdb=$('#ok').value.trim();st.lfm=$('#lk').value.trim();save();$('#dlg').close();toast('Settings saved');if(cur){loadWatch(cur,true);loadInfo(cur);loadScores(cur);drawItem()}}}
+  if(k==='settings'){dlg(`<h3>Settings</h3><p>Free API keys turn on extra lookups. They stay in this browser. TMDB powers film search and where to watch (themoviedb.org, Settings, API). RAWG powers game search. YouTube adds YouTube results to live set search.</p><label for="tk" style="font-size:13px;color:var(--mut)">TMDB API key</label><input id="tk" value="${esc(st.tmdb)}" autocomplete="off"><label for="rg" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Country</label><input id="rg" value="${esc(st.region)}" maxlength="2" style="width:80px;text-transform:uppercase"><label for="rk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">RAWG API key, for game search (free at rawg.io/apidocs)</label><input id="rk" value="${esc(st.rawg||'')}" autocomplete="off"><label for="yk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">YouTube API key, for live set search on YouTube</label><input id="yk" value="${esc(st.yt||'')}" autocomplete="off"><label for="ok" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">OMDb API key, for Rotten Tomatoes, IMDb and Metacritic scores (free at omdbapi.com)</label><input id="ok" value="${esc(st.omdb||'')}" autocomplete="off"><label for="lk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Last.fm API key, for albums by genre in Browse (free at last.fm/api)</label><input id="lk" value="${esc(st.lfm||'')}" autocomplete="off"><label for="spk" style="font-size:13px;color:var(--mut);display:block;margin-top:12px">Spotify client ID, to play album tracks and add them to your queue (needs Premium). Make an app at developer.spotify.com with this redirect URI: <b style="user-select:all;word-break:break-all">${esc(SPR())}</b></label><input id="spk" value="${esc(st.spc||'')}" autocomplete="off"><div style="display:flex;gap:10px;align-items:center;margin-top:8px;font-size:13px;color:var(--mut)"><span id="sps">${spOn()?'Spotify is connected.':'Not connected yet.'}</span><button class="btn" id="spc" type="button">${spOn()?'Disconnect':'Connect Spotify'}</button></div>${spDesk()?`<label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:13px;color:var(--mut)"><input type="checkbox" id="spapp" style="width:auto"${st.spApp!==false?' checked':''}>Open Spotify links in the Spotify app on this computer (turn off if you only use the web player)</label>`:''}<p style="font-size:13px;color:var(--mut);margin-top:16px">Setting up another device? Copy a setup link, send it to yourself, and open it there. It holds your keys, so keep it private.</p><button class="btn" id="tl" type="button">Copy setup link</button><input id="tlo" readonly style="display:none;margin-top:8px"><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn pri" id="ts">Save</button></div>`);
+    $('#tl').onclick=async()=>{const u=location.origin+location.pathname+'#setup='+encodeURIComponent(JSON.stringify({t:$('#tk').value.trim(),r:($('#rg').value.trim()||'US').toUpperCase(),g:$('#rk').value.trim(),y:$('#yk').value.trim(),o:$('#ok').value.trim(),l:$('#lk').value.trim(),s:$('#spk').value.trim()}));const o=$('#tlo');o.value=u;o.style.display='block';o.select();try{await navigator.clipboard.writeText(u);toast('Setup link copied')}catch(e){toast('Copy the link shown below')}};
+    $('#spc').onclick=()=>{if(spOn()){spSet(null);$('#sps').textContent='Disconnected.';$('#spc').textContent='Connect Spotify';return}const v=$('#spk').value.trim();if(!v){$('#spk').focus();toast('Paste your Spotify client ID first');return}if(v!==st.spc){st.spc=v;spSet(null);save()}spLogin()};
+    $('#ts').onclick=()=>{st.tmdb=$('#tk').value.trim();st.region=($('#rg').value.trim()||'US').toUpperCase();st.rawg=$('#rk').value.trim();st.yt=$('#yk').value.trim();st.omdb=$('#ok').value.trim();st.lfm=$('#lk').value.trim();const spc0=st.spc;st.spc=$('#spk').value.trim();if(st.spc!==spc0)spSet(null);if($('#spapp'))st.spApp=$('#spapp').checked;save();$('#dlg').close();toast('Settings saved');if(cur){loadWatch(cur,true);loadInfo(cur);loadScores(cur);drawItem()}}}
 }
 $('#file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());const inc=(j.items||[]).filter(i=>i.id&&i.title&&T[i.type]);const have=new Set(st.items.map(i=>i.id));
   upd(()=>st.items=[...inc.filter(i=>!have.has(i.id)),...st.items],`Imported ${inc.filter(i=>!have.has(i.id)).length} items`)}catch(x){toast('That file isn’t a backup from this app')}e.target.value=''});
