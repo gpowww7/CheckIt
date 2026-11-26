@@ -1039,6 +1039,34 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(safe-area-inset-bottom,0px))}
 @media(min-width:761px){#npb{left:20px;right:auto;bottom:20px;width:360px}.npc .nppv{display:grid}body.npon main{padding-bottom:96px}body.npon .toast{bottom:24px}}
 @media(prefers-reduced-motion:reduce){#npb,.npeq i{animation:none}}
+/* spotify thread, -14: artist link, artist page, Play album */
+.arl{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-thickness:1px;text-decoration-color:color-mix(in srgb,currentColor 40%,transparent);text-underline-offset:4px}
+.arl:hover{text-decoration-color:currentColor}
+.arl span{margin-left:6px;text-decoration:none;display:inline-block}
+.ar .hero p .arl{font-size:15px}
+.ar .hero .cv{border-radius:50%;overflow:hidden}
+.ar .bpa{margin-top:0}
+.lks a.spal{text-decoration:none}
+.ar .arw{margin:8px 0 4px}
+.ar .arw .wn .sp{font:inherit;color:var(--acc);text-decoration:underline}
+.lks .spal{margin-top:14px;display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 20px;font-size:15px;font-weight:600;border-radius:21px;cursor:pointer}
+.lks .spal.busy{opacity:.55;pointer-events:none}
+.lks .spal svg{width:13px;height:13px;fill:currentColor}
+.lks .spo{font-size:14px;align-self:center}
+.arpop{list-style:none;margin:0 0 6px;padding:0}
+.arpop li{display:flex;align-items:center;gap:12px;padding:7px 8px;margin:0 -8px;border-radius:8px}
+.arpop li[data-arp]{cursor:pointer}
+.arpop li[data-arp]:hover,.arpop li[data-arp]:focus-visible{background:var(--soft)}
+.arpop em{font-style:normal;width:18px;text-align:right;color:var(--mut);font-size:13px;font-variant-numeric:tabular-nums}
+.arpop u{width:40px;height:40px;border-radius:4px;background:var(--soft);flex:none}
+.arpop img{width:40px;height:40px;border-radius:4px;object-fit:cover;background:var(--soft);flex:none}
+.arpop span{flex:1;min-width:0}
+.arpop b{display:block;font-weight:500;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arpop small{display:block;color:var(--mut);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arpop i{font-style:normal;color:var(--mut);font-size:12.5px;font-variant-numeric:tabular-nums}
+.arpop li.spnow b,.arpop li.spnow em{color:var(--acc)}
+.arpop li.busy{opacity:.6}
+.ar .armb{display:flex;gap:20px}.ar .armo{margin:2px 0 6px;font-size:14px}
 /* spotify: big Now playing turntable (#bp) */
 #bp{position:fixed;inset:0;z-index:90;color:#fff;overflow:hidden auto;overscroll-behavior:contain;background:#0d0c12;font-size:15px;line-height:1.3;--c1:#c43b6d;--c2:#f4a259}
 #bp[hidden]{display:none}body.bpon{overflow:hidden}body.bpon #npb{display:none}body.bpon .toast{z-index:95}
@@ -1139,7 +1167,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-14</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-15</small>
     </div></details>
   </div>
 </header>
@@ -1760,7 +1788,7 @@ function drawItem(){const it=cur,sh=shape(it.type),simX=[...document.querySelect
   const cr=it.type==='set'?'DJ or artist':it.type==='movie'?'Director':it.type==='show'?'Network':it.type==='game'?'Studio':'Artist';
   const meta=[T[it.type],it.extra?.event,it.extra?.date||it.extra?.year,it.extra?.platforms].filter(Boolean).map(esc).join(', ');
   const host=it.url&&!/deezer\.com|spotify\.com/.test(it.url)?(()=>{try{return new URL(it.url).hostname.replace(/^www\./,'')}catch(e){return''}})():'';
-  const links=[MUS.includes(it.type)?`<a class="lk" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Listen on Spotify':'Find on Spotify'}<span>↗</span></a>`:'',
+  const links=[it.type==='album'&&st.spc?`<button type="button" class="btn pri spal" data-spal><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg>Play album</button><a class="lk spo" href="${esc(spot(it))}" target="_blank" rel="noopener">Open in Spotify<span>↗</span></a>`:MUS.includes(it.type)?`<a class="lk" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Listen on Spotify':'Find on Spotify'}<span>↗</span></a>`:'',
     it.type==='game'?`<a class="lk" href="${esc(steam(it))}" target="_blank" rel="noopener">Find on Steam<span>↗</span></a>`:'',
     it.type==='set'&&!/soundcloud\.com/.test(it.url||'')?`<a class="lk" href="${esc(scl(it))}" target="_blank" rel="noopener">Find on SoundCloud<span>↗</span></a>`:'',
     host?`<a class="lk" href="${esc(it.url)}" target="_blank" rel="noopener">${it.type==='set'?'Watch':'Open'} on ${esc(hostName(host))}<span>↗</span></a>`:''].join('');
@@ -1769,7 +1797,7 @@ function drawItem(){const it=cur,sh=shape(it.type),simX=[...document.querySelect
    <button class="x rm" data-del aria-label="Remove from list" title="Remove from list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
    <button class="x fv" data-fav aria-pressed="${!!it.fav}" aria-label="${it.fav?'Remove from favorites':'Add to favorites'}" title="Favorite">${heartSvg(it.fav)}</button>
    <div class="hero">${cover(it,'big ini'+(sh==='p'?' pp':sh==='w'?' ww':''))}
-    <div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)||'Untitled'}</h2>${it.creator?`<p>${esc(it.creator)}</p>`:''}</div></div>
+    <div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)||'Untitled'}</h2>${it.creator?`<p>${arLink(it)}</p>`:''}</div></div>
    ${links?`<div class="lks">${links}</div>`:''}
    ${infoBlock(it)}
    <div class="seg" role="group" aria-label="Status"${it.type==='game'?' style="grid-template-columns:repeat(5,minmax(0,1fr))"':''}>${stOpts(it).map(([k,l])=>`<button type="button" data-st="${k}" aria-pressed="${stOn(it,k)}">${l}</button>`).join('')}</div>
@@ -3865,8 +3893,8 @@ function brOpen(r){brIndex();const h=brHave(r);if(h){openItem(h.id);return}
 function brPvDraw(){const it=brPv;if(!it||cur||!$('#dr').classList.contains('on'))return;const sh=shape(it.type),meta=[T[it.type],it.extra?.year,it.extra?.platforms].filter(Boolean).map(esc).join(', ');
   const keep=[...$('#dr').querySelectorAll('.syn.open')].length;
   $('#dr').innerHTML=`<div class="ip ${sh}" style="${cs(it)}"><button class="x" data-bpx aria-label="Close">×</button>
-   <div class="hero">${cover(it,'big ini'+(sh==='p'?' pp':sh==='w'?' ww':''))}<div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)}</h2>${it.creator?`<p>${esc(it.creator)}</p>`:''}</div></div>
-   <div class="ba bpa">${brAct(it.pv)}</div>${it.type==='set'?`<div class="lks">${it.type==='set'&&!/soundcloud\.com/.test(it.url||'')?`<a class="lk" href="${esc(scl(it))}" target="_blank" rel="noopener">Find on SoundCloud<span>↗</span></a>`:''}</div>`:''}${infoBlock({...it,info:it.info&&{...it.info,sl:null}})}${watchBlock(it)}${simBlock(it)}</div>`;
+   <div class="hero">${cover(it,'big ini'+(sh==='p'?' pp':sh==='w'?' ww':''))}<div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)}</h2>${it.creator?`<p>${arLink(it)}</p>`:''}</div></div>
+   <div class="ba bpa">${brAct(it.pv)}</div>${it.type==='album'&&st.spc?`<div class="lks">${`<button type="button" class="btn pri spal" data-spal><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg>Play album</button><a class="lk spo" href="${esc(spot(it))}" target="_blank" rel="noopener">Open in Spotify<span>↗</span></a>`}</div>`:''}${it.type==='set'?`<div class="lks">${it.type==='set'&&!/soundcloud\.com/.test(it.url||'')?`<a class="lk" href="${esc(scl(it))}" target="_blank" rel="noopener">Find on SoundCloud<span>↗</span></a>`:''}</div>`:''}${infoBlock({...it,info:it.info&&{...it.info,sl:null}})}${watchBlock(it)}${simBlock(it)}</div>`;
   if(keep)$('#dr .syn')?.classList.add('open')}
 $('#dr').addEventListener('click',e=>{if(cur||!brPv)return;if(e.target.closest('[data-bpx]')){closeItem();return}const a=e.target.closest('[data-ba]');if(!a)return;
   const r=brPv.pv;brIndex();const h=brHave(r);closeItem();if(h){openItem(h.id);return}brDo(r,a.dataset.ba)});
@@ -3994,7 +4022,7 @@ function spSetup(){dlg(`<h3>Play in Spotify</h3><p>To play tracks and add them t
   try{await spTok({grant_type:'authorization_code',code:q.get('code'),redirect_uri:SPR(),code_verifier:p.v})}catch(e){setTimeout(()=>toast('Spotify sign-in didn’t work. Check the redirect URI'),400);return}
   const pd=p.pend,it=pd&&st.items.find(x=>x.id===pd[0]);
   npSoon(500);if(!it){setTimeout(()=>toast('Spotify connected'),400);return}
-  SOPEN.add(it.id+'/trk');setTimeout(()=>{openItem(it.id);spDo(it,pd[1],pd[2],document.querySelector(`#dr button[data-sp${pd[2]==='q'?'q':'p'}="${pd[1]}"]`))},300)})();
+  SOPEN.add(it.id+'/trk');setTimeout(()=>{openItem(it.id);if(pd[2]==='al'){spAlbPlay(it,document.querySelector('#dr [data-spal]'));return}spDo(it,pd[1],pd[2],document.querySelector(`#dr button[data-sp${pd[2]==='q'?'q':'p'}="${pd[1]}"]`))},300)})();
 $('#dr').addEventListener('click',e=>{const b=e.target.closest('[data-spp],[data-spq]');if(!b||!cur)return;const q=b.dataset.spq!=null;spDo(cur,+(q?b.dataset.spq:b.dataset.spp),q?'q':'p',b.matches('button')?b:b.closest('li')?.querySelector('button[data-spp]'))});
 /* spotify: Now playing mini player (option A: glass pill above the phone tabs, card bottom-left on computers). Polls currently-playing every 10s while playing, 30s otherwise, only while the page is visible. */
 const NP={d:null,at:0,tm:0,anim:null};
@@ -4048,6 +4076,94 @@ async function spCmd(path,method){try{return await spApi(path,{method})}catch(e)
 function spCmdErr(e){if(e?.dev)toast(`Spotify can’t be controlled on ${e.dev} from here`);
   else if(e?.st===403)toast(e.reason==='PREMIUM_REQUIRED'||/premium/i.test(e.msg||'')?'Spotify controls need Premium':`Spotify said no${e.msg?': '+e.msg:''}${e.reason&&!/restriction/i.test(e.msg||'')?' ('+e.reason+')':''}`);
   else if(e?.st===404)toast('Spotify isn’t playing on any device right now');else if(e?.st===429)toast('Spotify is busy. Try again in a moment');else toast('Spotify didn’t respond. Try again')}
+/* spotify thread, -14: tap the artist name on an album or song page (or a browse preview) to open an artist page in the drawer:
+   Open in Spotify (the artist page itself when Spotify is connected, otherwise a Spotify search; desktop app on computers),
+   + Up next / Done for the artist, "In your library" (everything of theirs you saved) and "More by" (Deezer discography).
+   Album pages also get a ▶ Play album button that starts the whole album in Spotify, with a small Open in Spotify link beside it. */
+const AR={top:null,topN:5,pu:null,key:'',n:'',src:null,pic:'',fans:0,url:'',sp:'',by:null,busy:0,err:0};
+const arLink=it=>MUS.includes(it.type)&&it.type!=='artist'&&it.creator?`<button type="button" class="arl" data-ar title="Open artist">${esc(it.creator)}<span aria-hidden="true">›</span></button>`:esc(it.creator);
+const arParts=c=>String(c||'').split(/\s*(?:,|&|\/|\bfeat\.?|\bft\.|\bwith\b|\bx\b)\s*/i).map(brN).filter(Boolean);
+const arR=()=>({type:'artist',title:AR.n,creator:'',art:AR.pic,url:AR.url,sub:''});
+function arLib(){const k=AR.key,O={album:0,song:1};return st.items.filter(i=>i.type!=='artist'&&i.creator&&(brN(i.creator)===k||arParts(i.creator).includes(k)))
+  .sort((a,b)=>(O[a.type]??2)-(O[b.type]??2)||cmpD(relD(b),relD(a))||a.title.localeCompare(b.title))}
+function arMore(){brIndex();return(AR.by||[]).filter(r=>!brHave(r))}
+function arOpen(name,src){const k=brN(name);if(!k)return;Object.assign(AR,{top:null,topN:5,pu:new Map(),key:k,n:name,src:src||null,pic:'',fans:0,url:'',sp:'',by:null,busy:1,err:0});
+  if(!$('#dr').classList.contains('on'))layer('item');cur=null;brPv=null;$('#dr').classList.add('on');$('#shade').classList.add('on');arDraw(1);$('#dr').scrollTop=0;
+  (async()=>{try{const j=await jsonp(`https://api.deezer.com/search/artist?q=${encodeURIComponent(name)}&limit=5&output=jsonp`),l=j.data||[],a=l.find(x=>brN(x.name)===k)||l[0];
+      if(AR.key!==k)return;if(a){AR.pic=a.picture_xl||a.picture_big||'';AR.fans=a.nb_fan||0;AR.url=a.link||''}arDraw();arTop(k,a?.id);
+      const by=a?await simBy({title:'',creator:name},a.id):[];if(AR.key!==k)return;AR.by=by}catch(e){if(AR.key!==k)return;AR.err=1}
+    AR.busy=0;arDraw()})();
+  arSpot(k)}
+/* Popular: Last.fm top tracks (by listeners) when a Last.fm key is set, with covers from Deezer; otherwise Deezer's own top tracks. */
+async function arTop(k,aid){let dz=[],lf=null;
+  try{if(aid)dz=((await jsonp(`https://api.deezer.com/artist/${aid}/top?limit=50&output=jsonp`)).data||[]).map(t=>({t:t.title_short||t.title,al:t.album?.title||'',img:t.album?.cover_small||t.album?.cover_medium||'',s:t.duration||0}))}catch(e){}
+  if(st.lfm)try{const j=await getJSON(`https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${encodeURIComponent(AR.n)}&autocorrect=1&limit=50&api_key=${encodeURIComponent(st.lfm)}&format=json`);
+    lf=(j.toptracks?.track||[]).filter(t=>t.name).map(t=>{const m=dz.find(x=>brN(x.t)===brN(t.name));return{t:t.name,al:m?.al||'',img:m?.img||'',s:m?.s||+t.duration||0,ls:+t.listeners||0}})}catch(e){}
+  if(AR.key!==k)return;const seen=new Set();AR.top=(lf&&lf.length?lf:dz).filter(x=>{const n=brN(x.t);if(!n||seen.has(n))return false;seen.add(n);return true}).slice(0,50);AR.lf=!!(lf&&lf.length);arDraw()}
+const arNum=n=>n>=1e6?(n/1e6).toFixed(n>=1e7?0:1).replace(/\.0$/,'')+'M':n>=1e3?Math.round(n/1e3)+'K':String(n);
+function arTopHtml(){const L=AR.top;if(L===null)return`<div class="simh"><b>Popular</b></div><p class="wn">Loading…</p>`;if(!L.length)return'';const sp=!!st.spc;
+  return`<div class="simh"><b>Popular</b><small>${AR.lf?'Listeners on Last.fm':''}</small></div><ol class="arpop">${L.slice(0,AR.topN).map((t,i)=>`<li${sp?` data-arp="${i}" tabindex="0" title="Play in Spotify"`:''}><em>${i+1}</em>${t.img?`<img src="${esc(t.img)}" alt="" loading="lazy">`:'<u></u>'}<span><b>${esc(t.t)}</b>${t.al?`<small>${esc(t.al)}</small>`:''}</span><i>${t.ls?arNum(t.ls):t.s?mmss(t.s):''}</i>${sp?`<button type="button" class="spb" data-arq="${i}" aria-label="Add ${esc(t.t)} to Spotify queue" title="Add to Spotify queue">${SPQ}</button>`:''}</li>`).join('')}</ol><div class="armb">${L.length>AR.topN?`<button type="button" class="lk armo" data-artn="+">Show ${Math.min(15,L.length-AR.topN)} more</button>`:''}${AR.topN>5?`<button type="button" class="lk armo" data-artn="-">Show less</button>`:''}</div>`}
+async function arUri(t){const k=brN(t.t);if(AR.pu.has(k))return AR.pu.get(k);
+  const j=await spApi('/search?type=track&limit=5&market='+spMk()+'&q='+encodeURIComponent(`track:${t.t} artist:${AR.n}`)),L=j.tracks?.items||[];
+  const m=L.find(x=>spN(x.name)===spN(t.t)&&x.artists.some(a=>spN(a.name)===spN(AR.n)))||L.find(x=>x.artists.some(a=>spN(a.name)===spN(AR.n)))||null;AR.pu.set(k,m);return m}
+/* tap a popular song: plays it, then the rest of the list after it, like Spotify's artist page. The queue button adds just that song. */
+async function arPlay(i,q,el){const L=AR.top||[],t=L[i];if(!t)return;if(!st.spc){spSetup();return}if(!spA().rt){spLogin(null);return}
+  if(el){if(el.classList.contains('busy'))return;el.classList.add('busy')}
+  try{const first=await arUri(t);if(!first){toast('Couldn’t find that song on Spotify');return}
+    const rest=q?[]:(await Promise.all(L.slice(i+1,i+20).map(x=>arUri(x).catch(()=>null)))).filter(Boolean);
+    const body=JSON.stringify({uris:[first,...rest].map(x=>x.uri)});
+    const go=d=>q?spApi('/me/player/queue?uri='+encodeURIComponent(first.uri)+(d?'&device_id='+d:''),{method:'POST'}):spApi('/me/player/play'+(d?'?device_id='+d:''),{method:'PUT',body});
+    try{await go()}catch(e){if(e.st!==404)throw e;const D=(await spApi('/me/player/devices')).devices||[];const d=D.find(x=>x.is_active&&!x.is_restricted)||D.find(x=>!x.is_restricted);if(!d)throw{st:404};await go(d.id)}
+    toast(q?`Queued in Spotify: ${t.t}`:`Playing in Spotify: ${t.t}`);npSoon(700);
+    if(!q){document.querySelectorAll('#dr .arpop li.spnow').forEach(x=>x.classList.remove('spnow'));el?.closest('li')?.classList.add('spnow')}
+  }catch(e){if(e.st===401){spSet(null);spLogin(null);return}spCmdErr(e)}
+  finally{el?.classList.remove('busy')}}
+async function arSpot(k){if(!spOn())return;try{let a=null;const s=AR.src&&SPAL.get(AR.src.id);
+    if(s)for(const t of s.T)for(const x of t.artists||[])if(!a&&spN(x.name)===spN(AR.n))a=x;
+    if(!a){const j=await spApi('/search?type=artist&limit=5&market='+spMk()+'&q='+encodeURIComponent(AR.n)),L=j.artists?.items||[];a=L.find(x=>spN(x.name)===spN(AR.n))||null}
+    if(a&&AR.key===k){AR.sp=a.external_urls?.spotify||'https://open.spotify.com/artist/'+a.id;arDraw()}}catch(e){}}
+function arDraw(force){const d=$('#dr');if(!AR.key||cur||brPv||!d.classList.contains('on')||(!force&&!d.querySelector(':scope>.ar')))return;
+  brIndex();const n=AR.n,pi={id:'ar'+AR.key,type:'artist',title:n,creator:'',art:AR.pic},L=arLib(),M=arMore(),src=AR.src;
+  const sp=AR.sp||`https://open.spotify.com/search/${encodeURIComponent(n)}`,sx=[...d.querySelectorAll('.simr')].map(x=>x.scrollLeft);
+  const yr2=i=>(relD(i)||'').slice(0,4),stl=i=>i.status==='done'||i.status==='again'?'Done':i.status==='prog'?'In progress':'Up next';
+  const lib=L.length?`<div class="simh"><b>In your library</b><small>${L.length}</small></div><div class="simr">${L.map(i=>`<div class="bt" data-ari="${i.id}"><div class="bp">${brImg({title:i.title,art:i.art})}</div><div class="bm"><b>${esc(i.title)}</b><small>${[T[i.type],yr2(i),stl(i)].filter(Boolean).map(esc).join(', ')}</small></div></div>`).join('')}</div>`:'';
+  const more=AR.busy?`<div class="simh"><b>More by ${esc(n)}</b></div><div class="simr">${simSk}</div>`:AR.err?`<p class="wn">Couldn’t load their albums. <button type="button" class="sp" data-arre>Try again</button></p>`
+    :M.length?`<div class="simh"><b>${L.length?'More by '+esc(n):'Albums'}</b><small>${M.length}</small></div><div class="simr">${M.map((r,i)=>`<div class="bt" data-arm="${i}"><div class="bp">${brImg(r)}</div><div class="bm"><b>${esc(r.title)}</b><small>${esc(r.extra?.year||'')}</small></div><div class="ba">${brAct(r)}</div></div>`).join('')}</div>`:'';
+  d.innerHTML=`<div class="ip ar ${shape('album')}" style="${cs(src||pi)}"><button class="x" data-arx aria-label="Close">×</button>
+   <div class="hero">${cover(pi,'big ini round')}<div class="ttl"><div class="mt">Artist${AR.fans?`, ${AR.fans.toLocaleString()} fans`:''}</div><h2>${esc(n)}</h2>${src?`<p><button type="button" class="arl" data-arb>‹ ${esc(src.title)}</button></p>`:''}</div></div>
+   <div class="lks"><a class="btn pri spal" href="${esc(sp)}" target="_blank" rel="noopener">Open in Spotify<span aria-hidden="true">↗</span></a></div>
+   <div class="ba bpa">${brAct(arR())}</div>
+   <section class="arw">${arTopHtml()}${lib}${more}</section></div>`;
+  d.querySelectorAll('.simr').forEach((x,i)=>x.scrollLeft=sx[i]||0)}
+async function spAlbPlay(it,btn){if(!it)return;if(!st.spc){spSetup();return}
+  if(!spA().rt){spLogin(st.items.includes(it)?[it.id,0,'al']:null);return}
+  if(btn){if(btn.classList.contains('busy'))return;btn.classList.add('busy')}
+  try{const al=await spAlbum(it);if(!al){spLinkT('Couldn’t find this album on Spotify','Search Spotify',spot(it));return}
+    const body=JSON.stringify({context_uri:'spotify:album:'+al.id,offset:{position:0}}),go=d=>spApi('/me/player/play'+(d?'?device_id='+d:''),{method:'PUT',body});
+    try{await go()}catch(e){if(e.st!==404)throw e;const D=(await spApi('/me/player/devices')).devices||[];const d=D.find(x=>x.is_active&&!x.is_restricted)||D.find(x=>!x.is_restricted);if(!d)throw{st:404};await go(d.id)}
+    toast(`Playing in Spotify: ${it.title}`);npSoon(700)
+  }catch(e){const url=spot(it);
+    if(e.st===401){spSet(null);spLogin(st.items.includes(it)?[it.id,0,'al']:null);return}
+    if(e.st===404)spLinkT('Spotify isn’t open anywhere. Open it, then try again','Open Spotify',url);
+    else if(e.st===403)spLinkT(e.reason==='PREMIUM_REQUIRED'||/premium/i.test(e.msg)?'Playing from Checkit needs Spotify Premium':`Spotify said no (${e.st} on ${e.path||'?'})${e.msg?': '+e.msg:''}`,'Open album',url);
+    else if(e.st===429)toast('Spotify is busy. Try again in a moment');
+    else toast('Spotify didn’t respond. Try again')}
+  finally{btn?.classList.remove('busy')}}
+$('#dr').addEventListener('click',e=>{const t=e.target,b=x=>t.closest(x);
+  const pa=b('[data-spal]');if(pa){e.stopImmediatePropagation();spAlbPlay(cur||brPv,pa);return}
+  if(b('[data-ar]')){e.stopImmediatePropagation();const it=cur||brPv;if(it?.creator)arOpen(it.creator,it);return}
+  if(!AR.key||cur||brPv||!b('#dr>.ar'))return;e.stopImmediatePropagation();
+  if(b('[data-arx]')){AR.key='';closeItem();return}
+  if(b('[data-arre]')){arOpen(AR.n,AR.src);return}
+  const tn=b('[data-artn]');if(tn){AR.topN=tn.dataset.artn==='+'?Math.min((AR.top||[]).length,AR.topN+15):5;arDraw();return}
+  const aq=b('[data-arq]');if(aq){arPlay(+aq.dataset.arq,1,aq);return}
+  const ap=b('[data-arp]');if(ap){arPlay(+ap.dataset.arp,0,ap);return}
+  if(b('[data-arb]')){const s=AR.src;AR.key='';if(s&&st.items.includes(s))openItem(s.id);else if(s?.pv)brOpen(s.pv);return}
+  const li=b('[data-ari]');if(li){AR.key='';openItem(li.dataset.ari);return}
+  const ba=b('[data-ba]'),m=b('[data-arm]'),r=m?arMore()[+m.dataset.arm]:ba?arR():null;if(!r)return;
+  if(ba){brDo(r,ba.dataset.ba);render();arDraw();return}
+  if(b('.bp,.bm')){brIndex();const h=brHave(r);AR.key='';if(h)openItem(h.id);else{brOpen(r);$('#dr').scrollTop=0}}},true);
+
 /* spotify: big Now playing turntable (spotify thread, 2026.11.25-10). Opens from the mini player. Colored vinyl drawn on a canvas (cover colors, track bands, current band glow, cover label). Tonearm shows the position across the album; drag it, or spin the record, to seek; tap a band to drop the needle on that song; tap the label to play or pause. Album sleeve beside the deck on computers; the record slides out and back when the album changes. Queue from /me/player/queue. */
 const BP={on:0,el:null,d:null,alb:{},al:null,rot:0,spd:0,boost:0,armA:3,drag:null,raf:0,key:'',qkey:'',col:{},last:0,lay:0};
 const BPTH=[['walnut','Walnut & Brass'],['studio','Studio Black'],['neon','Neon'],['sunset','Sunset 70s']];
