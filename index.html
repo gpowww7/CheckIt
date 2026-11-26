@@ -1167,7 +1167,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-15</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-16</small>
     </div></details>
   </div>
 </header>
@@ -4521,7 +4521,7 @@ async function sync(){if(!sbUser||!sb)return;if(syncing){syncAgain=true;return}s
     for(let i=0;i<up.length;i+=200){const {error:e}=await sb.from('items').upsert(up.slice(i,i+200),{onConflict:'user_id,id'});if(e)throw e}
     for(const u of up){if(u.deleted)delete ss.base[u.id];else ss.base[u.id]=JSON.stringify(u.data);delete ss.mt[u.id]}
     ss.last=maxT||ss.last||new Date(0).toISOString();saveSS();lastSyncAt=Date.now();
-    if(changed){saveLocal();if(cur)cur=st.items.find(i=>i.id===cur.id)||null;if(!cur)closeItem();else drawItem();render()}
+    if(changed){saveLocal();if(cur){cur=st.items.find(i=>i.id===cur.id)||null;if(!cur)closeItem();else drawItem()}render()}
     if(first&&(up.length||rows.length))toast(up.length?`Synced. ${up.length} item${up.length===1?'':'s'} from this device added to your account`:'Synced with your account')
   }catch(e){syncErr=e?.message||'Sync failed';saveSS()}
   finally{syncing=false;if(syncAgain){syncAgain=false;syncSoon(500)}}}
