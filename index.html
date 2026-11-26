@@ -1050,7 +1050,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-5</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-7</small>
     </div></details>
   </div>
 </header>
@@ -3844,7 +3844,7 @@ async function spApi(path,opt={}){const t=await spToken();if(!t)throw{st:401};
   const r=await fetch('https://api.spotify.com/v1'+path,{...opt,headers:{Authorization:'Bearer '+t,...(opt.body?{'Content-Type':'application/json'}:{})}});
   if(r.status===204||r.status===202)return{};let j={};try{j=await r.json()}catch(e){}
   if(r.status===401)spSet({...spA(),at:'',exp:0});
-  if(!r.ok)throw{st:r.status,reason:j.error?.reason||'',msg:j.error?.message||''};return j}
+  if(!r.ok){const er={st:r.status,reason:j.error?.reason||'',msg:j.error?.message||(typeof j.error==='string'?j.error:''),path:path.split('?')[0]};try{console.warn('Spotify',er)}catch(x){}throw er}return j}
 const spN=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\(.*?\)|\[.*?\]|feat\..*$| - .*$/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').trim();
 const SPAL=new Map();
 async function spAlbum(it){if(SPAL.has(it.id))return SPAL.get(it.id);
@@ -3864,7 +3864,7 @@ async function spDo(it,i,act,btn){const t=it?.info?.tracks?.[i];if(!t)return;
   if(!spA().rt){spLogin([it.id,i,act]);return}
   if(btn){if(btn.classList.contains('busy'))return;btn.classList.add('busy')}
   let tr=null,al=null;
-  try{al=await spAlbum(it).catch(e=>{if(e.st===401)throw e;return null});tr=al&&spMatch(al,t,i,it.info.tracks.length);
+  try{al=await spAlbum(it).catch(e=>{if(e.st===401||e.st===403)throw e;return null});tr=al&&spMatch(al,t,i,it.info.tracks.length);
     if(!tr){al=null;const j=await spApi('/search?type=track&limit=5&market=from_token&q='+encodeURIComponent(`track:${t.t} artist:${t.a||it.creator||''}`));tr=j.tracks?.items?.[0]||null}
     if(!tr){toast('Couldn’t find that track on Spotify');return}
     const body=JSON.stringify(al?{context_uri:'spotify:album:'+al.id,offset:{uri:tr.uri}}:{uris:[tr.uri]});
@@ -3875,7 +3875,7 @@ async function spDo(it,i,act,btn){const t=it?.info?.tracks?.[i];if(!t)return;
   }catch(e){const url=tr?.external_urls?.spotify||(tr?'https://open.spotify.com/track/'+tr.id:spot(it));
     if(e.st===401){spSet(null);spLogin([it.id,i,act]);return}
     if(e.st===404)spLinkT('Spotify isn’t open anywhere. Open it, then try again','Open Spotify',url);
-    else if(e.st===403)spLinkT(e.reason==='PREMIUM_REQUIRED'||/premium/i.test(e.msg)?'Playing from Checkit needs Spotify Premium':'Spotify didn’t allow that. This account may not be added to the app yet','Open track',url);
+    else if(e.st===403)spLinkT(e.reason==='PREMIUM_REQUIRED'||/premium/i.test(e.msg)?'Playing from Checkit needs Spotify Premium':`Spotify said no (${e.st} on ${e.path||'?'})${e.msg?': '+e.msg:''}`,'Open track',url);
     else if(e.st===429)toast('Spotify is busy. Try again in a moment');
     else toast('Spotify didn’t respond. Try again')}
   finally{btn?.classList.remove('busy')}}
