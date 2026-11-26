@@ -1050,7 +1050,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-7</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-8</small>
     </div></details>
   </div>
 </header>
@@ -3846,15 +3846,16 @@ async function spApi(path,opt={}){const t=await spToken();if(!t)throw{st:401};
   if(r.status===401)spSet({...spA(),at:'',exp:0});
   if(!r.ok){const er={st:r.status,reason:j.error?.reason||'',msg:j.error?.message||(typeof j.error==='string'?j.error:''),path:path.split('?')[0]};try{console.warn('Spotify',er)}catch(x){}throw er}return j}
 const spN=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\(.*?\)|\[.*?\]|feat\..*$| - .*$/g,'').replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').trim();
+const spMk=()=>/^[A-Z]{2}$/.test(st.region||'')?st.region:'US';
 const SPAL=new Map();
 async function spAlbum(it){if(SPAL.has(it.id))return SPAL.get(it.id);
   let id=(it.spotify||'').match(/album\/([A-Za-z0-9]{22})/)?.[1];
   if(!id){const n=it.info?.tracks?.length||0,tn=spN(it.title),an=spN(it.creator);
-    const j=await spApi('/search?type=album&limit=10&market=from_token&q='+encodeURIComponent(`album:${it.title} artist:${it.creator||''}`));
+    const j=await spApi('/search?type=album&limit=10&market='+spMk()+'&q='+encodeURIComponent(`album:${it.title} artist:${it.creator||''}`));
     const L=j.albums?.items||[],ok=a=>spN(a.name)===tn&&(!an||a.artists.some(x=>spN(x.name)===an));
     const p=L.find(a=>ok(a)&&(!n||a.total_tracks===n))||L.find(ok);
     if(!p){SPAL.set(it.id,null);return null}id=p.id;if(!it.spotify&&st.items.includes(it)){it.spotify='https://open.spotify.com/album/'+id;delete it.spTry;save()}}
-  const T=[];let u=`/albums/${id}/tracks?limit=50&market=from_token`;
+  const T=[];let u=`/albums/${id}/tracks?limit=50&market=${spMk()}`;
   while(u){const j=await spApi(u);T.push(...(j.items||[]));u=j.next?j.next.replace('https://api.spotify.com/v1',''):''}
   const o={id,T};SPAL.set(it.id,o);return o}
 function spMatch(al,t,i,n){const k=spN(t.t),T=al.T;return T.find(x=>spN(x.name)===k)||T.find(x=>{const n=spN(x.name);return n&&k&&(n.startsWith(k)||k.startsWith(n))})||(T.length===n?T[i]:null)}
@@ -3865,7 +3866,7 @@ async function spDo(it,i,act,btn){const t=it?.info?.tracks?.[i];if(!t)return;
   if(btn){if(btn.classList.contains('busy'))return;btn.classList.add('busy')}
   let tr=null,al=null;
   try{al=await spAlbum(it).catch(e=>{if(e.st===401||e.st===403)throw e;return null});tr=al&&spMatch(al,t,i,it.info.tracks.length);
-    if(!tr){al=null;const j=await spApi('/search?type=track&limit=5&market=from_token&q='+encodeURIComponent(`track:${t.t} artist:${t.a||it.creator||''}`));tr=j.tracks?.items?.[0]||null}
+    if(!tr){al=null;const j=await spApi('/search?type=track&limit=5&market='+spMk()+'&q='+encodeURIComponent(`track:${t.t} artist:${t.a||it.creator||''}`));tr=j.tracks?.items?.[0]||null}
     if(!tr){toast('Couldn’t find that track on Spotify');return}
     const body=JSON.stringify(al?{context_uri:'spotify:album:'+al.id,offset:{uri:tr.uri}}:{uris:[tr.uri]});
     const go=d=>act==='q'?spApi('/me/player/queue?uri='+encodeURIComponent(tr.uri)+(d?'&device_id='+d:''),{method:'POST'}):spApi('/me/player/play'+(d?'?device_id='+d:''),{method:'PUT',body});
@@ -3899,7 +3900,7 @@ function npEl(){let e=$('#npb');if(e)return e;e=document.createElement('div');e.
   document.body.append(e);e.addEventListener('click',npClick);return e}
 function npSoon(ms){clearTimeout(NP.tm);NP.tm=setTimeout(npPoll,ms||0)}
 async function npPoll(){clearTimeout(NP.tm);if(!spOn()||document.hidden){if(!spOn())npShow(null);return}
-  try{const j=await spApi('/me/player/currently-playing?market=from_token');NP.d=j&&j.item&&j.currently_playing_type!=='ad'?j:null;NP.at=Date.now()}catch(e){if(e.st===401||e.st===403)NP.d=null}
+  try{const j=await spApi('/me/player/currently-playing?market='+spMk());NP.d=j&&j.item&&j.currently_playing_type!=='ad'?j:null;NP.at=Date.now()}catch(e){if(e.st===401||e.st===403)NP.d=null}
   npShow(NP.d);const d=NP.d;let w=d?.is_playing?10000:30000;if(d?.is_playing&&d.item.duration_ms)w=Math.min(w,Math.max(1500,d.item.duration_ms-(d.progress_ms||0)+800));NP.tm=setTimeout(npPoll,w)}
 function npShow(d){const e=npEl();if(!d){if(!e.hidden){e.hidden=true;document.body.classList.remove('npon')}return}
   const it=d.item,im=it.album?.images||[],art=(im.find(x=>x.width&&x.width<=300)||im[im.length-1]||{}).url||'';
