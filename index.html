@@ -1139,7 +1139,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-13</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-14</small>
     </div></details>
   </div>
 </header>
@@ -4020,9 +4020,9 @@ function npMark(){const L=document.querySelectorAll('#dr .trk.spt li');if(!L.len
   L.forEach(li=>li.classList.toggle('spnow',!!on&&spN(li.querySelector('span')?.firstChild?.textContent)===k))}
 async function npClick(e){const b=e.target.closest('[data-npk]');if(!b)return;const k=b.dataset.npk,d=NP.d;
   if(k==='open'){bpOpen();return}
-  try{if(k==='pp'){const p=!!d?.is_playing;if(d){d.is_playing=!p;d.progress_ms=(d.progress_ms||0)+(p?Date.now()-NP.at:0);NP.at=Date.now();npShow(d)}await spApi('/me/player/'+(p?'pause':'play'),{method:'PUT'})}
-    else await spApi('/me/player/'+(k==='prev'?'previous':'next'),{method:'POST'});npSoon(k==='pp'?1500:600)}
-  catch(er){npSoon(300);if(er.st===403)toast('Spotify didn’t allow that. Controls need Premium');else if(er.st===404)toast('Spotify isn’t playing on any device right now');else toast('Spotify didn’t respond. Try again')}}
+  try{if(k==='pp'){const p=!!d?.is_playing;if(d){d.is_playing=!p;d.progress_ms=(d.progress_ms||0)+(p?Date.now()-NP.at:0);NP.at=Date.now();npShow(d)}await spCmd('/me/player/'+(p?'pause':'play'),'PUT')}
+    else await spCmd('/me/player/'+(k==='prev'?'previous':'next'),'POST');npSoon(k==='pp'?1500:600)}
+  catch(er){npSoon(300);spCmdErr(er)}}
 {const d0=drawItem;drawItem=function(){const r=d0.apply(this,arguments);npMark();return r}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&spOn())npSoon(200)});
 if(spOn())npSoon(600);
@@ -4035,6 +4035,19 @@ function spUri(u){try{const x=new URL(u);if(!/(^|\.)spotify\.com$/.test(x.hostna
 function spOpen(u){const r=spApp()&&spUri(u);if(r)location.href=r;else window.open(u,'_blank','noopener')}
 document.addEventListener('click',e=>{if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||!spApp())return;const a=e.target.closest?.('a[href*="spotify.com"]');if(!a)return;const r=spUri(a.href);if(!r)return;e.preventDefault();location.href=r},true);
 
+/* spotify thread, -14: player commands (play, pause, next, previous, seek) go through spCmd. When Spotify says no (403) or finds no device (404),
+   it reads the real player state: a pause while already paused, or a play while already playing, counts as done (the app's state was just stale);
+   otherwise it retries once on the active device. Errors show Spotify's own reason instead of always blaming Premium. */
+async function spCmd(path,method){try{return await spApi(path,{method})}catch(e){if(e.st!==403&&e.st!==404)throw e;
+  let pl=null;try{pl=await spApi('/me/player?market='+spMk())}catch(_){}const dv=pl?.device,base=path.split('?')[0];
+  if(dv&&base.endsWith('/pause')&&!pl.is_playing)return{};
+  if(dv&&base.endsWith('/play')&&pl.is_playing)return{};
+  if(dv?.is_restricted)throw{...e,dev:dv.name||'that device'};
+  let id=dv?.id;if(!id){const D=(await spApi('/me/player/devices')).devices||[];id=(D.find(x=>x.is_active&&!x.is_restricted)||D.find(x=>!x.is_restricted))?.id}
+  if(!id)throw e;return await spApi(path+(path.includes('?')?'&':'?')+'device_id='+encodeURIComponent(id),{method})}}
+function spCmdErr(e){if(e?.dev)toast(`Spotify can’t be controlled on ${e.dev} from here`);
+  else if(e?.st===403)toast(e.reason==='PREMIUM_REQUIRED'||/premium/i.test(e.msg||'')?'Spotify controls need Premium':`Spotify said no${e.msg?': '+e.msg:''}${e.reason&&!/restriction/i.test(e.msg||'')?' ('+e.reason+')':''}`);
+  else if(e?.st===404)toast('Spotify isn’t playing on any device right now');else if(e?.st===429)toast('Spotify is busy. Try again in a moment');else toast('Spotify didn’t respond. Try again')}
 /* spotify: big Now playing turntable (spotify thread, 2026.11.25-10). Opens from the mini player. Colored vinyl drawn on a canvas (cover colors, track bands, current band glow, cover label). Tonearm shows the position across the album; drag it, or spin the record, to seek; tap a band to drop the needle on that song; tap the label to play or pause. Album sleeve beside the deck on computers; the record slides out and back when the album changes. Queue from /me/player/queue. */
 const BP={on:0,el:null,d:null,alb:{},al:null,rot:0,spd:0,boost:0,armA:3,drag:null,raf:0,key:'',qkey:'',col:{},last:0,lay:0};
 const BPTH=[['walnut','Walnut & Brass'],['studio','Studio Black'],['neon','Neon'],['sunset','Sunset 70s']];
@@ -4179,10 +4192,10 @@ async function bpDrop(f,startOfTrack){const al=BP.al,d=BP.d;if(!d)return;
   try{await spApi('/me/player/play',{method:'PUT',body:JSON.stringify({context_uri:'spotify:album:'+al.id,offset:{uri:t.uri},position_ms:pos})});
     BP.d={...d,is_playing:true,progress_ms:pos,item:{...d.item,id:t.id,name:t.name,duration_ms:t.duration_ms,uri:t.uri,external_urls:t.external_urls}};NP.d=BP.d;NP.at=Date.now();bpSync(BP.d);npShow(BP.d);npSoon(900)}catch(e){bpErr(e)}}
 async function bpSeek(ms){const d=BP.d;if(!d)return;ms=Math.max(0,Math.min((d.item?.duration_ms||1)-500,Math.round(ms)));d.progress_ms=ms;NP.at=Date.now();
-  try{await spApi('/me/player/seek?position_ms='+ms,{method:'PUT'});npSoon(1200)}catch(e){bpErr(e)}}
-function bpErr(e){npSoon(300);if(e?.st===403)toast('Spotify didn’t allow that. Controls need Premium');else if(e?.st===404)toast('Spotify isn’t playing on any device right now');else toast('Spotify didn’t respond. Try again')}
-async function bpAct(k){const d=BP.d;try{if(k==='pp'){const p=!!d?.is_playing;if(d){d.progress_ms=bpPos();d.is_playing=!p;NP.at=Date.now();bpSync(d);npShow(d)}await spApi('/me/player/'+(p?'pause':'play'),{method:'PUT'});npSoon(1500)}
-  else{await spApi('/me/player/'+(k==='prev'?'previous':'next'),{method:'POST'});npSoon(500)}}catch(e){bpErr(e)}}
+  try{await spCmd('/me/player/seek?position_ms='+ms,'PUT');npSoon(1200)}catch(e){bpErr(e)}}
+function bpErr(e){npSoon(300);spCmdErr(e)}
+async function bpAct(k){const d=BP.d;try{if(k==='pp'){const p=!!d?.is_playing;if(d){d.progress_ms=bpPos();d.is_playing=!p;NP.at=Date.now();bpSync(d);npShow(d)}await spCmd('/me/player/'+(p?'pause':'play'),'PUT');npSoon(1500)}
+  else{await spCmd('/me/player/'+(k==='prev'?'previous':'next'),'POST');npSoon(500)}}catch(e){bpErr(e)}}
 /* queue */
 async function bpQueue(force){if(!BP.on)return;let j;try{j=await spApi('/me/player/queue')}catch(e){return}const Q=(j.queue||[]).slice(0,20),ol=BP.el.querySelector('.bpqq');
   const k=Q.map(t=>t.id).join(',');if(k===BP.qkey&&!force)return;BP.qkey=k;
