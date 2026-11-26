@@ -1050,7 +1050,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-8</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-9</small>
     </div></details>
   </div>
 </header>
@@ -1298,7 +1298,7 @@ const sorted=list=>{const l=[...list];
   else if(st.sort==='revisit')l.sort((a,b)=>(b.rv||0)-(a.rv||0)||(b.rating||0)-(a.rating||0));
   else if(st.sort==='type')l.sort((a,b)=>Object.keys(T).indexOf(a.type)-Object.keys(T).indexOf(b.type)||a.title.localeCompare(b.title));
   else if(st.sort==='status'){const o=['prog','check','again','done'],r=i=>o.indexOf(i.status)*2+(i.dnf?1:0);l.sort((a,b)=>r(a)-r(b)||a.title.localeCompare(b.title))}
-  else if(st.sort==='creator'){const ck=i=>fold(i.type==='artist'?i.title:(i.creator||'')).replace(/^the\s+/,'');l.sort((a,b)=>!ck(a)-!ck(b)||ck(a).localeCompare(ck(b))||(a.type==='artist'?0:1)-(b.type==='artist'?0:1)||(relYr(a)||9999)-(relYr(b)||9999)||a.title.localeCompare(b.title))}
+  else if(st.sort==='creator'){const ck=i=>fold(i.type==='artist'?i.title:(i.creator||'')).replace(/^the\s+/,'');l.sort((a,b)=>!ck(a)-!ck(b)||ck(a).localeCompare(ck(b))||(a.type==='artist'?0:1)-(b.type==='artist'?0:1)||cmpD(relD(a),relD(b))||a.title.localeCompare(b.title))}
   else if(st.sort==='by')l.sort((a,b)=>!a.by-!b.by||(a.by||'').localeCompare(b.by||'')||a.title.localeCompare(b.title));
   else if(st.sort==='rating')l.sort((a,b)=>(b.rating||0)-(a.rating||0)||(b.rv||0)-(a.rv||0)||a.title.localeCompare(b.title));
   else if(st.sort==='done')l.sort((a,b)=>(b.doneAt||'').localeCompare(a.doneAt||'')||b.added.localeCompare(a.added));
@@ -1329,7 +1329,22 @@ const segOf={todo:i=>i.status!=='done',done:i=>i.status==='done'||i.status==='ag
 const LSUB={todo:[['','All to do'],['prog','In progress'],['check','Check out'],['again','Revisit']],done:[['','All done'],['unrated','Unrated'],['dnf','Didn’t finish']]};
 const SEGN={todo:'to do',done:'done',fav:'favorites',all:'saved'};
 const lf={q:''};
-const relYr=it=>+(it.extra?.year||String(it.info?.date||'').slice(0,4))||0;
+const relYr=it=>+relD(it).slice(0,4)||0;
+/* Sort by artist puts each artist's albums oldest first by original release. relD is the earliest date known for an item: extra.od (first release
+   date from MusicBrainz, since Deezer's date is often a remaster or reissue), info.date, extra.date, then extra.year. Undated items go last. relYr (year sort, list subtitles) uses it too. */
+const relD=it=>{const y=String(it.extra?.year||'').slice(0,4);return[it.extra?.od,it.info?.date,it.extra?.date].map(d=>String(d||'')).filter(d=>/^\d{4}/.test(d)&&!d.startsWith('0000')).concat(/^\d{4}$/.test(y)?[y]:[]).sort((a,b)=>a.slice(0,4)-b.slice(0,4)||b.length-a.length)[0]||''};
+const cmpD=(a,b)=>!a-!b||(a<b?-1:a>b?1:0);
+/* Background fill of original release dates while sorting by artist: one MusicBrainz lookup a second, saved as
+   extra.od (a miss is remembered as extra.odAt for 30 days). Saves and redraws once when a batch of answers is in. */
+const odAsked=new Set();let odT=0,odQ=Promise.resolve();
+function odFill(list){const now=Date.now(),need=list.filter(i=>i.type==='album'&&i.title&&i.creator&&!i.sample&&!i.extra?.od&&!(now-(i.extra?.odAt||0)<30*864e5)&&!odAsked.has(i.id)).slice(0,60);
+  need.forEach(it=>{odAsked.add(it.id);const run=async()=>{const t=it.title.replace(/\s*[\(\[].*?[\)\]]/g,'').replace(/\s+-\s+.*$/,'').replace(/"/g,'').trim()||it.title.replace(/"/g,'');
+      const j=await getJSON(`https://musicbrainz.org/ws/2/release-group/?query=${encodeURIComponent(`releasegroup:"${t}" AND artist:"${it.creator.replace(/"/g,'')}"`)}&fmt=json&limit=8`),k=brN(t),
+        l=(j['release-groups']||[]).filter(x=>x['first-release-date']&&(x['artist-credit']||[]).some(c=>brN(c.name||c.artist?.name)===brN(it.creator))),
+        m=l.find(x=>brN(x.title)===k)||l.find(x=>k.length>=6&&(brN(x.title).startsWith(k)||k.startsWith(brN(x.title))));
+      it.extra={...it.extra};if(m){it.extra.od=m['first-release-date'];delete it.extra.odAt}else it.extra.odAt=Date.now();
+      clearTimeout(odT);odT=setTimeout(()=>{save();if(st.sort==='creator')render()},1500)};
+    odQ=odQ.then(run).catch(()=>{}).then(()=>new Promise(z=>setTimeout(z,1100)))})}
 const rFmt=r=>Math.floor(r)+(r%1?'½':'');
 if(!st.lseg){const s=st.stat;st.lseg=['done','dnf'].includes(s)?'done':s==='fav'?'fav':s==='all'?'all':'todo';st.lsub=['check','prog','again','dnf'].includes(s)?s:'';
   st.sorts={todo:'next',done:'done',fav:'rank',all:st.sort&&st.sort!=='color'?st.sort:'added'};st.sort=st.sorts[st.lseg];st.sortRev=false}
@@ -1375,7 +1390,7 @@ function libBar(){const base=st.items.filter(i=>inGrp(i,st.grp)),segAll=st.items
 function libPills(){const p=[];if(lf.q.trim())p.push(['q',`“${esc(lf.q.trim())}”`]);if(st.lrate)p.push(['rate',st.lrate==='none'?'Unrated':'★ '+st.lrate+'+']);st.ltag.forEach(t=>p.push(['tag:'+t,esc(t)]));if(st.lby)p.push(['by','From '+esc(st.lby)]);return p}
 function drawLibView(sample){$('#filters').innerHTML=libBar();drawLibBody(sample)}
 function drawLibBody(sample){const v=$('#view'),sm=$('#sum');if(sample===undefined)sample=st.items.some(i=>i.sample)?`<span class="smp">These are sample items.<button id="clr">Clear samples</button></span>`:'';
-  const wl=st.layout==='wall',s0=[st.sort,st.sortRev];if(wl){st.sort='color';st.sortRev=false}const list=sorted(st.items.filter(libMatch));if(wl)[st.sort,st.sortRev]=s0;const segN=st.items.filter(i=>lsOk(i)&&subOk(i,st.lsub)).length,pills=libPills();
+  const wl=st.layout==='wall',s0=[st.sort,st.sortRev];if(wl){st.sort='color';st.sortRev=false}const list=sorted(st.items.filter(libMatch));if(wl)[st.sort,st.sortRev]=s0;else if(st.sort==='creator')odFill(list);const segN=st.items.filter(i=>lsOk(i)&&subOk(i,st.lsub)).length,pills=libPills();
   const unr=st.items.filter(i=>inGrp(i,st.grp)&&segOf.done(i)&&!i.rating).length,favs=st.items.filter(i=>inGrp(i,st.grp)&&i.fav);
   const cta=st.lseg==='done'&&unr?`<button type="button" class="lcta" data-rate>Rate ${unr} unrated</button>`:st.lseg==='fav'&&favs.length>1?`<button type="button" class="lcta" data-rank>${favs.some(i=>i.fr!=null)?(favs.some(i=>i.fr==null)&&st.grp!=='all'?'Rank '+favs.filter(i=>i.fr==null).length+' new':'Edit ranking'):'Rank your favorites'}</button>`:st.lseg==='todo'&&list.length>1?`<button type="button" class="lcta" data-lpick>Pick one for me</button>`:'';
   const rankOn=st.sort==='rank'&&st.grp!=='all';
