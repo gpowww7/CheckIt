@@ -1039,6 +1039,54 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(safe-area-inset-bottom,0px))}
 @media(min-width:761px){#npb{left:20px;right:auto;bottom:20px;width:360px}.npc .nppv{display:grid}body.npon main{padding-bottom:96px}body.npon .toast{bottom:24px}}
 @media(prefers-reduced-motion:reduce){#npb,.npeq i{animation:none}}
+/* spotify: big Now playing turntable (#bp) */
+#bp{position:fixed;inset:0;z-index:90;color:#fff;overflow:hidden auto;overscroll-behavior:contain;background:#0d0c12;font-size:15px;line-height:1.3;--c1:#c43b6d;--c2:#f4a259}
+#bp[hidden]{display:none}body.bpon{overflow:hidden}body.bpon #npb{display:none}body.bpon .toast{z-index:95}
+#bp .bpbg{position:fixed;inset:-20%;pointer-events:none;background:radial-gradient(40% 35% at 30% 28%,color-mix(in srgb,var(--c1) 60%,transparent),transparent 70%),radial-gradient(45% 40% at 75% 62%,color-mix(in srgb,var(--c2) 40%,transparent),transparent 70%),radial-gradient(50% 50% at 50% 105%,color-mix(in srgb,var(--c1) 35%,#1a1530),transparent 70%);filter:blur(30px);transition:background 1s}
+#bp.play .bpbg{animation:bpbr 6s ease-in-out infinite}@keyframes bpbr{50%{opacity:.75;transform:scale(1.04)}}
+#bp .bpin{position:relative;min-height:100%;display:grid}
+#bp button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+#bp .bptop{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);touch-action:none}
+#bp .bptop span{text-align:center;min-width:0}#bp .bptop b{display:block;text-transform:none;letter-spacing:0;font-size:13px;color:#fff;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bp .bpi{flex:none;width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.08)}#bp .bpi svg{width:20px;height:20px}#bp .bpi:hover{background:rgba(255,255,255,.14)}
+#bp .bpvis{position:relative}
+#bp .deck{position:relative;aspect-ratio:1.12;border-radius:20px;background:linear-gradient(150deg,#2b2a31,#15151a 70%);box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,255,255,.05);user-select:none;-webkit-user-select:none}
+#bp .deck::after{content:"";position:absolute;inset:0;border-radius:20px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px);pointer-events:none}
+#bp .plat{position:absolute;left:5%;top:5.5%;width:80%;aspect-ratio:1;border-radius:50%;background:repeating-conic-gradient(#3b3b42 0 2.2deg,#232328 2.2deg 4.5deg);box-shadow:0 10px 30px rgba(0,0,0,.6);touch-action:none;cursor:grab;will-change:transform}
+#bp .plat:active{cursor:grabbing}
+#bp .vinw{position:absolute;inset:2.6%}#bp canvas.vin{display:block;width:100%;height:100%;border-radius:50%}
+#bp .sheen{position:absolute;left:7.08%;top:7.83%;width:75.84%;aspect-ratio:1;border-radius:50%;pointer-events:none;background:conic-gradient(from 300deg,transparent 0 8%,rgba(255,255,255,.2) 12%,transparent 18% 55%,rgba(255,255,255,.13) 60%,transparent 66%);mix-blend-mode:screen}
+#bp .arm{position:absolute;right:7%;top:7%;width:15%;aspect-ratio:1;touch-action:none;cursor:grab}
+#bp .arm .base{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 40% 35%,#e9e9ee,#8d8d96 60%,#4a4a52);box-shadow:0 6px 14px rgba(0,0,0,.6)}
+#bp .arm .rod{position:absolute;left:50%;top:50%;width:6%;height:430%;transform-origin:50% 0;transform:translateX(-50%) rotate(2deg);background:linear-gradient(90deg,#9a9aa2,#f0f0f4 45%,#8a8a92);border-radius:4px;box-shadow:3px 6px 10px rgba(0,0,0,.5)}
+#bp .arm .rod::before{content:"";position:absolute;inset:0 -7px}
+#bp .arm .hs{position:absolute;left:50%;bottom:-6%;width:420%;height:13%;transform:translateX(-50%) rotate(-18deg);background:linear-gradient(#2c2c33,#121216);border-radius:3px;box-shadow:0 4px 8px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.15);transition:box-shadow .3s,transform .3s}
+#bp .arm.lift .hs{box-shadow:0 12px 16px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.15);transform:translateX(-50%) rotate(-18deg) translateY(-3px) scale(1.06)}
+#bp .arm .cw{position:absolute;left:50%;top:-55%;width:42%;height:60%;transform:translateX(-50%);border-radius:6px;background:linear-gradient(90deg,#55555d,#c9c9cf 50%,#55555d)}
+#bp .knob{position:absolute;right:7%;bottom:8%;display:flex;gap:6px}
+#bp .knob button{padding:5px 7px;border-radius:5px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);font:600 10px/1 "Inter Tight",sans-serif;letter-spacing:.08em}#bp .knob button.on{background:rgba(255,215,140,.18);color:#ffd78c}
+#bp .led{position:absolute;left:5.5%;bottom:5%;width:7px;height:7px;border-radius:50%;background:#5a2230;transition:.4s}#bp.play .led{background:#ff4d6d;box-shadow:0 0 10px #ff4d6d}
+#bp .bpsl{display:none}
+#bp .bpti{display:flex;align-items:flex-end;gap:12px}#bp .bpti div{flex:1;min-width:0}#bp h2{margin:0;font:400 26px/1.1 Righteous,"Inter Tight",sans-serif;overflow-wrap:anywhere}#bp .bpti p{margin:4px 0 0;color:rgba(255,255,255,.7)}
+#bp .bphv{width:36px;height:36px;display:grid;place-items:center;color:rgba(255,255,255,.7)}#bp .bphv svg{width:26px;height:26px}#bp .bphv.on{color:#ff5c8a}
+#bp .bppg input{-webkit-appearance:none;appearance:none;width:100%;height:20px;margin:0;background:transparent;cursor:pointer;--p:0%}
+#bp .bppg input::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(90deg,#fff var(--p),rgba(255,255,255,.18) var(--p))}
+#bp .bppg input::-moz-range-track{height:4px;border-radius:4px;background:linear-gradient(90deg,#fff var(--p),rgba(255,255,255,.18) var(--p))}
+#bp .bppg input::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#fff;margin-top:-4.5px;border:0}
+#bp .bppg input::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#fff;border:0}
+#bp .bptm{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;font-variant-numeric:tabular-nums}
+#bp .bpct{display:flex;justify-content:center;align-items:center;gap:34px}#bp .bpct button{display:grid;place-items:center;width:48px;height:48px;border-radius:50%}#bp .bpct svg{width:30px;height:30px}#bp .bpct .pp{width:68px;height:68px;background:#fff;color:#111}#bp .bpct button:active{transform:scale(.92)}
+#bp .bplk{display:flex;justify-content:center;gap:22px;font-size:13px;color:rgba(255,255,255,.75)}#bp .bplk button{border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:1px}#bp .bplk button[hidden]{display:none}
+#bp .bpq h3{margin:0 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:600}
+#bp .bpq ol{list-style:none;margin:0;padding:0}#bp .bpq li{display:flex;align-items:center;gap:12px;padding:8px 6px;margin:0 -6px;border-bottom:1px solid rgba(255,255,255,.07);border-radius:6px}#bp .bpq li[data-bpq]{cursor:pointer}#bp .bpq li[data-bpq]:hover{background:rgba(255,255,255,.06)}
+#bp .bpq img{width:40px;height:40px;border-radius:4px;flex:none;object-fit:cover;background:rgba(255,255,255,.08)}#bp .bpq li span{flex:1;min-width:0}#bp .bpq b{display:block;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#bp .bpq small{display:block;color:rgba(255,255,255,.6);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#bp .bpq em{font-style:normal;font-size:12.5px;color:rgba(255,255,255,.5)}#bp .bpq .bpqe{color:rgba(255,255,255,.55);font-size:13.5px;border:0}
+#npb .npw{cursor:pointer}
+@media(max-width:760px){#bp .bpin{grid-template-rows:auto auto 1fr;gap:16px;padding:calc(12px + env(safe-area-inset-top,0px)) 22px 0}#bp .bpmain{display:grid;gap:18px}#bp .bpinfo{display:grid;gap:16px}#bp .bpq{background:rgba(0,0,0,.25);margin:4px -22px 0;padding:16px 22px calc(24px + env(safe-area-inset-bottom,0px));border-radius:18px 18px 0 0}}
+@media(min-width:761px){#bp .bpin{grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr);grid-template-rows:auto 1fr;gap:0 48px;padding:28px 48px 36px;height:100%}#bp .bptop{grid-column:1/-1}
+ #bp .bpmain{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.8fr);gap:44px;align-items:center;align-content:center}#bp .bpinfo{display:grid;gap:20px}#bp h2{font-size:clamp(30px,3vw,44px)}#bp .bpct,#bp .bplk{justify-content:flex-start}
+ #bp .bpvis{padding:6% 0 0 14%}#bp .bpsl{display:block;position:absolute;left:0;top:0;width:52%;aspect-ratio:1;object-fit:cover;border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,.6);transform:rotate(-7deg)}#bp .bpsl[hidden]{display:none}#bp .deck{z-index:1}
+ #bp .bpq{align-self:stretch;background:rgba(0,0,0,.28);border-radius:16px;padding:22px;margin-top:22px;overflow:auto;min-height:0}}
+@media(prefers-reduced-motion:reduce){#bp.play .bpbg{animation:none}}
 </style>
 </head>
 <body>
@@ -1053,7 +1101,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-10</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-11</small>
     </div></details>
   </div>
 </header>
@@ -3933,7 +3981,7 @@ function npAlbum(d){const al=d?.item?.album;if(!al)return null;const an=spN(al.n
 function npMark(){const L=document.querySelectorAll('#dr .trk.spt li');if(!L.length)return;const d=NP.d,on=d&&cur&&npAlbum(d)===cur,k=on&&spN(d.item.name);
   L.forEach(li=>li.classList.toggle('spnow',!!on&&spN(li.querySelector('span')?.firstChild?.textContent)===k))}
 async function npClick(e){const b=e.target.closest('[data-npk]');if(!b)return;const k=b.dataset.npk,d=NP.d;
-  if(k==='open'){const it=npAlbum(d);if(it)openItem(it.id);else if(d?.item?.external_urls?.spotify)spOpen(d.item.external_urls.spotify);return}
+  if(k==='open'){bpOpen();return}
   try{if(k==='pp'){const p=!!d?.is_playing;if(d){d.is_playing=!p;d.progress_ms=(d.progress_ms||0)+(p?Date.now()-NP.at:0);NP.at=Date.now();npShow(d)}await spApi('/me/player/'+(p?'pause':'play'),{method:'PUT'})}
     else await spApi('/me/player/'+(k==='prev'?'previous':'next'),{method:'POST'});npSoon(k==='pp'?1500:600)}
   catch(er){npSoon(300);if(er.st===403)toast('Spotify didn’t allow that. Controls need Premium');else if(er.st===404)toast('Spotify isn’t playing on any device right now');else toast('Spotify didn’t respond. Try again')}}
@@ -3948,6 +3996,144 @@ function spUri(u){try{const x=new URL(u);if(!/(^|\.)spotify\.com$/.test(x.hostna
   if(['album','artist','track','playlist','show','episode'].includes(P[0])&&/^[A-Za-z0-9]{22}$/.test(P[1]||''))return`spotify:${P[0]}:${P[1]}`}catch(e){}return''}
 function spOpen(u){const r=spApp()&&spUri(u);if(r)location.href=r;else window.open(u,'_blank','noopener')}
 document.addEventListener('click',e=>{if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||!spApp())return;const a=e.target.closest?.('a[href*="spotify.com"]');if(!a)return;const r=spUri(a.href);if(!r)return;e.preventDefault();location.href=r},true);
+
+/* spotify: big Now playing turntable (spotify thread, 2026.11.25-10). Opens from the mini player. Colored vinyl drawn on a canvas (cover colors, track bands, current band glow, cover label). Tonearm shows the position across the album; drag it, or spin the record, to seek; tap a band to drop the needle on that song; tap the label to play or pause. Album sleeve beside the deck on computers; the record slides out and back when the album changes. Queue from /me/player/queue. */
+const BP={on:0,el:null,d:null,alb:{},al:null,rot:0,spd:0,boost:0,armA:3,drag:null,raf:0,key:'',qkey:'',col:{},last:0,lay:0};
+const BPI={down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M18 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4"/></svg>'};
+/* deck geometry, in deck widths (deck is 1 wide, 1/1.12 tall) */
+const BPG=(()=>{const H=1/1.12,P={x:1-.07-.075,y:.07*H+.075},L=.15*4.3,C={x:.05+.4,y:.055*H+.4},R=.4*(1-.052);return{H,P,L,C,R}})();
+const bpTip=a=>{const r=a*Math.PI/180;return{x:BPG.P.x-BPG.L*Math.sin(r),y:BPG.P.y+BPG.L*Math.cos(r)}};
+const bpRad=a=>{const t=bpTip(a);return Math.hypot(t.x-BPG.C.x,t.y-BPG.C.y)/BPG.R};
+const BPR={out:.95,inn:.37,lab:.33};
+function bpAng(r){let lo=0,hi=70;const f=a=>bpRad(a)-r;const s=f(lo)>f(hi);for(let i=0;i<40;i++){const m=(lo+hi)/2;(f(m)>0)===s?lo=m:hi=m}return(lo+hi)/2}
+const BPA={get out(){return this._o??(this._o=bpAng(BPR.out))},get inn(){return this._i??(this._i=bpAng(BPR.inn))},rest:2};
+function bpEl(){if(BP.el)return BP.el;const e=document.createElement('div');e.id='bp';e.hidden=true;e.setAttribute('role','dialog');e.setAttribute('aria-label','Now playing');
+  e.innerHTML=`<div class="bpbg"></div><div class="bpin"><div class="bptop"><button type="button" class="bpi" data-bp="close" aria-label="Close">${BPI.down}</button><span>Now playing<b class="bpal"></b></span><button type="button" class="bpi" data-bp="sp" aria-label="Open in Spotify">${BPI.ext}</button></div>
+  <div class="bpmain"><div class="bpvis"><img class="bpsl" alt="" hidden><div class="deck"><div class="plat"><div class="vinw"><canvas class="vin"></canvas></div></div><i class="sheen"></i><div class="arm"><div class="cw"></div><div class="rod"><i class="hs"></i></div><div class="base"></div></div><div class="knob"><button type="button" data-bp="33" class="on" aria-label="33 rpm">33</button><button type="button" data-bp="45" aria-label="45 rpm">45</button></div><i class="led"></i></div></div>
+  <div class="bpinfo"><div class="bpti"><div><h2></h2><p></p></div><button type="button" class="bphv" data-bp="fav" hidden aria-label="Favorite this track">${heartSvg(false)}</button></div>
+  <div class="bppg"><input type="range" min="0" max="1000" value="0" step="1000" aria-label="Position in song"><div class="bptm"><span></span><span></span></div></div>
+  <div class="bpct"><button type="button" data-bp="prev" aria-label="Previous track">${NPI.prev}</button><button type="button" class="pp" data-bp="pp" aria-label="Pause">${NPI.pause}</button><button type="button" data-bp="next" aria-label="Next track">${NPI.next}</button></div>
+  <div class="bplk"><button type="button" data-bp="album" hidden>Open album</button><button type="button" data-bp="sp">Open in Spotify</button></div></div></div>
+  <div class="bpq"><h3>Up next in your queue</h3><ol></ol></div></div>`;
+  document.body.append(e);BP.el=e;
+  e.addEventListener('click',bpClick);
+  const rg=e.querySelector('.bppg input');rg.addEventListener('input',()=>{BP.rg=1;bpTimes(+rg.value)});rg.addEventListener('change',()=>{BP.rg=0;bpSeek(+rg.value)});
+  const vin=e.querySelector('.plat'),arm=e.querySelector('.arm');vin.addEventListener('pointerdown',bpRecDown);arm.addEventListener('pointerdown',bpArmDown);
+  e.querySelector('.bptop').addEventListener('pointerdown',bpSwipeDown);
+  return e}
+function bpOpen(){if(!NP.d&&!BP.d)return;const e=bpEl();BP.on=1;e.hidden=false;document.body.classList.add('bpon');layer('np');BP.lay=1;bpSync(NP.d||BP.d,1);bpQueue(1);
+  e.animate?.([{opacity:0,transform:'translateY(40px)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,1,.3,1)'});
+  BP.last=performance.now();cancelAnimationFrame(BP.raf);BP.raf=requestAnimationFrame(bpTick);npSoon(300);e.querySelector('[data-bp=close]').focus({preventScroll:true})}
+function bpClose(fromPop){if(!BP.on)return;BP.on=0;cancelAnimationFrame(BP.raf);const e=BP.el;document.body.classList.remove('bpon');
+  if(!fromPop&&BP.lay)unlayer('np');BP.lay=0;
+  if(e.animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches){e.animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateY(60px)'}],{duration:220,easing:'ease-in'}).onfinish=()=>{if(!BP.on)e.hidden=true}}else e.hidden=true}
+addEventListener('popstate',()=>{if(BP.on&&!LS.some(x=>x.k==='np'&&!x.dead))bpClose(1)});
+document.addEventListener('keydown',e=>{if(BP.on&&e.key==='Escape'){e.preventDefault();bpClose()}});
+/* album tracks (for bands) */
+async function bpAlbum(id){if(BP.alb[id])return BP.alb[id];const T=[];let u=`/albums/${id}/tracks?limit=50&market=${spMk()}`;
+  try{while(u){const j=await spApi(u);T.push(...(j.items||[]));u=j.next?j.next.replace('https://api.spotify.com/v1',''):''}}catch(e){return null}
+  const o={id,T,tot:T.reduce((s,t)=>s+(t.duration_ms||0),0)||1};BP.alb[id]=o;return o}
+function bpIdx(al,it){if(!al||!it)return-1;let i=al.T.findIndex(t=>t.id===it.id);if(i<0){const k=spN(it.name);i=al.T.findIndex(t=>spN(t.name)===k)}return i}
+function bpBands(al){let c=0;return al.T.map(t=>{const a=c/al.tot;c+=t.duration_ms||0;return[a,c/al.tot]})}
+const bpR=f=>BPR.out-(BPR.out-BPR.inn)*f, bpF=r=>(BPR.out-r)/(BPR.out-BPR.inn);
+/* cover colors */
+function bpColors(url){return new Promise(res=>{if(!url)return res(null);if(BP.col[url])return res(BP.col[url]);const im=new Image();im.crossOrigin='anonymous';
+  im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=24;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0,24,24);const p=x.getImageData(0,0,24,24).data;let best=[0,0,0,-1],avg=[0,0,0],n=0;
+    for(let i=0;i<p.length;i+=4){const r=p[i],g=p[i+1],b=p[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),s=mx?(mx-mn)/mx:0,v=mx/255;avg[0]+=r;avg[1]+=g;avg[2]+=b;n++;const sc=s*(.35+v)*(v>.15?1:.2);if(sc>best[3])best=[r,g,b,sc]}
+    avg=avg.map(v=>v/n);const o={c1:best[3]>.12?best.slice(0,3):avg,c2:avg,img:im};BP.col[url]=o;res(o)}catch(e){res({img:im})}};im.onerror=()=>res(null);im.src=url})}
+const bpRgb=(c,k=1)=>`rgb(${c.map(v=>Math.round(Math.max(0,Math.min(255,v*k)))).join(',')})`;
+function bpDraw(){const cv=BP.el.querySelector('.vin'),al=BP.al,d=BP.d;const S=Math.min(1100,Math.round((cv.clientWidth||320)*(devicePixelRatio||1)));if(!S)return;if(cv.width!==S){cv.width=cv.height=S}
+  const x=cv.getContext('2d'),R=S/2,c1=BP.cc?.c1||[196,59,109];x.clearRect(0,0,S,S);x.save();x.translate(R,R);
+  let g=x.createRadialGradient(0,0,R*.3,0,0,R);g.addColorStop(0,bpRgb(c1,.95));g.addColorStop(.7,bpRgb(c1,.7));g.addColorStop(1,bpRgb(c1,.42));x.fillStyle=g;x.beginPath();x.arc(0,0,R,0,7);x.fill();
+  x.lineWidth=Math.max(.6,R/420);for(let r=BPR.inn;r<.975;r+=.0055){x.strokeStyle=`rgba(0,0,0,${.12+(Math.sin(r*97)+1)*.05})`;x.beginPath();x.arc(0,0,r*R,0,7);x.stroke()}
+  if(al&&d){const B=bpBands(al),ci=bpIdx(al,d.item);if(ci>=0){const[a,b]=B[ci];x.fillStyle='rgba(255,226,160,.16)';x.beginPath();x.arc(0,0,bpR(a)*R,0,7);x.arc(0,0,bpR(b)*R,0,7,true);x.fill()}
+    B.slice(1).forEach(([a])=>{const r=bpR(a)*R;x.strokeStyle='rgba(0,0,0,.55)';x.lineWidth=R/90;x.beginPath();x.arc(0,0,r,0,7);x.stroke();x.strokeStyle='rgba(255,255,255,.12)';x.lineWidth=R/400;x.beginPath();x.arc(0,0,r+R/140,0,7);x.stroke()})}
+  x.strokeStyle='rgba(0,0,0,.5)';x.lineWidth=R*.03;x.beginPath();x.arc(0,0,R*.985,0,7);x.stroke();
+  x.strokeStyle='rgba(255,255,255,.14)';x.lineWidth=R/300;x.beginPath();x.arc(0,0,BPR.inn*R*.97,0,7);x.stroke();
+  x.save();x.beginPath();x.arc(0,0,BPR.lab*R,0,7);x.clip();const im=BP.cc?.img;if(im&&im.complete&&im.naturalWidth)x.drawImage(im,-BPR.lab*R,-BPR.lab*R,BPR.lab*R*2,BPR.lab*R*2);else{x.fillStyle=bpRgb(BP.cc?.c2||[40,30,50]);x.fill()}x.restore();
+  x.fillStyle='#d9d9de';x.beginPath();x.arc(0,0,R*.022,0,7);x.fill();x.fillStyle='#6b6b73';x.beginPath();x.arc(0,0,R*.011,0,7);x.fill();x.restore()}
+/* sync from currently-playing */
+async function bpSync(d,force){if(!BP.on||!d)return;const prev=BP.d;BP.d=d;const it=d.item,e=BP.el;if(!it)return;
+  const tkey=it.id+'|'+d.is_playing,akey=it.album?.id||'';
+  e.querySelector('h2').textContent=it.name.replace(/\s+-\s+((\d{4} )?(digital )?remaster(ed)?( \d{4})?( version)?)$/i,'');
+  e.querySelector('.bpti p').textContent=(it.artists||[]).map(a=>a.name).join(', ');e.querySelector('.bpal').textContent=it.album?.name||'';
+  const pp=e.querySelector('.bpct .pp');pp.innerHTML=d.is_playing?NPI.pause:NPI.play;pp.setAttribute('aria-label',d.is_playing?'Pause':'Play');e.classList.toggle('play',!!d.is_playing);
+  const lib=npAlbum(d);e.querySelector('[data-bp=album]').hidden=!lib;bpHeart();
+  const rg=e.querySelector('.bppg input');rg.max=it.duration_ms||1000;
+  const albChanged=!prev||prev.item?.album?.id!==akey;
+  if(albChanged||force){const im=it.album?.images||[],url=(im.find(x=>x.width&&x.width>=300&&x.width<=640)||im[0]||{}).url||'';
+    const sl=e.querySelector('.bpsl');if(url){sl.src=url;sl.hidden=false}else sl.hidden=true;
+    const swap=prev&&albChanged&&!force&&!matchMedia('(prefers-reduced-motion: reduce)').matches,vw=e.querySelector('.vinw');
+    if(swap&&vw.animate)await vw.animate([{transform:'none',opacity:1},{transform:'translate(-70%,-4%) scale(.9)',opacity:0}],{duration:420,easing:'cubic-bezier(.5,0,.75,0)',fill:'forwards'}).finished.catch(()=>{});
+    BP.cc=await bpColors(url)||(lib?.color?{c1:hexRgb(lib.color),c2:hexRgb(lib.color)}:null);
+    const c1=BP.cc?.c1||[196,59,109],c2=BP.cc?.c2||[244,162,89];e.style.setProperty('--c1',bpRgb(c1));e.style.setProperty('--c2',bpRgb(c2));
+    BP.al=akey?await bpAlbum(akey):null;bpDraw();
+    if(swap&&vw.animate){vw.animate([{transform:'translate(-70%,-4%) scale(.9)',opacity:0},{transform:'none',opacity:1}],{duration:520,easing:'cubic-bezier(.2,1,.3,1)',fill:'forwards'})}}
+  else if(prev?.item?.id!==it.id)bpDraw();
+  if(prev?.item?.id!==it.id||force)bpQueue();
+  BP.key=tkey}
+function hexRgb(h){const m=(h||'').match(/^#?([0-9a-f]{6})$/i);if(!m)return[196,59,109];const n=parseInt(m[1],16);return[n>>16&255,n>>8&255,n&255]}
+function bpHeart(){const e=BP.el,d=BP.d,b=e.querySelector('[data-bp=fav]'),lib=d&&npAlbum(d),t=lib&&bpLibTrack(lib,d.item);b.hidden=!t;if(!t)return;const on=(lib.ft||[]).includes(tkey(t));b.innerHTML=heartSvg(on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)}
+function bpLibTrack(lib,it){const k=spN(it.name);return(lib.info?.tracks||[]).find(t=>spN(t.t)===k)||null}
+function bpPos(){const d=BP.d;if(!d)return 0;const p=(d.progress_ms||0)+(d.is_playing?Date.now()-NP.at:0);return Math.max(0,Math.min(d.item?.duration_ms||0,p))}
+function bpTimes(p){const d=BP.d,du=d?.item?.duration_ms||0,f=s=>{s=Math.round(s/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')},T=BP.el.querySelectorAll('.bptm span');T[0].textContent=f(p);T[1].textContent='-'+f(Math.max(0,du-p))}
+function bpFrac(){const d=BP.d,al=BP.al;if(!d)return 0;const p=bpPos(),du=d.item?.duration_ms||1,i=bpIdx(al,d.item);if(i<0)return Math.min(1,p/du);const B=bpBands(al)[i];return B[0]+(B[1]-B[0])*Math.min(1,p/du)}
+/* animation loop */
+function bpTick(t){if(!BP.on)return;const dt=Math.min(.1,(t-BP.last)/1000);BP.last=t;const e=BP.el,d=BP.d,rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const tgt=rm||!d?.is_playing||BP.drag?.k==='rec'?0:(BP.boost>t?270:200);BP.spd+=(tgt-BP.spd)*Math.min(1,dt*(tgt>BP.spd?2.2:3.5));if(!BP.drag||BP.drag.k!=='rec')BP.rot=(BP.rot+BP.spd*dt)%360;
+  e.querySelector('.plat').style.transform=`rotate(${BP.rot}deg)`;
+  const p=bpPos();if(!BP.rg){const rg=e.querySelector('.bppg input');rg.value=p;rg.style.setProperty('--p',(p/(+rg.max||1)*100)+'%');bpTimes(p)}
+  let aT=BP.drag?.k==='arm'?BP.drag.a:d?bpAng(bpR(bpFrac())):BPA.rest;if(BP.drag?.k==='rec')aT=BP.armA;
+  BP.armA+=(aT-BP.armA)*Math.min(1,dt*(BP.drag?.k==='arm'?30:5));e.querySelector('.rod').style.transform=`translateX(-50%) rotate(${BP.armA}deg)`;
+  e.querySelector('.arm').classList.toggle('lift',!d?.is_playing||BP.drag?.k==='arm');
+  BP.raf=requestAnimationFrame(bpTick)}
+/* pointer: record (spin to scrub, tap band, tap label) */
+function bpDeck(ev){const r=BP.el.querySelector('.deck').getBoundingClientRect(),W=r.width;return{x:(ev.clientX-r.left)/W,y:(ev.clientY-r.top)/W}}
+function bpRecDown(ev){if(!BP.d)return;ev.preventDefault();const p=bpDeck(ev),a0=Math.atan2(p.y-BPG.C.y,p.x-BPG.C.x);BP.drag={k:'rec',a0,last:a0,tot:0,mv:0,x:ev.clientX,y:ev.clientY,p,base:bpPos()};ev.currentTarget.setPointerCapture?.(ev.pointerId);
+  const mv=e=>{const q=bpDeck(e),a=Math.atan2(q.y-BPG.C.y,q.x-BPG.C.x);let da=a-BP.drag.last;if(da>Math.PI)da-=2*Math.PI;if(da<-Math.PI)da+=2*Math.PI;BP.drag.last=a;BP.drag.tot+=da;BP.drag.mv=Math.max(BP.drag.mv,Math.hypot(e.clientX-BP.drag.x,e.clientY-BP.drag.y));
+    BP.rot=(BP.rot+da*180/Math.PI+360)%360;if(BP.drag.mv>6){const np=Math.max(0,Math.min(BP.d.item.duration_ms,BP.drag.base+BP.drag.tot/(2*Math.PI)*8000));BP.rg=1;bpTimes(np);const rg=BP.el.querySelector('.bppg input');rg.value=np;rg.style.setProperty('--p',(np/(+rg.max||1)*100)+'%')}};
+  const up=e=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);const g=BP.drag;BP.drag=null;BP.rg=0;if(!g)return;
+    if(g.mv<=6){const r=Math.hypot(g.p.x-BPG.C.x,g.p.y-BPG.C.y)/BPG.R;if(r<=BPR.lab)bpAct('pp');else if(r<=1)bpDrop(bpF(r),1);return}
+    if(e.type!=='pointercancel')bpSeek(g.base+g.tot/(2*Math.PI)*8000)};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up)}
+/* pointer: tonearm */
+function bpArmDown(ev){if(!BP.d||ev.target.closest('button'))return;ev.preventDefault();ev.stopPropagation();const A=a=>Math.max(BPA.rest,Math.min(BPA.inn+1,a));
+  const ang=e=>{const q=bpDeck(e);return A(Math.atan2(-(q.x-BPG.P.x),q.y-BPG.P.y)*180/Math.PI)};BP.drag={k:'arm',a:ang(ev)};
+  const mv=e=>{if(BP.drag)BP.drag.a=ang(e)};const up=e=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);const g=BP.drag;BP.drag=null;if(!g||e.type==='pointercancel')return;
+    const r=bpRad(g.a);if(r>1.01||g.a<BPA.out-.5){if(BP.d?.is_playing)bpAct('pp');return}bpDrop(Math.max(0,Math.min(1,bpF(r))),0)};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up)}
+/* swipe down to close (phone, from the top bar) */
+function bpSwipeDown(ev){if(ev.target.closest('button'))return;const y0=ev.clientY,e=BP.el;let dy=0;const mv=x=>{dy=Math.max(0,x.clientY-y0);e.style.transform=`translateY(${dy}px)`};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);e.style.transform='';if(dy>90)bpClose()};addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up)}
+/* drop the needle at album fraction f; startOfTrack: tap on a band goes to its start */
+async function bpDrop(f,startOfTrack){const al=BP.al,d=BP.d;if(!d)return;
+  if(!al||bpIdx(al,d.item)<0){bpSeek(f*(d.item.duration_ms||0));return}
+  const B=bpBands(al);let i=B.findIndex(([a,b])=>f>=a&&f<b);if(i<0)i=f<=0?0:B.length-1;const t=al.T[i],pos=startOfTrack?0:Math.max(0,Math.min((t.duration_ms||0)-1500,Math.round((f-B[i][0])/(B[i][1]-B[i][0])*(t.duration_ms||0))));
+  if(t.id===d.item.id||spN(t.name)===spN(d.item.name)){bpSeek(pos);if(!d.is_playing)bpAct('pp');return}
+  try{await spApi('/me/player/play',{method:'PUT',body:JSON.stringify({context_uri:'spotify:album:'+al.id,offset:{uri:t.uri},position_ms:pos})});
+    BP.d={...d,is_playing:true,progress_ms:pos,item:{...d.item,id:t.id,name:t.name,duration_ms:t.duration_ms,uri:t.uri,external_urls:t.external_urls}};NP.d=BP.d;NP.at=Date.now();bpSync(BP.d);npShow(BP.d);npSoon(900)}catch(e){bpErr(e)}}
+async function bpSeek(ms){const d=BP.d;if(!d)return;ms=Math.max(0,Math.min((d.item?.duration_ms||1)-500,Math.round(ms)));d.progress_ms=ms;NP.at=Date.now();
+  try{await spApi('/me/player/seek?position_ms='+ms,{method:'PUT'});npSoon(1200)}catch(e){bpErr(e)}}
+function bpErr(e){npSoon(300);if(e?.st===403)toast('Spotify didn’t allow that. Controls need Premium');else if(e?.st===404)toast('Spotify isn’t playing on any device right now');else toast('Spotify didn’t respond. Try again')}
+async function bpAct(k){const d=BP.d;try{if(k==='pp'){const p=!!d?.is_playing;if(d){d.progress_ms=bpPos();d.is_playing=!p;NP.at=Date.now();bpSync(d);npShow(d)}await spApi('/me/player/'+(p?'pause':'play'),{method:'PUT'});npSoon(1500)}
+  else{await spApi('/me/player/'+(k==='prev'?'previous':'next'),{method:'POST'});npSoon(500)}}catch(e){bpErr(e)}}
+/* queue */
+async function bpQueue(force){if(!BP.on)return;let j;try{j=await spApi('/me/player/queue')}catch(e){return}const Q=(j.queue||[]).slice(0,20),ol=BP.el.querySelector('.bpq ol');
+  const k=Q.map(t=>t.id).join(',');if(k===BP.qkey&&!force)return;BP.qkey=k;
+  ol.innerHTML=Q.length?Q.map((t,i)=>{const im=t.album?.images||t.images||[],u=(im[im.length-1]||{}).url||'';const s=Math.round((t.duration_ms||0)/1000);
+    return`<li${i<10?` data-bpq="${i}" tabindex="0"`:''}><img alt="" loading="lazy"${u?` src="${esc(u)}"`:''}><span><b>${esc(t.name||'')}</b><small>${esc((t.artists||[]).map(a=>a.name).join(', ')||t.show?.name||'')}</small></span><em>${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}</em></li>`}).join(''):'<li class="bpqe">Nothing queued. Add songs with the queue button on any album’s tracklist.</li>'}
+async function bpJump(n){if(BP.jmp)return;BP.jmp=1;try{for(let i=0;i<=n;i++)await spApi('/me/player/next',{method:'POST'});npSoon(500);setTimeout(()=>bpQueue(1),900)}catch(e){bpErr(e)}finally{BP.jmp=0}}
+function bpClick(ev){const q=ev.target.closest('[data-bpq]');if(q){bpJump(+q.dataset.bpq);return}const b=ev.target.closest('[data-bp]');if(!b)return;const k=b.dataset.bp,d=BP.d;
+  if(k==='close')bpClose();
+  else if(k==='pp'||k==='prev'||k==='next')bpAct(k);
+  else if(k==='sp'){const u=d?.item?.external_urls?.spotify||(d?.item?.album?.id?'https://open.spotify.com/album/'+d.item.album.id:'');if(u)spOpen(u)}
+  else if(k==='album'){const it=npAlbum(d);if(it){bpClose();setTimeout(()=>openItem(it.id),60)}}
+  else if(k==='fav'){const lib=npAlbum(d),t=lib&&bpLibTrack(lib,d.item);if(!t)return;const kk=tkey(t),l=lib.ft||[],on=!l.includes(kk);lib.ft=on?[...l,kk]:l.filter(x=>x!==kk);if(!lib.ft.length)delete lib.ft;lib.touched=new Date().toISOString();save();bpHeart();if(cur===lib)drawItem();
+    if(on&&b.animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches)b.animate([{transform:'scale(1)'},{transform:'scale(1.35)'},{transform:'scale(1)'}],{duration:260})}
+  else if(k==='45'||k==='33'){const K=BP.el.querySelectorAll('.knob button');if(k==='45'){K[0].classList.remove('on');K[1].classList.add('on');BP.boost=performance.now()+1600;setTimeout(()=>{K[1].classList.remove('on');K[0].classList.add('on')},1600)}}}
+BP.el||0;
+{const s0=npShow;npShow=function(d){s0(d);if(BP.on&&d)bpSync(d)}}
+addEventListener('resize',()=>{if(BP.on)bpDraw()});
 
 function localGroups(q){const ql=q.toLowerCase();
   const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${sLab(i).toLowerCase()}`,open:i.id,it:i}));
