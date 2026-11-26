@@ -992,6 +992,9 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 .unbill .now p{margin:0;font-size:15.5px;color:var(--mut);line-height:1.5}
 .unbill .now b{color:var(--ink);font:400 21px Righteous,"Inter Tight",sans-serif}
 .unbill .now em{font-family:"Newsreader",Georgia,serif}
+.unbill .nw{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
+.unbill .ncv{padding:0;display:block;cursor:pointer}
+.unbill .ncv .cv{width:84px;height:84px;box-shadow:0 10px 24px rgba(0,0,0,.35)}.unbill .ncv .cv.p{width:72px;height:108px}.unbill .ncv .cv.w{width:132px;height:74px}
 .unbill .now .acts{display:flex;gap:16px;margin-top:4px}
 .unbill .ord{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:0 48px;padding-top:22px;border-bottom:1px solid var(--rule)}
 .unbill .cols{columns:3 300px;column-gap:48px;column-rule:1px solid var(--rule);padding-top:22px}
@@ -1012,7 +1015,7 @@ body.mo-off img.mo-ld{opacity:1;transform:none;transition:none}
 .unbill .mv .lnk{text-decoration:none;color:var(--mut);font-size:17px;line-height:1;padding:6px 2px}
 .unbill .mv .lnk:hover{color:var(--ink)}
 .unbill .mv .go{font-size:14px;text-decoration:underline;color:var(--ink);padding:0}
-@media(max-width:600px){.unbill{padding-top:34px}.unbill li{grid-template-columns:38px 48px minmax(0,1fr) auto;gap:10px}.unbill .num{font-size:26px}.unbill .ent .cv{width:48px;height:48px}.unbill .tx b{font-size:17px}.unbill li{grid-template-columns:38px 48px minmax(0,1fr)}.unbill .mv{grid-column:3/-1;gap:14px;margin-top:-4px}.unbill .ord,.unbill .now{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.unbill{padding-top:34px}.unbill .nw{gap:14px}.unbill .ncv .cv{width:64px;height:64px}.unbill .ncv .cv.p{width:56px;height:84px}.unbill .ncv .cv.w{width:100px;height:56px}.unbill li{grid-template-columns:38px 48px minmax(0,1fr) auto;gap:10px}.unbill .num{font-size:26px}.unbill .ent .cv{width:48px;height:48px}.unbill .tx b{font-size:17px}.unbill li{grid-template-columns:38px 48px minmax(0,1fr)}.unbill .mv{grid-column:3/-1;gap:14px;margin-top:-4px}.unbill .ord,.unbill .now{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:760px){.unwall{--uw:96px;opacity:.2}.crate::after{background:radial-gradient(ellipse 60% 34% at 50% 30%,var(--ic) 35%,transparent 85%),radial-gradient(ellipse 70% 40% at 50% 75%,color-mix(in srgb,var(--ic) 70%,transparent) 20%,transparent 85%)}}
 @media(prefers-reduced-motion:reduce){.unwall .uwi{animation:none}}
 /* spotify: Play and Add to queue buttons on album tracklist rows (spotify thread, 2026.11.25-3) */
@@ -1050,7 +1053,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-9</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-10</small>
     </div></details>
   </div>
 </header>
@@ -4414,7 +4417,7 @@ function unSpin(again){if(UN.spin||!pickQ||pickQ.length<2)return;
       c.animate([{transform:'scale(1.08)'},{transform:'none'}],{duration:420,easing:'cubic-bezier(.25,1.4,.4,1)'})}};
   a.finished.then(()=>{const hit=rail.children[K];hit?.animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1.05)'}],{duration:320,easing:'ease-out',fill:'forwards'});setTimeout(done,380)}).catch(()=>{UN.spin=0});
   setTimeout(()=>{if(UN.spin)done()},D+1500)}
-function unBill(v){const crt=v.querySelector('.crate');v.querySelectorAll(':scope>section.nrow').forEach(e=>e.remove());if(!crt)return;
+function unBill(v){const crt=v.querySelector('.crate');if(!crt)return;
   const open=st.items.filter(i=>i.status!=='done');if(!open.length)return;
   const byAge=(a,b)=>ageDays(b)-ageDays(a),chk=open.filter(i=>i.status==='check'),old=[...chk].sort(byAge).slice(0,8),oldS=new Set(old.map(i=>i.id));
   const showTV=pk.g==='all'||pk.g==='show',showG=pk.g==='all'||pk.g==='game';
@@ -4428,13 +4431,14 @@ function unBill(v){const crt=v.querySelector('.crate');v.querySelectorAll(':scop
   const order=(h,l,go,t)=>l.length?`<div class="grp"><h4>${h}</h4><ol>${l.map((it,k)=>ent(it,k+1,k===0?'Up next':'',mv(it,k,l.length,go),k===0)).join('')}</ol></div>`:'';
   const epLine=it=>{const nx=epNext(it),t=nx?epTitle(it,nx):'';return nx?`next up ${epLab(nx)}${t?`, <em>${esc(t)}</em>`:''}.</p><p class="acts"><button type="button" class="lnk" data-ep="next" data-eid="${it.id}">Watched it ✓</button>${it.ep?`<button type="button" class="lnk" data-ep="back" data-eid="${it.id}">Undo</button>`:''}`
     :`all caught up${it.ep?` (${epLab(it.ep)})`:''}.</p><p class="acts"><button type="button" class="lnk" data-ep="done" data-eid="${it.id}">Finished the show</button>${it.ep?`<button type="button" class="lnk" data-ep="back" data-eid="${it.id}">Undo</button>`:''}`};
-  const now=[...tvNow.map(it=>`<div><h4>Now watching</h4><p><b>${esc(it.title)}</b>, ${epLine(it)}</p></div>`),...gNow.map(it=>`<div><h4>Now playing</h4><p><b>${esc(it.title)}</b>${it.creator?`, ${esc(it.creator)}`:''}. Started ${ago(it)} ago.</p><p class="acts"><button type="button" class="lnk" data-open="${it.id}">Open it</button></p></div>`)].join('');
+  const nc=it=>`<button type="button" class="ncv" data-open="${it.id}" aria-label="Open ${esc(it.title)}">${cover(it,'ini '+shape(it.type))}</button>`;
+  const now=[...tvNow.map(it=>`<div class="nw">${nc(it)}<div><h4>Now watching</h4><p><b>${esc(it.title)}</b>, ${epLine(it)}</p></div></div>`),...gNow.map(it=>`<div class="nw">${nc(it)}<div><h4>Now playing</h4><p><b>${esc(it.title)}</b>${it.creator?`, ${esc(it.creator)}`:''}. Started ${ago(it)} ago.</p><p class="acts"><button type="button" class="lnk" data-open="${it.id}">Open it</button></p></div></div>`)].join('');
   let n=1;const grp=(h,l,meta)=>l.length?`<div class="grp"><h4>${h}</h4><ol>${l.map(it=>ent(it,n++,meta(it))).join('')}</ol></div>`:'';
   const prog=open.filter(i=>i.status==='prog'&&!tvNow.includes(i)&&!gNow.includes(i)),again=open.filter(i=>i.status==='again').sort((a,b)=>(b.rv||0)-(a.rv||0));
   const fresh=chk.filter(i=>!oldS.has(i.id)).sort((a,b)=>b.added.localeCompare(a.added)).slice(0,8);
   const ords=order('TV, watch order',tvQ,'Start watching')+order('Games, play order',gQ,'Start playing');
   const cols=grp('In progress',prog,i=>ago(i)+' in')+grp('For another go',again,i=>T[i.type])+grp('Waiting longest',old,i=>'Waiting '+ago(i))+grp('Just added',fresh,i=>'Added '+md(i.added));
-  crt.insertAdjacentHTML('afterend',`<section class="unbill"><div class="bh"><h2>Also on the bill</h2><p>${open.length} thing${open.length===1?'':'s'} waiting, about ${hrs} hour${hrs===1?'':'s'}${oldest?`, the oldest since ${md(oldest.added)}`:''}</p></div>
+  v.querySelectorAll(':scope>section.nrow').forEach(e=>e.remove());crt.insertAdjacentHTML('afterend',`<section class="unbill"><div class="bh"><h2>Also on the bill</h2><p>${open.length} thing${open.length===1?'':'s'} waiting, about ${hrs} hour${hrs===1?'':'s'}${oldest?`, the oldest since ${md(oldest.added)}`:''}</p></div>
    ${now?`<div class="now">${now}</div>`:''}${ords?`<div class="ord">${ords}</div>`:''}${cols?`<div class="cols">${cols}</div>`:''}</section>`)}
 {const dn=drawNext;drawNext=function(){const r=dn.apply(this,arguments);try{const v=$('#view'),sec=v.querySelector('.crate');unWall(sec);unSpinBtn(sec);unBill(v)}catch(e){console.warn('upnext',e)}return r}}
 document.addEventListener('click',e=>{if(e.target.closest?.('#unspin')){unSpin();return}
