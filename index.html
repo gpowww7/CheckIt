@@ -1050,7 +1050,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-4</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-5</small>
     </div></details>
   </div>
 </header>
@@ -1157,6 +1157,8 @@ const MUS=['artist','album','song'];
 const spot=it=>MUS.includes(it.type)?(it.spotify||`https://open.spotify.com/search/${encodeURIComponent((it.type==='artist'?it.title:(it.title+' '+(it.creator||''))).trim())}`):'';
 const spLink=it=>MUS.includes(it.type)?`<a class="sp" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Open in Spotify':'Find on Spotify'}</a>`:'';
 const VID=['movie','show'];
+/* live sets: search SoundCloud for the same set (plays on Sonos) */
+const scl=it=>{let q=(it.title||'').replace(/\[[^\]]*\]|\([^)]*\)/g,' ').replace(/\b(official video|official|4k|hd|full set|full stream)\b/gi,' ').replace(/[|•–—:@#]|\s-\s/g,' ').replace(/\s+/g,' ').trim();if(it.extra?.event==='Mixcloud'&&it.creator&&!q.toLowerCase().includes(it.creator.toLowerCase()))q=it.creator+' '+q;return`https://soundcloud.com/search/sounds?q=${encodeURIComponent(q||it.title||'')}`};
 const steam=it=>`https://store.steampowered.com/search/?term=${encodeURIComponent(it.title)}`;
 const jw=it=>`https://www.justwatch.com/${(st.region||'US').toLowerCase()}/search?q=${encodeURIComponent(it.title)}`;
 const logo=p=>p.logo?`<img src="https://image.tmdb.org/t/p/w92${esc(p.logo)}" alt="" width="22" height="22">`:'';
@@ -1515,7 +1517,7 @@ function cands(){const fit=TIMES.find(t=>t[0]===pk.t)[2];return st.items.filter(
 function buildQ(){const c=cands(),out=[];const w=c.map(i=>i.status==='done'?.5+(i.rv||2)*.4+(i.rating||0)*.2:1+ageDays(i)/30+(i.status==='prog'?3:0)+(i.status==='again'?(i.rv||0)*.5:0));
   while(c.length){let r=Math.random()*w.reduce((a,b)=>a+b,0),k=0;for(;k<c.length-1;k++){r-=w[k];if(r<=0)break}out.push(c[k].id);c.splice(k,1);w.splice(k,1)}
   if(pk.g==='game'){const r=new Map(gameQ().map((i,n)=>[i.id,n])),it=id=>st.items.find(i=>i.id===id),sc=id=>{const x=it(id);return x.status==='prog'?-1:x.status==='check'?r.get(id)??999:1e3};out.sort((a,b)=>sc(a)-sc(b))}pickQ=out}
-function linksFor(it){return [MUS.includes(it.type)?`<a class="lk" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Listen on Spotify':'Find on Spotify'}<span>↗</span></a>`:'',VID.includes(it.type)?`<a class="lk" href="${esc(it.watch?.link||jw(it))}" target="_blank" rel="noopener">Where to watch<span>↗</span></a>`:'',it.type==='game'?`<a class="lk" href="${esc(steam(it))}" target="_blank" rel="noopener">Find on Steam<span>↗</span></a>`:''].join('')}
+function linksFor(it){return [MUS.includes(it.type)?`<a class="lk" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Listen on Spotify':'Find on Spotify'}<span>↗</span></a>`:'',VID.includes(it.type)?`<a class="lk" href="${esc(it.watch?.link||jw(it))}" target="_blank" rel="noopener">Where to watch<span>↗</span></a>`:'',it.type==='game'?`<a class="lk" href="${esc(steam(it))}" target="_blank" rel="noopener">Find on Steam<span>↗</span></a>`:'',it.type==='set'&&!/soundcloud\.com/.test(it.url||'')?`<a class="lk" href="${esc(scl(it))}" target="_blank" rel="noopener">Find on SoundCloud<span>↗</span></a>`:''].join('')}
 function card(it,why){const sh=shape(it.type);return `<button type="button" class="tile ${sh}" data-id="${it.id}" aria-label="${esc(it.title)}">${cover(it,'',why)}</button>`}
 function drawNext(sample){const ids=new Set(cands().map(i=>i.id));if(!pickQ||pickQ.some(id=>!ids.has(id))||pickQ.length!==ids.size)buildQ();
   const q=pickQ.map(id=>st.items.find(i=>i.id===id)).filter(Boolean),n=q.length,it=q[0];
@@ -1571,7 +1573,7 @@ function drawCrate(list){const l=crateList(list),n=l.length,v=$('#view');crate.i
    <div class="cinfo"><div class="cnum">${crate.i+1} of ${n}</div><div class="mt">${meta}${dust(it)>.15?`, untouched for ${ago(it)}`:''}${it.rv?`, ${RV[it.rv-1].toLowerCase()}`:''}</div><h2>${esc(it.title)}</h2>${it.creator?`<p class="by">${esc(it.creator)}</p>`:''}
     ${it.note?`<blockquote>${esc(it.note)}${it.by?`<cite>Recommended by ${esc(it.by)}</cite>`:''}</blockquote>`:''}
     <div class="seg">${Object.entries(S).map(([k,lb])=>`<button type="button" data-cs="${k}" aria-pressed="${it.status===k}">${lb}</button>`).join('')}</div>
-    <div class="lks">${MUS.includes(it.type)?`<a class="lk" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Listen on Spotify':'Find on Spotify'}<span>↗</span></a>`:''}${VID.includes(it.type)?`<a class="lk" href="${esc(it.watch?.link||jw(it))}" target="_blank" rel="noopener">Where to watch<span>↗</span></a>`:''}${it.type==='game'?`<a class="lk" href="${esc(steam(it))}" target="_blank" rel="noopener">Find on Steam<span>↗</span></a>`:''}<button class="lk" type="button" data-open="${it.id}">Open item</button></div>
+    <div class="lks">${MUS.includes(it.type)?`<a class="lk" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Listen on Spotify':'Find on Spotify'}<span>↗</span></a>`:''}${VID.includes(it.type)?`<a class="lk" href="${esc(it.watch?.link||jw(it))}" target="_blank" rel="noopener">Where to watch<span>↗</span></a>`:''}${it.type==='game'?`<a class="lk" href="${esc(steam(it))}" target="_blank" rel="noopener">Find on Steam<span>↗</span></a>`:''}${it.type==='set'&&!/soundcloud\.com/.test(it.url||'')?`<a class="lk" href="${esc(scl(it))}" target="_blank" rel="noopener">Find on SoundCloud<span>↗</span></a>`:''}<button class="lk" type="button" data-open="${it.id}">Open item</button></div>
     <div class="cnav"><button type="button" id="cprev" aria-label="Previous">←</button><button type="button" id="cshuf">${crate.order?'Unshuffle':'Shuffle'}</button><button type="button" id="cnext" aria-label="Next">→</button></div></div></div>`;
   crate.dir=0}
 /* shelf */
@@ -1656,6 +1658,7 @@ function drawItem(){const it=cur,sh=shape(it.type),simX=[...document.querySelect
   const host=it.url&&!/deezer\.com|spotify\.com/.test(it.url)?(()=>{try{return new URL(it.url).hostname.replace(/^www\./,'')}catch(e){return''}})():'';
   const links=[MUS.includes(it.type)?`<a class="lk" href="${esc(spot(it))}" target="_blank" rel="noopener">${it.spotify?'Listen on Spotify':'Find on Spotify'}<span>↗</span></a>`:'',
     it.type==='game'?`<a class="lk" href="${esc(steam(it))}" target="_blank" rel="noopener">Find on Steam<span>↗</span></a>`:'',
+    it.type==='set'&&!/soundcloud\.com/.test(it.url||'')?`<a class="lk" href="${esc(scl(it))}" target="_blank" rel="noopener">Find on SoundCloud<span>↗</span></a>`:'',
     host?`<a class="lk" href="${esc(it.url)}" target="_blank" rel="noopener">${it.type==='set'?'Watch':'Open'} on ${esc(hostName(host))}<span>↗</span></a>`:''].join('');
   $('#dr').innerHTML=`<div class="ip ${sh}" style="${cs(it)}">
    <button class="x" id="dx" aria-label="Close">×</button>
@@ -3759,7 +3762,7 @@ function brPvDraw(){const it=brPv;if(!it||cur||!$('#dr').classList.contains('on'
   const keep=[...$('#dr').querySelectorAll('.syn.open')].length;
   $('#dr').innerHTML=`<div class="ip ${sh}" style="${cs(it)}"><button class="x" data-bpx aria-label="Close">×</button>
    <div class="hero">${cover(it,'big ini'+(sh==='p'?' pp':sh==='w'?' ww':''))}<div class="ttl"><div class="mt">${meta}</div><h2>${esc(it.title)}</h2>${it.creator?`<p>${esc(it.creator)}</p>`:''}</div></div>
-   <div class="ba bpa">${brAct(it.pv)}</div>${infoBlock({...it,info:it.info&&{...it.info,sl:null}})}${watchBlock(it)}${simBlock(it)}</div>`;
+   <div class="ba bpa">${brAct(it.pv)}</div>${it.type==='set'?`<div class="lks">${it.type==='set'&&!/soundcloud\.com/.test(it.url||'')?`<a class="lk" href="${esc(scl(it))}" target="_blank" rel="noopener">Find on SoundCloud<span>↗</span></a>`:''}</div>`:''}${infoBlock({...it,info:it.info&&{...it.info,sl:null}})}${watchBlock(it)}${simBlock(it)}</div>`;
   if(keep)$('#dr .syn')?.classList.add('open')}
 $('#dr').addEventListener('click',e=>{if(cur||!brPv)return;if(e.target.closest('[data-bpx]')){closeItem();return}const a=e.target.closest('[data-ba]');if(!a)return;
   const r=brPv.pv;brIndex();const h=brHave(r);closeItem();if(h){openItem(h.id);return}brDo(r,a.dataset.ba)});
