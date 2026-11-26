@@ -1067,6 +1067,8 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
 .arpop li.spnow b,.arpop li.spnow em{color:var(--acc)}
 .arpop li.busy{opacity:.6}
 .ar .armb{display:flex;gap:20px}.ar .armo{margin:2px 0 6px;font-size:14px}
+.arrel .bp{border-radius:50%;aspect-ratio:1}
+.arrel .bm{text-align:center}
 /* spotify: big Now playing turntable (#bp) */
 #bp{position:fixed;inset:0;z-index:90;color:#fff;overflow:hidden auto;overscroll-behavior:contain;background:#0d0c12;font-size:15px;line-height:1.3;--c1:#c43b6d;--c2:#f4a259}
 #bp[hidden]{display:none}body.bpon{overflow:hidden}body.bpon #npb{display:none}body.bpon .toast{z-index:95}
@@ -1167,7 +1169,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-16</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-17</small>
     </div></details>
   </div>
 </header>
@@ -4080,21 +4082,24 @@ function spCmdErr(e){if(e?.dev)toast(`Spotify can’t be controlled on ${e.dev} 
    Open in Spotify (the artist page itself when Spotify is connected, otherwise a Spotify search; desktop app on computers),
    + Up next / Done for the artist, "In your library" (everything of theirs you saved) and "More by" (Deezer discography).
    Album pages also get a ▶ Play album button that starts the whole album in Spotify, with a small Open in Spotify link beside it. */
-const AR={top:null,topN:5,pu:null,key:'',n:'',src:null,pic:'',fans:0,url:'',sp:'',by:null,busy:0,err:0};
+const AR={rel:null,hist:[],top:null,topN:5,pu:null,key:'',n:'',src:null,pic:'',fans:0,url:'',sp:'',by:null,busy:0,err:0};
 const arLink=it=>MUS.includes(it.type)&&it.type!=='artist'&&it.creator?`<button type="button" class="arl" data-ar title="Open artist">${esc(it.creator)}<span aria-hidden="true">›</span></button>`:esc(it.creator);
 const arParts=c=>String(c||'').split(/\s*(?:,|&|\/|\bfeat\.?|\bft\.|\bwith\b|\bx\b)\s*/i).map(brN).filter(Boolean);
 const arR=()=>({type:'artist',title:AR.n,creator:'',art:AR.pic,url:AR.url,sub:''});
 function arLib(){const k=AR.key,O={album:0,song:1};return st.items.filter(i=>i.type!=='artist'&&i.creator&&(brN(i.creator)===k||arParts(i.creator).includes(k)))
   .sort((a,b)=>(O[a.type]??2)-(O[b.type]??2)||cmpD(relD(b),relD(a))||a.title.localeCompare(b.title))}
 function arMore(){brIndex();return(AR.by||[]).filter(r=>!brHave(r))}
-function arOpen(name,src){const k=brN(name);if(!k)return;Object.assign(AR,{top:null,topN:5,pu:new Map(),key:k,n:name,src:src||null,pic:'',fans:0,url:'',sp:'',by:null,busy:1,err:0});
+function arOpen(name,src,hist){const k=brN(name);if(!k)return;Object.assign(AR,{rel:null,hist:hist||[],top:null,topN:5,pu:new Map(),key:k,n:name,src:src||null,pic:'',fans:0,url:'',sp:'',by:null,busy:1,err:0});
   if(!$('#dr').classList.contains('on'))layer('item');cur=null;brPv=null;$('#dr').classList.add('on');$('#shade').classList.add('on');arDraw(1);$('#dr').scrollTop=0;
   (async()=>{try{const j=await jsonp(`https://api.deezer.com/search/artist?q=${encodeURIComponent(name)}&limit=5&output=jsonp`),l=j.data||[],a=l.find(x=>brN(x.name)===k)||l[0];
-      if(AR.key!==k)return;if(a){AR.pic=a.picture_xl||a.picture_big||'';AR.fans=a.nb_fan||0;AR.url=a.link||''}arDraw();arTop(k,a?.id);
+      if(AR.key!==k)return;if(a){AR.pic=a.picture_xl||a.picture_big||'';AR.fans=a.nb_fan||0;AR.url=a.link||''}arDraw();arTop(k,a?.id);arRel(k,a?.id);
       const by=a?await simBy({title:'',creator:name},a.id):[];if(AR.key!==k)return;AR.by=by}catch(e){if(AR.key!==k)return;AR.err=1}
     AR.busy=0;arDraw()})();
   arSpot(k)}
 /* Popular: Last.fm top tracks (by listeners) when a Last.fm key is set, with covers from Deezer; otherwise Deezer's own top tracks. */
+/* Fans also like: Deezer related artists. Tap one to open their artist page; the back link then returns to this artist. */
+async function arRel(k,aid){let L=[];try{if(aid)L=((await jsonp(`https://api.deezer.com/artist/${aid}/related?limit=20&output=jsonp`)).data||[]).filter(a=>a.name).map(a=>({type:'artist',title:a.name,creator:'',art:a.picture_xl||a.picture_big||'',thumb:a.picture_medium||a.picture_big||'',url:a.link||'',fans:a.nb_fan||0}))}catch(e){}
+  if(AR.key!==k)return;AR.rel=L;arDraw()}
 async function arTop(k,aid){let dz=[],lf=null;
   try{if(aid)dz=((await jsonp(`https://api.deezer.com/artist/${aid}/top?limit=50&output=jsonp`)).data||[]).map(t=>({t:t.title_short||t.title,al:t.album?.title||'',img:t.album?.cover_small||t.album?.cover_medium||'',s:t.duration||0}))}catch(e){}
   if(st.lfm)try{const j=await getJSON(`https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${encodeURIComponent(AR.n)}&autocorrect=1&limit=50&api_key=${encodeURIComponent(st.lfm)}&format=json`);
@@ -4130,10 +4135,10 @@ function arDraw(force){const d=$('#dr');if(!AR.key||cur||brPv||!d.classList.cont
   const more=AR.busy?`<div class="simh"><b>More by ${esc(n)}</b></div><div class="simr">${simSk}</div>`:AR.err?`<p class="wn">Couldn’t load their albums. <button type="button" class="sp" data-arre>Try again</button></p>`
     :M.length?`<div class="simh"><b>${L.length?'More by '+esc(n):'Albums'}</b><small>${M.length}</small></div><div class="simr">${M.map((r,i)=>`<div class="bt" data-arm="${i}"><div class="bp">${brImg(r)}</div><div class="bm"><b>${esc(r.title)}</b><small>${esc(r.extra?.year||'')}</small></div><div class="ba">${brAct(r)}</div></div>`).join('')}</div>`:'';
   d.innerHTML=`<div class="ip ar ${shape('album')}" style="${cs(src||pi)}"><button class="x" data-arx aria-label="Close">×</button>
-   <div class="hero">${cover(pi,'big ini round')}<div class="ttl"><div class="mt">Artist${AR.fans?`, ${AR.fans.toLocaleString()} fans`:''}</div><h2>${esc(n)}</h2>${src?`<p><button type="button" class="arl" data-arb>‹ ${esc(src.title)}</button></p>`:''}</div></div>
+   <div class="hero">${cover(pi,'big ini round')}<div class="ttl"><div class="mt">Artist${AR.fans?`, ${AR.fans.toLocaleString()} fans`:''}</div><h2>${esc(n)}</h2>${AR.hist.length?`<p><button type="button" class="arl" data-arb>‹ ${esc(AR.hist[AR.hist.length-1])}</button></p>`:src?`<p><button type="button" class="arl" data-arb>‹ ${esc(src.title)}</button></p>`:''}</div></div>
    <div class="lks"><a class="btn pri spal" href="${esc(sp)}" target="_blank" rel="noopener">Open in Spotify<span aria-hidden="true">↗</span></a></div>
    <div class="ba bpa">${brAct(arR())}</div>
-   <section class="arw">${arTopHtml()}${lib}${more}</section></div>`;
+   <section class="arw">${arTopHtml()}${lib}${more}${AR.rel?.length?`<div class="simh"><b>Fans also like</b></div><div class="simr arrel">${AR.rel.map((r,i)=>`<div class="bt" data-arr="${i}"><div class="bp">${brImg(r)}</div><div class="bm"><b>${esc(r.title)}</b>${r.fans?`<small>${arNum(r.fans)} fans</small>`:''}</div></div>`).join('')}</div>`:''}</section></div>`;
   d.querySelectorAll('.simr').forEach((x,i)=>x.scrollLeft=sx[i]||0)}
 async function spAlbPlay(it,btn){if(!it)return;if(!st.spc){spSetup();return}
   if(!spA().rt){spLogin(st.items.includes(it)?[it.id,0,'al']:null);return}
@@ -4158,12 +4163,13 @@ $('#dr').addEventListener('click',e=>{const t=e.target,b=x=>t.closest(x);
   const tn=b('[data-artn]');if(tn){AR.topN=tn.dataset.artn==='+'?Math.min((AR.top||[]).length,AR.topN+15):5;arDraw();return}
   const aq=b('[data-arq]');if(aq){arPlay(+aq.dataset.arq,1,aq);return}
   const ap=b('[data-arp]');if(ap){arPlay(+ap.dataset.arp,0,ap);return}
+  const rr=b('[data-arr]');if(rr){const r=AR.rel?.[+rr.dataset.arr];if(r){arOpen(r.title,AR.src,[...AR.hist,AR.n]);}return}
+  if(b('[data-arb]')&&AR.hist.length){const h=AR.hist.slice(0,-1);arOpen(AR.hist[AR.hist.length-1],AR.src,h);return}
   if(b('[data-arb]')){const s=AR.src;AR.key='';if(s&&st.items.includes(s))openItem(s.id);else if(s?.pv)brOpen(s.pv);return}
   const li=b('[data-ari]');if(li){AR.key='';openItem(li.dataset.ari);return}
   const ba=b('[data-ba]'),m=b('[data-arm]'),r=m?arMore()[+m.dataset.arm]:ba?arR():null;if(!r)return;
   if(ba){brDo(r,ba.dataset.ba);render();arDraw();return}
   if(b('.bp,.bm')){brIndex();const h=brHave(r);AR.key='';if(h)openItem(h.id);else{brOpen(r);$('#dr').scrollTop=0}}},true);
-
 /* spotify: big Now playing turntable (spotify thread, 2026.11.25-10). Opens from the mini player. Colored vinyl drawn on a canvas (cover colors, track bands, current band glow, cover label). Tonearm shows the position across the album; drag it, or spin the record, to seek; tap a band to drop the needle on that song; tap the label to play or pause. Album sleeve beside the deck on computers; the record slides out and back when the album changes. Queue from /me/player/queue. */
 const BP={on:0,el:null,d:null,alb:{},al:null,rot:0,spd:0,boost:0,armA:3,drag:null,raf:0,key:'',qkey:'',col:{},last:0,lay:0};
 const BPTH=[['walnut','Walnut & Brass'],['studio','Studio Black'],['neon','Neon'],['sunset','Sunset 70s']];
