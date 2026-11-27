@@ -926,8 +926,8 @@ body.mo-glitch #view{animation:moGlitch .24s steps(3) 1}
 @media(prefers-reduced-motion:reduce){#mo-eco,#mo-burst{display:none}}
 #mo-ecot{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:25;transition:opacity .6s ease}
 #mo-grade{position:fixed;inset:0;pointer-events:none;z-index:24;opacity:0;transition:opacity .6s ease;background:#a8743a;mix-blend-mode:color;color:#ff6fb5}
-body.mo-live[data-world=movie] #mo-grade{opacity:.26}
-#mo-ambt[data-t=movie]::before{opacity:.13}
+body.mo-live[data-world=movie] #mo-grade{opacity:.14}
+#mo-ambt[data-t=movie]::before{opacity:.08}
 #mo-ambt[data-t=game]::before{background:repeating-linear-gradient(90deg,rgba(255,0,60,.035) 0 1px,rgba(0,255,120,.03) 1px 2px,rgba(0,120,255,.035) 2px 3px)}
 #mo-hud{position:fixed;left:20px;bottom:18px;z-index:26;display:flex;gap:14px;align-items:baseline;font:700 13px/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.12em;color:#ffe66d;text-shadow:2px 2px 0 #ff3d7f;pointer-events:none;transform-origin:0 100%}
 #mo-hud b{color:#4df0ff;animation:moBlink 1s steps(1) infinite}#mo-hud i{font-style:normal;color:#fff}
@@ -1155,6 +1155,44 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
  #bp .bpvis{padding:6% 0 0 12%;width:100%;max-width:calc((100vh - 190px) * 1.2);justify-self:center}#bp .bpsl{display:block;position:absolute;left:0;top:0;width:50%;aspect-ratio:1;object-fit:cover;border-radius:6px;box-shadow:0 24px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08);transform:rotate(-7deg)}#bp .bpsl[hidden]{display:none}#bp .deck{z-index:1}
  #bp .bpq{align-self:stretch;background:rgba(0,0,0,.28);border-radius:16px;padding:22px;margin-top:22px;overflow:auto;min-height:0}}
 @media(prefers-reduced-motion:reduce){#bp.play .bpbg{animation:none}}
+/* player thread (2026.11.27-1): mini player over item pages, queue gestures, queue menus, Save queue */
+body:has(#dr.on) #npb,#dr.on~#npb{z-index:42}
+#npb{touch-action:none}#npb::before{content:'';position:absolute;top:3px;left:50%;width:30px;height:3px;margin-left:-15px;border-radius:2px;background:rgba(255,255,255,.22)}
+#npb .npw{min-height:44px}.npup{flex:none;display:grid;place-items:center;width:22px;height:22px;color:var(--mut);margin-left:-4px}.npup svg{width:16px;height:16px}
+@media(max-width:760px){body:has(#dr.on) #npb{bottom:calc(12px + env(safe-area-inset-bottom,0px));right:12px}body.npon #dr::after{content:'';display:block;height:90px}}
+#bp .bptabs{align-items:center;gap:14px}#bp .bptabs button{white-space:nowrap}#bp .bptabs .pqsave{margin-left:auto;font-size:12.5px;letter-spacing:0;text-transform:none;font-weight:600;color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:99px;padding:5px 12px;display:inline-flex;align-items:center;gap:6px}#bp .bptabs .pqsave svg{width:14px;height:14px}#bp .bptabs .pqsave:hover{background:rgba(255,255,255,.1)}
+#bp .bpq li.qr{position:relative;display:block;padding:0;margin:0 -6px;border-radius:8px;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .18s ease}
+#bp .bpq li.qr.drag{z-index:5;transition:none;overflow:visible;box-shadow:0 14px 34px rgba(0,0,0,.55);background:rgba(28,26,36,.97);border-color:transparent}
+body.pqdrag,body.pqdrag *{cursor:grabbing!important}
+#bp .qfg{position:relative;z-index:1;display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:8px}
+#bp li.qr.qsw .qfg{background:color-mix(in srgb,var(--c1) 10%,#16141c)}
+#bp .qbg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:13px;font-weight:700;opacity:0;border-radius:8px}
+#bp li.qr.qsw .qbg{opacity:1}#bp li.qR .qbg{background:#1d7a47}#bp li.qL .qbg{background:#a8383c}#bp li.lock.qR .qbg{background:#3b3946}
+#bp .bpq .qbg span{flex:none;display:inline-flex;align-items:center;gap:6px;transition:transform .15s}#bp li.qR .qbx,#bp li.qL .qbn{visibility:hidden}#bp li.arm .qbg span{transform:scale(1.12)}
+#bp .qbn svg{width:15px;height:15px}
+#bp .qtx{cursor:pointer;border-radius:4px}#bp .qtx:focus-visible{outline:2px solid var(--c2);outline-offset:2px}
+#bp .qh{flex:none;width:38px;height:40px;margin:-4px -6px -4px -4px;display:grid;place-items:center;color:rgba(255,255,255,.45);touch-action:none;cursor:grab}#bp .qh svg{width:20px;height:20px}#bp .qh:hover{color:#fff}
+#bp .qlk{flex:none;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.22);border-radius:99px;padding:2px 7px}
+#bp .bpq li .qx{display:none;flex:none;gap:2px}#bp .qx button{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.75);font-size:13px}#bp .qx button svg{width:15px;height:15px}#bp .qx button:hover{background:rgba(255,255,255,.12);color:#fff}
+@media(hover:hover) and (pointer:fine){#bp li.qr:not(.drag):hover .qx{display:flex}#bp li.qr:not(.drag):hover em{display:none}#bp li.qr:not(.drag):hover .qfg{background:rgba(255,255,255,.05)}}
+#bp .bpq li.pqhint{display:block;border:0;color:rgba(255,255,255,.4);font-size:12px;padding:12px 0 4px;text-align:center}
+@media(hover:hover) and (pointer:fine){#bp .bpq li.pqhint{display:none}}
+#bp .pqsl li span{cursor:pointer}#bp .pqsl .pqp{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#111}#bp .pqsl .pqp svg{width:16px;height:16px}
+#bp .pqsl .pqd{flex:none;width:30px;height:30px;border-radius:50%;color:rgba(255,255,255,.5)}#bp .pqsl .pqd:hover{color:#fff;background:rgba(255,255,255,.1)}
+.pqnm{display:block;margin:6px 0 4px}.pqnm span{display:block;font-size:13px;color:var(--mut);margin-bottom:4px}.pqsub{font-size:12.5px;color:var(--mut)}
+.lks .spqa{margin:14px 0 0 8px;display:inline-flex;align-items:center;gap:7px;height:42px;padding:0 16px;font-size:15px;font-weight:600;border-radius:21px;cursor:pointer}.lks .spqa svg{width:17px;height:17px}
+.tile,.cv[data-id]{-webkit-touch-callout:none}
+#pqms{position:fixed;inset:0;z-index:96;background:rgba(0,0,0,.4);animation:pqfade .18s ease}
+#pqm{position:fixed;z-index:97;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:18px;padding:6px;box-shadow:0 22px 60px rgba(0,0,0,.55);animation:pqin .24s cubic-bezier(.2,1,.3,1)}
+#pqm .pqmh{padding:10px 14px 8px;font-size:13px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--rule);margin-bottom:4px}
+#pqm button{display:block;width:100%;text-align:left;padding:12px 14px;border:0;background:none;color:inherit;font:inherit;font-size:16px;font-weight:600;border-radius:12px;cursor:pointer}
+#pqm button small{display:block;font-size:12.5px;font-weight:400;color:var(--mut);margin-top:2px}
+#pqm button:hover,#pqm button:focus-visible{background:color-mix(in srgb,var(--ink) 8%,transparent);outline:0}
+#pqm .pqmc{text-align:center;color:var(--mut);font-weight:500;margin-top:4px}
+@media(min-width:761px){#pqms{background:transparent;animation:none}#pqm{left:auto;right:auto;bottom:auto;width:250px;border-radius:12px}#pqm .pqmc{display:none}#pqm button{font-size:14.5px;padding:9px 12px;border-radius:8px}#pqm button small{font-size:12px}}
+@keyframes pqin{from{opacity:0;transform:translateY(14px)}}@keyframes pqfade{from{opacity:0}}
+@media(prefers-reduced-motion:reduce){#pqm,#pqms{animation:none}#bp .bpq li.qr{transition:none}}
+.toast{width:max-content;max-width:calc(100vw - 32px)}
 </style>
 </head>
 <body>
@@ -1169,7 +1207,7 @@ body.npon main{padding-bottom:170px}body.npon .toast{bottom:calc(132px + env(saf
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.25-17</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.27-2</small>
     </div></details>
   </div>
 </header>
@@ -3968,9 +4006,9 @@ async function spLogin(pend){if(!st.spc){toast('Add your Spotify client ID in Se
   const v=spB64(crypto.getRandomValues(new Uint8Array(48))),s=spB64(crypto.getRandomValues(new Uint8Array(12)));
   const ch=spB64(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));
   try{localStorage.setItem(SPV,JSON.stringify({v,s,pend:pend||null,h:location.hash}))}catch(e){}
-  location.href='https://accounts.spotify.com/authorize?'+new URLSearchParams({client_id:st.spc,response_type:'code',redirect_uri:SPR(),code_challenge_method:'S256',code_challenge:ch,state:s,scope:'user-modify-playback-state user-read-playback-state user-read-currently-playing'})}
+  location.href='https://accounts.spotify.com/authorize?'+new URLSearchParams({client_id:st.spc,response_type:'code',redirect_uri:SPR(),code_challenge_method:'S256',code_challenge:ch,state:s,scope:'user-modify-playback-state user-read-playback-state user-read-currently-playing playlist-modify-private user-read-recently-played'})}
 async function spTok(body){const r=await fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:st.spc,...body})});
-  let j={};try{j=await r.json()}catch(e){}if(!r.ok)throw{st:r.status,error:j.error||''};const o={at:j.access_token,rt:j.refresh_token||spA().rt,exp:Date.now()+((j.expires_in||3600)-60)*1e3};spSet(o);return o}
+  let j={};try{j=await r.json()}catch(e){}if(!r.ok)throw{st:r.status,error:j.error||''};const o={at:j.access_token,rt:j.refresh_token||spA().rt,sc:j.scope||spA().sc||'',exp:Date.now()+((j.expires_in||3600)-60)*1e3};spSet(o);return o}
 let spRef=null;
 async function spToken(){const a=spA();if(!a.rt)return null;if(a.at&&a.exp>Date.now())return a.at;
   spRef=spRef||spTok({grant_type:'refresh_token',refresh_token:a.rt}).then(o=>o.at,e=>{if(e.error==='invalid_grant'||e.error==='invalid_client')spSet(null);return null}).finally(()=>{spRef=null});return spRef}
@@ -4022,7 +4060,7 @@ function spSetup(){dlg(`<h3>Play in Spotify</h3><p>To play tracks and add them t
   if(!p.s||q.get('state')!==p.s)return;
   if(q.has('error')){setTimeout(()=>toast(q.get('error')==='access_denied'?'Spotify wasn’t connected':'Spotify sign-in didn’t work'),400);return}
   try{await spTok({grant_type:'authorization_code',code:q.get('code'),redirect_uri:SPR(),code_verifier:p.v})}catch(e){setTimeout(()=>toast('Spotify sign-in didn’t work. Check the redirect URI'),400);return}
-  const pd=p.pend,it=pd&&st.items.find(x=>x.id===pd[0]);
+  if(p.pend&&p.pend[0]==='__pl'){const pd=p.pend;npSoon(500);setTimeout(()=>plSave(pd[1],pd[2]),700);return}const pd=p.pend,it=pd&&st.items.find(x=>x.id===pd[0]);
   npSoon(500);if(!it){setTimeout(()=>toast('Spotify connected'),400);return}
   SOPEN.add(it.id+'/trk');setTimeout(()=>{openItem(it.id);if(pd[2]==='al'){spAlbPlay(it,document.querySelector('#dr [data-spal]'));return}spDo(it,pd[1],pd[2],document.querySelector(`#dr button[data-sp${pd[2]==='q'?'q':'p'}="${pd[1]}"]`))},300)})();
 $('#dr').addEventListener('click',e=>{const b=e.target.closest('[data-spp],[data-spq]');if(!b||!cur)return;const q=b.dataset.spq!=null;spDo(cur,+(q?b.dataset.spq:b.dataset.spp),q?'q':'p',b.matches('button')?b:b.closest('li')?.querySelector('button[data-spp]'))});
@@ -4342,6 +4380,215 @@ function bpClick(ev){if(!ev.target.closest('.bptr'))BP.el.querySelector('.bpthm'
 BP.el||0;
 {const s0=npShow;npShow=function(d){s0(d);if(BP.on&&d)bpSync(d)}}
 addEventListener('resize',()=>{if(BP.on)bpDraw()});
+
+/* player thread (2026.11.27-1): phone-first player upgrades. Revert: notes/player/README.md.
+   - Mini player stays visible over item and album pages. Tap it, or swipe it up, to open the big player.
+   - Big player queue: tap a song to open its album. Swipe right = play next, swipe left = remove, long-press (or drag the ≡ handle) to reorder. Each edit has Undo.
+   - Spotify's API can add to its queue but can't remove or reorder. So queue edits re-cue playback: Checkit restarts the current song at the same spot
+     as an explicit list [current, ...your order]. Songs put in Spotify's own queue by Play next can't be moved; they show as "Queued" at the top, and
+     removing one makes Checkit skip it when it starts (only while Checkit is open).
+   - Play next / Add to end of queue: tracklist queue buttons, the album page Queue button, artist Popular rows, long-press (right-click on computers) on any album cover.
+   - Save queue: a private Spotify playlist (scope playlist-modify-private; asks to reconnect once if the sign-in lacks it) or a named Checkit session on this device (Saved tab). */
+const PQ={P:[],S:[],cq:null,locked:[],vis:[],E:[],pend:null,pt:0,busy:0,g:null,lu:''};
+const pqLoad=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const pqSave=(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+{const n=Date.now();PQ.P=pqLoad('checkit.spq',[]).filter(x=>x&&x.u&&n-x.t<6*36e5);PQ.S=pqLoad('checkit.spskip',[]).filter(x=>x&&x.u&&n-x.t<3*36e5);PQ.cq=pqLoad('checkit.cq',null)}
+const pqP=()=>pqSave('checkit.spq',PQ.P.slice(-80)),pqS=()=>pqSave('checkit.spskip',PQ.S.slice(-80));
+const rmOne=(a,v)=>{const i=a.indexOf(v);if(i>=0)a.splice(i,1);return i>=0};
+const rmU=(a,u)=>{const i=a.findIndex(x=>x.u===u);if(i>=0)a.splice(i,1);return i>=0};
+const pqMs=ms=>{const s=Math.round((ms||0)/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function pqMin(t,alb){const al=t.album||alb||{},im=al.images||[],I=im.length>1?[im[0],im[im.length-1]]:im.slice(0,1);
+  return{uri:t.uri,id:t.id,name:(t.name||'').replace(/\s+-\s+((\d{4} )?(digital )?remaster(ed)?( \d{4})?( version)?)$/i,''),artists:(t.artists||[]).map(a=>({name:a.name})),album:{id:al.id||'',name:al.name||'',images:I.map(x=>({url:x.url}))},duration_ms:t.duration_ms||0}}
+async function spDev(go){try{return await go()}catch(e){if(e.st!==404)throw e;const D=(await spApi('/me/player/devices')).devices||[];const d=D.find(x=>x.is_active&&!x.is_restricted)||D.find(x=>!x.is_restricted);if(!d)throw{st:404};return await go(d.id)}}
+function pqErr(e){if(e?.st===401){spSet(null);spLogin(null);return}spCmdErr(e)}
+function pqReady(){if(!st.spc){spSetup();return false}if(!spA().rt){spLogin(null);return false}return true}
+
+/* what's coming up: songs in Spotify's own queue (locked, at the top: ones Checkit put there, plus any that sit ahead of Checkit's list), then the list Checkit can reorder */
+async function pqState(){const j=await spApi('/me/player/queue'),cur=j.currently_playing||null,Q=(j.queue||[]).filter(t=>t&&t.uri);
+  const P=PQ.P.map(x=>x.u);let n=0;while(n<Q.length&&rmOne(P,Q[n].uri))n++;
+  PQ.P=PQ.P.filter(x=>Q.some(t=>t.uri===x.u));pqP();
+  const cq=PQ.cq;let E=null;
+  if(cq&&cur){const i=cq.t.findIndex((x,k)=>k>=(cq.i||0)&&x.uri===cur.uri);if(i>=0){const R=cq.t.slice(i+1),m=R.length?Q.findIndex((t,k)=>k>=n&&t.uri===R[0].uri):n;if(m>=0){n=m;cq.i=i;E=R}}}
+  if(!E){E=Q.slice(n).map(t=>pqMin(t));const ctx=NP.d?.context;
+    if(ctx?.type==='album'&&Q.length>=19&&E.length){const id=ctx.uri.split(':')[2],al=await bpAlbum(id);
+      if(al){const k=al.T.findIndex(t=>t.id===E[E.length-1].id);if(k>=0){const ab=cur?.album?.id===id?cur.album:{id};E.push(...al.T.slice(k+1).map(t=>pqMin(t,ab)))}}}}
+  return{cur,locked:Q.slice(0,n).map(t=>pqMin(t)),E}}
+/* re-cue: play [current, ...E] from the current spot */
+async function pqApply(E){const pl=await spApi('/me/player?market='+spMk()).catch(()=>null),it=pl?.item,dev=pl?.device?.id||'';
+  if(pl?.shuffle_state)await spApi('/me/player/shuffle?state=false'+(dev?'&device_id='+dev:''),{method:'PUT'}).catch(()=>{});
+  const list=(it?[pqMin(it),...E]:E).slice(0,400);if(!list.length)return;
+  const body=JSON.stringify(it?{uris:list.map(t=>t.uri),offset:{position:0},position_ms:Math.max(0,(pl.progress_ms||0)+(pl.is_playing?300:0))}:{uris:list.map(t=>t.uri)});
+  await spDev(d=>spApi('/me/player/play'+((d||dev)?'?device_id='+(d||dev):''),{method:'PUT',body}));
+  if(it&&!pl.is_playing)await spApi('/me/player/pause',{method:'PUT'}).catch(()=>{});
+  PQ.cq={t:list,i:0};pqSave('checkit.cq',PQ.cq);npSoon(800)}
+function pqEdit(E,msg,undoE){PQ.E=E;PQ.pend=E;pqDraw();clearTimeout(PQ.pt);PQ.pt=setTimeout(pqFlush,700);if(msg)toast(msg,undoE?()=>pqEdit(undoE):null)}
+async function pqFlush(){const E=PQ.pend;if(!E)return;if(PQ.busy){PQ.pt=setTimeout(pqFlush,400);return}PQ.busy=1;PQ.pend=null;
+  try{await pqApply(E)}catch(e){pqErr(e)}finally{PQ.busy=0;setTimeout(()=>{BP.qkey='';bpQueue(1)},1000)}}
+
+/* queue list in the big player */
+bpQueue=async function(force){if(!BP.on||PQ.pend||PQ.busy||PQ.g)return;let s;try{s=await pqState()}catch(e){return}
+  if(PQ.pend||PQ.busy||PQ.g)return;const k=s.locked.concat(s.E).map(t=>t.uri).join(',')+'|'+PQ.S.length;if(k===BP.qkey&&!force)return;BP.qkey=k;PQ.locked=s.locked;PQ.E=s.E;pqDraw()};
+const PQH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 9h14M5 15h14"/></svg>';
+function pqRow(t,q,lock){const im=t.album?.images||[],u=(im[im.length-1]||{}).url||'',sub=[(t.artists||[]).map(a=>a.name).join(', '),t.album?.name].filter(Boolean).join(' · ');
+  return`<li class="qr${lock?' lock':''}" data-q="${q}"><div class="qbg" aria-hidden="true"><span class="qbn">${lock?'Already queued':NPI.next+' Play next'}</span><span class="qbx">Remove ✕</span></div><div class="qfg"><img alt="" loading="lazy" draggable="false"${u?` src="${esc(u)}"`:''}><span class="qtx" tabindex="0" role="button" title="Open the album" aria-label="${esc(t.name)}, ${esc(sub)}. Open the album"><b>${esc(t.name)}</b><small>${esc(sub)}</small></span>${lock?'<i class="qlk">Queued</i>':`<em>${pqMs(t.duration_ms)}</em>`}<span class="qx">${lock?'':`<button type="button" data-qa="n" aria-label="Play next" title="Play next">${NPI.next}</button>`}<button type="button" data-qa="x" aria-label="Remove" title="Remove">✕</button></span>${lock?'':`<button type="button" class="qh" aria-label="Drag to reorder" title="Drag to reorder">${PQH}</button>`}</div></li>`}
+function pqDraw(){const ol=BP.el?.querySelector('.bpqq');if(!ol)return;const S=PQ.S.map(x=>x.u);PQ.vis=PQ.locked.filter(t=>!rmOne(S,t.uri));
+  ol.innerHTML=PQ.vis.length||PQ.E.length?PQ.vis.map((t,k)=>pqRow(t,'l'+k,1)).join('')+PQ.E.map((t,k)=>pqRow(t,'e'+k,0)).join('')+'<li class="pqhint">Swipe right to play next, left to remove. Hold to reorder. Tap a song for its album.</li>'
+    :'<li class="bpqe">Nothing queued. Long-press any album cover, or use the queue button on a tracklist, to line songs up here.</li>'}
+const pqT=q=>q[0]==='l'?PQ.vis[+q.slice(1)]:PQ.E[+q.slice(1)];
+function pqAct(q,a){const k=+q.slice(1);
+  if(q[0]==='l'){const t=PQ.vis[k];if(!t)return;if(a==='n'){toast('Already queued to play next');pqDraw();return}
+    PQ.S.push({u:t.uri,t:Date.now()});pqS();rmU(PQ.P,t.uri);pqP();pqDraw();
+    toast(`Removed ${t.name}. Checkit will skip it`,()=>{rmU(PQ.S,t.uri);pqS();PQ.P.push({u:t.uri,t:Date.now()});pqP();pqDraw()});return}
+  const E=PQ.E,t=E[k];if(!t)return;const old=[...E];
+  if(a==='n'){if(k===0){toast(PQ.vis.length?'Already next, after your queued songs':'Already up next');pqDraw();return}pqEdit([t,...E.filter((_,i)=>i!==k)],`Playing next: ${t.name}`,old)}
+  else pqEdit(E.filter((_,i)=>i!==k),`Removed ${t.name}`,old)}
+function pqMove(from,to){const E=[...PQ.E],old=[...PQ.E],[t]=E.splice(from,1);E.splice(to,0,t);pqEdit(E,`Moved ${t.name}`,old)}
+function bpOpenAlb(t){const al=t?.album;if(!al?.name)return;const it=npAlbum({item:t});bpClose();
+  setTimeout(()=>{if(it)openItem(it.id);else{const im=al.images||[];brOpen({type:'album',title:al.name,creator:(t.artists||[])[0]?.name||'',art:(im[0]||{}).url||'',url:al.id?'https://open.spotify.com/album/'+al.id:'',extra:{}})}},60)}
+
+/* gestures: swipe (right = play next, left = remove), hold or ≡ = drag to reorder, tap = album */
+function pqWire(e){const ol=e.querySelector('.bpqq');ol.addEventListener('pointerdown',pqDown);
+  ol.addEventListener('touchmove',ev=>{const g=PQ.g;if(g&&(g.m==='drag'||g.m==='swipe')&&ev.cancelable)ev.preventDefault()},{passive:false});
+  ol.addEventListener('contextmenu',ev=>{if(ev.target.closest('li.qr'))ev.preventDefault()});
+  ol.addEventListener('click',ev=>{const b=ev.target.closest('[data-qa]');if(b)pqAct(b.closest('li.qr').dataset.q,b.dataset.qa)});
+  ol.addEventListener('keydown',ev=>{if((ev.key==='Enter'||ev.key===' ')&&ev.target.closest('.qtx')){ev.preventDefault();bpOpenAlb(pqT(ev.target.closest('li.qr').dataset.q))}})}
+function pqDown(ev){if(ev.button>0||PQ.g)return;const li=ev.target.closest('li.qr');if(!li||ev.target.closest('.qx'))return;
+  const g=PQ.g={li,id:ev.pointerId,x0:ev.clientX,y0:ev.clientY,y:ev.clientY,m:'?',dx:0,dy:0,lock:li.classList.contains('lock'),fg:li.querySelector('.qfg'),t0:performance.now(),h0:!!ev.target.closest('.qh')};
+  if(g.h0){ev.preventDefault();pqDragStart()}else if(!g.lock)g.lp=setTimeout(()=>{if(PQ.g===g&&g.m==='?'){navigator.vibrate?.(12);pqDragStart()}},430);
+  addEventListener('pointermove',pqMv,{passive:false});addEventListener('pointerup',pqUp);addEventListener('pointercancel',pqCancel)}
+function pqMv(ev){const g=PQ.g;if(!g||ev.pointerId!==g.id)return;g.dx=ev.clientX-g.x0;g.dy=ev.clientY-g.y0;g.y=ev.clientY;
+  if(g.m==='?'){if(Math.abs(g.dx)>9&&Math.abs(g.dx)>Math.abs(g.dy)*1.3){g.m='swipe';clearTimeout(g.lp);g.li.classList.add('qsw');try{g.li.setPointerCapture(g.id)}catch(e){}}else if(Math.abs(g.dy)>9){clearTimeout(g.lp);g.m='scroll'}}
+  if(g.m==='swipe'){ev.preventDefault();const w=g.li.offsetWidth,th=Math.min(110,w*.3);let dx=g.dx;if(g.lock&&dx>0)dx=Math.min(dx,36)*.8;
+    g.fg.style.transform=`translateX(${dx}px)`;g.li.classList.toggle('qR',dx>0);g.li.classList.toggle('qL',dx<0);
+    const arm=Math.abs(dx)>th&&!(g.lock&&dx>0);if(arm!==!!g.arm){g.arm=arm;g.li.classList.toggle('arm',arm);if(arm)navigator.vibrate?.(8)}}
+  else if(g.m==='drag'){ev.preventDefault();pqDragMove()}}
+function pqScroller(){return innerWidth<=760?BP.el:BP.el.querySelector('.bpq')}
+function pqDragStart(){const g=PQ.g;g.m='drag';clearTimeout(g.lp);g.rows=[...g.li.parentNode.querySelectorAll('li.qr:not(.lock)')];g.from=g.to=g.rows.indexOf(g.li);g.h=g.li.offsetHeight;
+  g.sc=pqScroller();g.s0=g.sc.scrollTop;g.mids=g.rows.map(r=>{const b=r.getBoundingClientRect();return b.top+b.height/2});g.li.classList.add('drag');document.body.classList.add('pqdrag');
+  try{g.li.setPointerCapture(g.id)}catch(e){}
+  const loop=()=>{if(PQ.g!==g||g.m!=='drag')return;const r=g.sc===BP.el?{top:0,bottom:innerHeight}:g.sc.getBoundingClientRect(),y=g.y,sp=y<r.top+80?-(r.top+80-y)/5:y>r.bottom-80?(y-(r.bottom-80))/5:0;
+    if(sp){const s=g.sc.scrollTop;g.sc.scrollTop+=sp;if(g.sc.scrollTop!==s)pqDragMove()}g.raf=requestAnimationFrame(loop)};g.raf=requestAnimationFrame(loop)}
+function pqDragMove(){const g=PQ.g,off=(g.y-g.y0)+(g.sc.scrollTop-g.s0),mid=g.mids[g.from]+off;g.li.style.transform=`translateY(${off}px)`;
+  let to=0;g.mids.forEach((m,k)=>{if(k!==g.from&&m<mid)to++});g.to=to;
+  g.rows.forEach((r,k)=>{if(k===g.from)return;const s=g.from<k&&k<=to?-g.h:to<=k&&k<g.from?g.h:0;r.style.transform=s?`translateY(${s}px)`:''})}
+function pqEnd(){removeEventListener('pointermove',pqMv);removeEventListener('pointerup',pqUp);removeEventListener('pointercancel',pqCancel);
+  const g=PQ.g;PQ.g=null;if(g){clearTimeout(g.lp);cancelAnimationFrame(g.raf)}document.body.classList.remove('pqdrag');return g}
+function pqUp(ev){const g=PQ.g;if(!g||ev.pointerId!==g.id)return;pqEnd();const q=g.li.dataset.q;
+  if(g.m==='swipe'){if(g.arm){const right=g.dx>0;g.fg.style.transition='transform .17s ease-in';g.fg.style.transform=`translateX(${right?110:-110}%)`;
+      setTimeout(()=>{if(right){pqAct(q,'n');return}const li=g.li;li.style.height=li.offsetHeight+'px';li.style.transition='height .18s ease,opacity .18s';requestAnimationFrame(()=>{li.style.height='0px';li.style.opacity='0'});setTimeout(()=>pqAct(q,'x'),190)},170)}
+    else{g.fg.style.transition='transform .2s ease';g.fg.style.transform='';setTimeout(()=>{g.fg.style.transition='';g.li.classList.remove('qR','qL','arm','qsw')},200)}return}
+  if(g.m==='drag'){g.rows.forEach(r=>r.style.transform='');g.li.classList.remove('drag');if(g.to!==g.from)pqMove(g.from,g.to);return}
+  if(g.m==='?'&&!g.h0&&performance.now()-g.t0<430)bpOpenAlb(pqT(q))}
+function pqCancel(ev){const g=PQ.g;if(!g||ev.pointerId!==g.id)return;pqEnd();g.fg.style.transform='';g.li.style.transform='';g.li.classList.remove('qR','qL','arm','qsw','drag');g.rows?.forEach(r=>r.style.transform='')}
+
+/* Saved tab and Save queue */
+function pqTabs(e){e.querySelector('.bptabs').insertAdjacentHTML('beforeend','<button type="button" role="tab" data-bpt="s" aria-selected="false">Saved</button><button type="button" class="pqsave" data-pqsave aria-label="Save queue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Save</button>');
+  e.querySelector('.bprl').insertAdjacentHTML('afterend','<ol class="pqsl" hidden></ol>');
+  e.addEventListener('click',ev=>{const t=ev.target.closest('[data-bpt]');
+    if(t){const s=t.dataset.bpt==='s';e.querySelector('.pqsl').hidden=!s;if(s){ev.stopImmediatePropagation();BP.tab='s';e.querySelectorAll('[data-bpt]').forEach(x=>x.setAttribute('aria-selected',x===t));e.querySelector('.bpqq').hidden=true;e.querySelector('.bprl').hidden=true;pqSessDraw()}return}
+    if(ev.target.closest('[data-pqsave]')){ev.stopImmediatePropagation();pqSaveDlg();return}
+    const sp=ev.target.closest('[data-pss]');if(sp){ev.stopImmediatePropagation();pqSessPlay(sp.dataset.pss);return}
+    const sd=ev.target.closest('[data-psd]');if(sd){ev.stopImmediatePropagation();pqSessDel(sd.dataset.psd)}},true)}
+const pqSess=()=>pqLoad('checkit.sess',[]);
+function pqSessDraw(){const ol=BP.el?.querySelector('.pqsl');if(!ol)return;const L=pqSess();
+  ol.innerHTML=L.length?L.map(s=>{const im=s.t[0]?.album?.images||[],u=(im[im.length-1]||{}).url||'',dt=new Date(s.at).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+    return`<li class="pqs"><img alt="" loading="lazy"${u?` src="${esc(u)}"`:''}><span data-pss="${esc(s.id)}" role="button" tabindex="0"><b>${esc(s.name)}</b><small>${s.t.length} songs · saved ${esc(dt)}${s.pos?' · resumes where you left off':''}</small></span><button type="button" class="pqp" data-pss="${esc(s.id)}" aria-label="Play ${esc(s.name)}">${NPI.play}</button><button type="button" class="pqd" data-psd="${esc(s.id)}" aria-label="Delete ${esc(s.name)}">✕</button></li>`}).join('')
+    :'<li class="bpqe">No saved sessions yet. Tap Save to keep what’s playing and what’s next, then come back to it here.</li>'}
+async function pqSessPlay(id){const s=pqSess().find(x=>x.id===id);if(!s||!pqReady())return;
+  try{const pl=await spApi('/me/player?market='+spMk()).catch(()=>null);if(pl?.shuffle_state)await spApi('/me/player/shuffle?state=false',{method:'PUT'}).catch(()=>{});
+    const body=JSON.stringify({uris:s.t.map(t=>t.uri),offset:{position:0},position_ms:s.pos||0});
+    await spDev(d=>spApi('/me/player/play'+(d?'?device_id='+d:''),{method:'PUT',body}));PQ.cq={t:s.t,i:0};pqSave('checkit.cq',PQ.cq);
+    toast(`Playing session: ${s.name}`);npSoon(600);setTimeout(()=>{BP.qkey='';bpQueue(1)},1300)}catch(e){pqErr(e)}}
+function pqSessDel(id){const L=pqSess(),i=L.findIndex(x=>x.id===id);if(i<0)return;const[s]=L.splice(i,1);pqSave('checkit.sess',L);pqSessDraw();
+  toast(`Deleted ${s.name}`,()=>{const M=pqSess();M.splice(i,0,s);pqSave('checkit.sess',M);pqSessDraw()})}
+function pqSaveDlg(){const c=BP.d?.item,T=[...(c?[pqMin(c)]:[]),...PQ.vis,...PQ.E];if(!T.length){toast('Nothing to save yet');return}
+  const def='Queue · '+new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'})+', '+new Date().toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+  dlg(`<h3>Save this queue</h3><p>${T.length} song${T.length>1?'s':''}, starting with ${esc(T[0].name)}.</p><label class="pqnm"><span>Name</span><input id="pqnm" value="${esc(def)}" maxlength="80" autocomplete="off"></label><p class="pqsub">Spotify saves a private playlist you can play anywhere. A Checkit session stays on this device and picks up where you left off.</p><div class="dbtn"><button class="btn" data-close>Cancel</button><button class="btn" id="pqss" type="button">Save in Checkit</button><button class="btn pri" id="pqsp" type="button">Save to Spotify</button></div>`);
+  const nm=()=>$('#pqnm').value.trim()||def;
+  $('#pqss').onclick=()=>{const n=nm(),L=pqSess();L.unshift({id:'s'+Date.now().toString(36),name:n,at:Date.now(),pos:c?bpPos():0,t:T});pqSave('checkit.sess',L.slice(0,30));$('#dlg').close();toast(`Saved session: ${n}. Find it under Saved`);if(BP.tab==='s')pqSessDraw()};
+  $('#pqsp').onclick=()=>{const n=nm();$('#dlg').close();plSave(n,T.map(t=>t.uri))}}
+async function plSave(name,uris){if(!uris?.length||!pqReady())return;
+  const again=()=>spLogin(['__pl',name,uris.slice(0,300)]);
+  if(!/playlist-modify-private/.test(spA().sc||'')){dlg(`<h3>One more Spotify permission</h3><p>Saving playlists needs Spotify’s OK to create private playlists for you. You’ll hop to Spotify, tap Agree, and come straight back. “${esc(name)}” saves as soon as you’re back.</p><div class="dbtn"><button class="btn" data-close>Not now</button><button class="btn pri" id="plgo" type="button">Continue to Spotify</button></div>`);$('#plgo').onclick=()=>{$('#dlg').close();again()};return}
+  try{const meta=JSON.stringify({name,public:false,description:'Saved from Checkit'});let p;
+    try{p=await spApi('/me/playlists',{method:'POST',body:meta})}catch(e){if(e.st!==404&&e.st!==405)throw e;const me=await spApi('/me');p=await spApi('/users/'+encodeURIComponent(me.id)+'/playlists',{method:'POST',body:meta})}
+    for(let i=0;i<uris.length;i+=100){const body=JSON.stringify({uris:uris.slice(i,i+100)});try{await spApi('/playlists/'+p.id+'/items',{method:'POST',body})}catch(e){if(e.st!==404&&e.st!==405)throw e;await spApi('/playlists/'+p.id+'/tracks',{method:'POST',body})}}
+    spLinkT(`Saved to Spotify: ${name}`,'Open',p.external_urls?.spotify||'https://open.spotify.com/playlist/'+p.id)}
+  catch(e){if(e.st===401){spSet(null);again();return}if(e.st===403&&/scope|permission/i.test(e.msg||'')){spSet({...spA(),sc:''});plSave(name,uris);return}toast(`Couldn’t save the playlist${e.msg?': '+e.msg:''}`)}}
+
+/* Play next / Add to end of queue */
+async function pqAdd(T,mode,label){T=(T||[]).filter(Boolean);if(!T.length){toast('Couldn’t find that on Spotify');return}
+  try{if(mode==='next'){const before=PQ.P.length;for(const t of T){await spDev(d=>spApi('/me/player/queue?uri='+encodeURIComponent(t.uri)+(d?'&device_id='+d:''),{method:'POST'}));PQ.P.push({u:t.uri,t:Date.now()})}pqP();
+      toast(before?`Up next after your other queued songs: ${label}`:`Playing next: ${label}`,()=>{T.forEach(t=>{rmU(PQ.P,t.uri);PQ.S.push({u:t.uri,t:Date.now()})});pqP();pqS();BP.qkey='';if(BP.on)pqDraw()})}
+    else{let s=null;try{s=await pqState()}catch(e){}
+      if(!s?.cur){await spDev(d=>spApi('/me/player/play'+(d?'?device_id='+d:''),{method:'PUT',body:JSON.stringify({uris:T.map(t=>t.uri)})}));PQ.cq={t:T,i:0};pqSave('checkit.cq',PQ.cq);toast(`Playing in Spotify: ${label}`)}
+      else{const old=s.E;await pqApply([...s.E,...T]);toast(`Added to the end of your queue: ${label}`,()=>pqApply(old).catch(pqErr))}}
+    npSoon(700);setTimeout(()=>{BP.qkey='';bpQueue(1)},1100)}catch(e){pqErr(e)}}
+async function pqTrackOf(it,i){const t=it.info?.tracks?.[i];if(!t)return null;const al=await spAlbum(it).catch(e=>{if(e.st===401)throw e;return null}),tr=al&&spMatch(al,t,i,it.info.tracks.length);
+  if(tr)return pqMin(tr,{id:al.id,name:it.title,images:it.art?[{url:it.art}]:[]});
+  const j=await spApi('/search?type=track&limit=5&market='+spMk()+'&q='+encodeURIComponent(`track:${t.t} artist:${t.a||it.creator||''}`)),x=j.tracks?.items?.[0];return x?pqMin(x):null}
+async function pqAlbumOf(it){const al=await spAlbum(it);return al?al.T.map(t=>pqMin(t,{id:al.id,name:it.title,images:it.art?[{url:it.art}]:[]})):[]}
+async function pqRun(get,mode,label){if(!pqReady())return;try{pqAdd(await get(),mode,label)}catch(e){pqErr(e)}}
+const pqOpts=(get,label)=>[['Play next',()=>pqRun(get,'next',label),'Right after this song'],['Add to end of queue',()=>pqRun(get,'end',label),'After everything already lined up']];
+function pqMenu(anchor,title,opts){pqMenuClose();const sh=document.createElement('div');sh.id='pqms';const m=document.createElement('div');m.id='pqm';m.setAttribute('role','menu');
+  m.innerHTML=`<div class="pqmh">${esc(title||'')}</div>${opts.map((o,i)=>`<button type="button" role="menuitem" data-pqm="${i}">${esc(o[0])}${o[2]?`<small>${esc(o[2])}</small>`:''}</button>`).join('')}<button type="button" class="pqmc" data-pqm="c">Cancel</button>`;
+  document.body.append(sh,m);
+  if(innerWidth>760&&anchor){const r=anchor.getBoundingClientRect(),w=250,h=m.offsetHeight;m.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px';m.style.top=(r.bottom+6+h<innerHeight?r.bottom+6:Math.max(8,r.top-h-6))+'px'}
+  m.addEventListener('click',e=>{const b=e.target.closest('[data-pqm]');if(!b)return;pqMenuClose();opts[+b.dataset.pqm]?.[1]()});
+  sh.addEventListener('pointerdown',e=>{e.preventDefault();pqMenuClose()});m.querySelector('[data-pqm]')?.focus({preventScroll:true})}
+function pqMenuClose(){$('#pqm')?.remove();$('#pqms')?.remove()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#pqm')){e.preventDefault();e.stopPropagation();pqMenuClose()}},true);
+/* hooks: tracklist queue button, artist Popular queue button, album page Queue button */
+document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;
+  const q=t.closest('#dr [data-spq]');if(q&&cur){e.stopPropagation();e.preventDefault();const it=cur,i=+q.dataset.spq,tt=it.info?.tracks?.[i];
+    pqMenu(q,tt?.t,[['Play now',()=>spDo(it,i,'p',q.parentNode.querySelector('button[data-spp]'))],...pqOpts(async()=>[await pqTrackOf(it,i)],tt?.t||'song')]);return}
+  const a=t.closest('#dr [data-arq]');if(a){e.stopPropagation();e.preventDefault();const i=+a.dataset.arq,tt=(AR.top||[])[i];if(!tt)return;
+    pqMenu(a,tt.t,[['Play now',()=>arPlay(i,0,a)],...pqOpts(async()=>{const x=await arUri(tt);return[x&&pqMin(x)]},tt.t)]);return}
+  const qa=t.closest('#dr [data-spqa]');if(qa){e.stopPropagation();e.preventDefault();const it=cur||brPv;if(it)pqMenu(qa,it.title,pqOpts(()=>pqAlbumOf(it),it.title))}},true);
+new MutationObserver(()=>{document.querySelectorAll('#dr [data-spal]').forEach(b=>{if(!b.nextElementSibling?.matches('[data-spqa]'))b.insertAdjacentHTML('afterend',`<button type="button" class="btn spqa" data-spqa aria-label="Queue this album">${SPQ}<span>Queue</span></button>`)})}).observe($('#dr'),{childList:true,subtree:true});
+/* long-press (or right-click) an album cover anywhere: Play now / Play next / Add to end / Open */
+const PQL={tm:0,x:0,y:0,f:0};
+function pqTile(el){const c=el?.closest?.('[data-id]');if(!c||c.closest('#bp,#pqm,#dlg'))return null;const it=st.items.find(i=>i.id===c.dataset.id);return it&&it.type==='album'?[c,it]:null}
+function pqTileMenu(el,it){if(Date.now()-PQL.f<800)return;PQL.f=Date.now();clearTimeout(PQL.tm);PQL.tm=0;pqMenu(el,it.title+(it.creator?' · '+it.creator:''),[['Play now',()=>spAlbPlay(it)],...pqOpts(()=>pqAlbumOf(it),it.title),['Open album',()=>openItem(it.id)]])}
+document.addEventListener('pointerdown',e=>{if(e.button>0||!st.spc)return;const r=pqTile(e.target);if(!r)return;clearTimeout(PQL.tm);PQL.x=e.clientX;PQL.y=e.clientY;PQL.tm=setTimeout(()=>{PQL.tm=0;navigator.vibrate?.(10);pqTileMenu(r[0],r[1])},480)},true);
+document.addEventListener('pointermove',e=>{if(PQL.tm&&Math.hypot(e.clientX-PQL.x,e.clientY-PQL.y)>10){clearTimeout(PQL.tm);PQL.tm=0}},true);
+['pointerup','pointercancel','scroll'].forEach(k=>document.addEventListener(k,()=>{clearTimeout(PQL.tm);PQL.tm=0},true));
+document.addEventListener('contextmenu',e=>{if(!st.spc)return;const r=pqTile(e.target);if(!r)return;e.preventDefault();pqTileMenu(r[0],r[1])},true);
+document.addEventListener('click',e=>{if(Date.now()-PQL.f<700&&pqTile(e.target)){e.preventDefault();e.stopPropagation()}},true);
+
+/* mini player: swipe up to open, and open only once */
+{const o0=bpOpen;bpOpen=function(){if(BP.on)return;return o0.apply(this,arguments)}}
+{const e0=bpEl;bpEl=function(){const had=BP.el,e=e0();if(!had){pqWire(e);pqTabs(e)}return e}}
+{const e=npEl();e.querySelector('.npt')?.insertAdjacentHTML('afterend','<i class="npup" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></i>');
+  e.querySelector('.npw')?.setAttribute('aria-label','Open the player');
+  e.addEventListener('pointerdown',ev=>{if(ev.button>0||ev.target.closest('.npc'))return;const y0=ev.clientY,x0=ev.clientX;let dy=0,mv=0;
+    const m=x=>{dy=x.clientY-y0;if(Math.hypot(x.clientX-x0,dy)>12)mv=1;e.style.transform=dy<0?`translateY(${Math.max(dy,-70)*.6}px)`:''};
+    const up=()=>{removeEventListener('pointermove',m);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);e.style.transform='';if(mv){NP.sup=Date.now();if(dy<-28)bpOpen()}};
+    addEventListener('pointermove',m);addEventListener('pointerup',up);addEventListener('pointercancel',up)});
+  e.addEventListener('click',ev=>{if(Date.now()-(NP.sup||0)<450){ev.stopImmediatePropagation();ev.preventDefault()}},true)}
+/* skip songs removed from Spotify's own queue, and forget Checkit-queued songs once they play */
+{const s0=npShow;npShow=function(d){s0(d);const u=d?.item?.uri;if(!u||u===PQ.lu)return;PQ.lu=u;if(rmU(PQ.P,u))pqP();
+  if(d.is_playing&&(d.progress_ms||0)<15000&&rmU(PQ.S,u)){pqS();spCmd('/me/player/next','POST').then(()=>npSoon(600),()=>{})}}}
+/* player thread (2026.11.27-2): when Spotify has nothing active, show your last-played song (recently-played) so the mini player and big player open right away.
+   Play (or next/previous) resumes that song in its album or playlist on an available device. Needs user-read-recently-played; asks once (toast) if the sign-in lacks it. */
+const NPR={at:0,d:null};
+const spHas=s=>(' '+(spA().sc||'')+' ').includes(' '+s+' ');
+async function npRecent(){if(!spHas('user-read-recently-played'))return null;if(Date.now()-NPR.at<120000)return NPR.d;
+  try{const j=await spApi('/me/player/recently-played?limit=1'),x=j.items?.[0];NPR.d=x?.track?{item:x.track,progress_ms:0,is_playing:false,context:x.context||null,idle:1}:null}catch(e){NPR.d=null}NPR.at=Date.now();return NPR.d}
+{const s0=npShow;npShow=function(d){if(!d&&spOn()&&NPR.d){d=NPR.d;NP.d=d}s0(d);const e=$('#npb');if(!e)return;e.classList.toggle('idle',!!d?.idle);
+  if(d?.idle){const sm=e.querySelector('.npt small');sm.textContent='Last played · '+sm.textContent}
+  const lb=BP.el?.querySelector('.bptop>span')?.firstChild;if(lb&&lb.nodeType===3)lb.nodeValue=d?.idle?'Last played':'Now playing'}}
+{const p0=npPoll;npPoll=async function(){await p0.apply(this,arguments);if(NP.d||!spOn()||document.hidden)return;
+  if(!spHas('user-read-recently-played')){let a=0;try{a=+localStorage.getItem('checkit.rpask')||0}catch(e){}
+    if(Date.now()-a>3*864e5){try{localStorage.setItem('checkit.rpask',Date.now())}catch(e){}setTimeout(()=>{toast('Show your last Spotify song here when nothing’s playing?',()=>spLogin(['__rp']));$('#tundo').textContent='Turn on'},1200)}return}
+  const r=await npRecent();if(r&&!NP.d){NP.d=r;NP.at=Date.now();npShow(r)}}}
+async function npResume(){const d=NP.d;if(!d?.idle)return;const it=d.item,c=d.context;
+  const body=JSON.stringify(c&&/^(album|playlist)$/.test(c.type)?{context_uri:c.uri,offset:{uri:it.uri}}:{uris:[it.uri]});
+  try{await spDev(x=>spApi('/me/player/play'+(x?'?device_id='+x:''),{method:'PUT',body}));NPR.d=null;NPR.at=0;d.idle=0;d.is_playing=true;NP.at=Date.now();npShow(d);npSoon(900);if(BP.on)setTimeout(()=>{BP.qkey='';bpQueue(1)},1300)}
+  catch(e){if(e.st===404)spLinkT('Spotify isn’t open anywhere. Open it, then press play','Open Spotify',it.external_urls?.spotify||'https://open.spotify.com/track/'+it.id);else pqErr(e)}}
+$('#npb')?.addEventListener('click',ev=>{const b=ev.target.closest('[data-npk]');if(b&&b.dataset.npk!=='open'&&NP.d?.idle){ev.stopImmediatePropagation();ev.preventDefault();npResume()}},true);
+{const a0=bpAct;bpAct=async function(k){if(NP.d?.idle&&(k==='pp'||k==='next'||k==='prev'))return npResume();return a0.apply(this,arguments)}}
+if(spOn())npSoon(700);
 
 function localGroups(q){const ql=q.toLowerCase();
   const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${sLab(i).toLowerCase()}`,open:i.id,it:i}));
@@ -4695,19 +4942,19 @@ const eLo=(W,H)=>{const w=Math.ceil(W/8),h=Math.ceil(H/8);if(ELO.width!==w||ELO.
 const eVig=(col,inner)=>{const k=col+inner;if(EVIG[k])return EVIG[k];const c=document.createElement('canvas');c.width=c.height=128;const d=c.getContext('2d'),g=d.createRadialGradient(64,64,64*inner,64,64,64*1.42);g.addColorStop(0,eA(col,0));g.addColorStop(1,eA(col,1));d.fillStyle=g;d.fillRect(0,0,128,128);return EVIG[k]=c};
 const ECOD2={
   movie(x,W,H,t,dt,ds,o){const sy=scrollY;if(t>ECO.flT){ECO.flT=t+1/24;ECO.fl=ER();
-      ECO.specks=ER()<.55?Array.from({length:1+ER()*7|0},()=>({x:ER()*W,y:ER()*H,r:ER()*2.4+.4,wh:ER()<.3})):[];
-      if(!ECO.hair&&ER()<.03)ECO.hair={x:ER()*W,y:ER()*H,a:ER()*6,l:30+ER()*70,n:2+ER()*4|0};else if(ECO.hair&&--ECO.hair.n<=0)ECO.hair=null;
+      ECO.specks=ER()<.35?Array.from({length:1+ER()*4|0},()=>({x:ER()*W,y:ER()*H,r:ER()*2.4+.4,wh:ER()<.3})):[];
+      if(!ECO.hair&&ER()<.015)ECO.hair={x:ER()*W,y:ER()*H,a:ER()*6,l:30+ER()*70,n:2+ER()*4|0};else if(ECO.hair&&--ECO.hair.n<=0)ECO.hair=null;
       if(!ECO.scr||ER()<.03)ECO.scr=Array.from({length:ER()*3|0},()=>({x:ER()*W,v:(ER()-.5)*60}))}
-    let g=x.createRadialGradient(W/2,H*.42,0,W/2,H*.42,Math.max(W,H)*.75);g.addColorStop(0,`rgba(255,214,150,${(.1+ECO.fl*.04).toFixed(3)})`);g.addColorStop(1,'rgba(255,214,150,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
-    o.fillStyle=ECO.fl<.12?'rgba(0,0,0,.07)':`rgba(255,236,205,${(ECO.fl*.045).toFixed(3)})`;o.fillRect(0,0,W,H);
-    o.globalAlpha=.55;o.drawImage(eVig('#140a00',.5),0,0,W,H);o.globalAlpha=1;
-    for(const p of ECO.specks){o.fillStyle=p.wh?'rgba(255,245,225,.6)':'rgba(12,8,4,.7)';o.beginPath();o.ellipse(p.x,p.y,p.r,p.r*(.6+ER()*.6),ER()*3,0,7);o.fill()}
-    if(ECO.hair){const h=ECO.hair;o.strokeStyle='rgba(10,6,2,.6)';o.lineWidth=1;o.beginPath();o.moveTo(h.x,h.y);o.bezierCurveTo(h.x+Math.cos(h.a)*h.l,h.y+Math.sin(h.a)*h.l*.4,h.x-h.l*.3,h.y+h.l*.8,h.x+h.l*.5,h.y+h.l);o.stroke()}
-    for(const s of ECO.scr){s.x+=s.v*dt+(ER()-.5)*2;o.fillStyle='rgba(255,245,225,.16)';o.fillRect(s.x,0,1,H)}
-    if(t>ECO.nextCue){ECO.cueEnd=t+.42;ECO.nextCue=t+16+ER()*14}if(t<(ECO.cueEnd||0)){const cx=W-(W<700?44:90),cy=W<700?120:110,r=W<700?14:20;o.fillStyle='rgba(10,6,2,.75)';o.beginPath();o.arc(cx,cy,r,0,7);o.fill();o.strokeStyle='rgba(255,240,210,.35)';o.lineWidth=2;o.beginPath();o.arc(cx,cy,r*.62,0,7);o.stroke()}
-    if(ECO.sv>22){const y=(t*1400)%(H+40)-20;o.fillStyle='rgba(0,0,0,.55)';o.fillRect(0,y,W,8)}
-    const sw=W<700?9:26,hw=sw*.52,hh=sw*.38,pit=sw*.95,off=-((sy*.9+t*4)%pit);
-    [0,W-sw].forEach(x0=>{o.fillStyle='rgba(14,10,6,.94)';o.fillRect(x0,0,sw,H);o.fillStyle='rgba(236,222,192,.85)';for(let y=off;y<H+pit;y+=pit){o.beginPath();o.roundRect?o.roundRect(x0+(sw-hw)/2,y,hw,hh,hh*.3):o.rect(x0+(sw-hw)/2,y,hw,hh);o.fill()}
+    let g=x.createRadialGradient(W/2,H*.42,0,W/2,H*.42,Math.max(W,H)*.75);g.addColorStop(0,`rgba(255,214,150,${(.06+ECO.fl*.02).toFixed(3)})`);g.addColorStop(1,'rgba(255,214,150,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
+    o.fillStyle=ECO.fl<.12?'rgba(0,0,0,.03)':`rgba(255,236,205,${(ECO.fl*.02).toFixed(3)})`;o.fillRect(0,0,W,H);
+    o.globalAlpha=.32;o.drawImage(eVig('#140a00',.5),0,0,W,H);o.globalAlpha=1;
+    for(const p of ECO.specks){o.fillStyle=p.wh?'rgba(255,245,225,.38)':'rgba(12,8,4,.42)';o.beginPath();o.ellipse(p.x,p.y,p.r,p.r*(.6+ER()*.6),ER()*3,0,7);o.fill()}
+    if(ECO.hair){const h=ECO.hair;o.strokeStyle='rgba(10,6,2,.38)';o.lineWidth=1;o.beginPath();o.moveTo(h.x,h.y);o.bezierCurveTo(h.x+Math.cos(h.a)*h.l,h.y+Math.sin(h.a)*h.l*.4,h.x-h.l*.3,h.y+h.l*.8,h.x+h.l*.5,h.y+h.l);o.stroke()}
+    for(const s of ECO.scr){s.x+=s.v*dt+(ER()-.5)*2;o.fillStyle='rgba(255,245,225,.08)';o.fillRect(s.x,0,1,H)}
+    if(t>ECO.nextCue){ECO.cueEnd=t+.42;ECO.nextCue=t+16+ER()*14}if(t<(ECO.cueEnd||0)){const cx=W-(W<700?44:90),cy=W<700?120:110,r=W<700?14:20;o.fillStyle='rgba(10,6,2,.45)';o.beginPath();o.arc(cx,cy,r,0,7);o.fill();o.strokeStyle='rgba(255,240,210,.35)';o.lineWidth=2;o.beginPath();o.arc(cx,cy,r*.62,0,7);o.stroke()}
+    if(ECO.sv>22){const y=(t*1400)%(H+40)-20;o.fillStyle='rgba(0,0,0,.25)';o.fillRect(0,y,W,8)}
+    const sw=W<700?7:18,hw=sw*.52,hh=sw*.38,pit=sw*.95,off=-((sy*.9+t*4)%pit);
+    [0,W-sw].forEach(x0=>{o.fillStyle='rgba(14,10,6,.78)';o.fillRect(x0,0,sw,H);o.fillStyle='rgba(236,222,192,.55)';for(let y=off;y<H+pit;y+=pit){o.beginPath();o.roundRect?o.roundRect(x0+(sw-hw)/2,y,hw,hh,hh*.3):o.rect(x0+(sw-hw)/2,y,hw,hh);o.fill()}
       o.fillStyle='rgba(255,200,120,.08)';o.fillRect(x0===0?sw:x0-2,0,2,H)})},
   music(x,W,H,t,dt,ds,o){const acc=eAcc(),bt=60/96,ph=(t%bt)/bt,pulse=Math.exp(-ph*5),dir=ds<0?-1:1;ECO.rot+=dt*(1.2+Math.min(6,ECO.sv*.2))*dir;
     if(t>(ECO.colT||0)){ECO.colT=t+2.5;ECO.cols=moCols()}const cols=ECO.cols||['rgb(255,111,181)'];

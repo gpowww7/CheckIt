@@ -1,7 +1,7 @@
 // Checkit service worker: opens instantly and works offline, but always asks the network for a new version first.
 // The app page is network-first (with a short timeout, then the saved copy), so a new release shows up on the next open.
 // Fonts and icons are cache-first. Cover art and API calls are left to the browser.
-const V = 'checkit-v1';
+const V = 'checkit-v3';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-64.png', 'icon-192.png', 'apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).catch(() => {}).then(() => self.skipWaiting()));
