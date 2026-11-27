@@ -926,8 +926,8 @@ body.mo-glitch #view{animation:moGlitch .24s steps(3) 1}
 @media(prefers-reduced-motion:reduce){#mo-eco,#mo-burst{display:none}}
 #mo-ecot{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:25;transition:opacity .6s ease}
 #mo-grade{position:fixed;inset:0;pointer-events:none;z-index:24;opacity:0;transition:opacity .6s ease;background:#a8743a;mix-blend-mode:color;color:#ff6fb5}
-body.mo-live[data-world=movie] #mo-grade{opacity:.14}
-#mo-ambt[data-t=movie]::before{opacity:.08}
+body.mo-live[data-world=movie] #mo-grade{opacity:.26}
+#mo-ambt[data-t=movie]::before{opacity:.13}
 #mo-ambt[data-t=game]::before{background:repeating-linear-gradient(90deg,rgba(255,0,60,.035) 0 1px,rgba(0,255,120,.03) 1px 2px,rgba(0,120,255,.035) 2px 3px)}
 #mo-hud{position:fixed;left:20px;bottom:18px;z-index:26;display:flex;gap:14px;align-items:baseline;font:700 13px/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.12em;color:#ffe66d;text-shadow:2px 2px 0 #ff3d7f;pointer-events:none;transform-origin:0 100%}
 #mo-hud b{color:#4df0ff;animation:moBlink 1s steps(1) infinite}#mo-hud i{font-style:normal;color:#fff}
@@ -1207,7 +1207,7 @@ body.pqdrag,body.pqdrag *{cursor:grabbing!important}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.27-2</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.27-4</small>
     </div></details>
   </div>
 </header>
@@ -1800,7 +1800,7 @@ function sizeWall(){const w=$('#wall');if(!w)return;
 
 /* drawer */
 let cur=null;
-function openItem(id){const was=!!cur&&$('#dr').classList.contains('on');cur=st.items.find(i=>i.id===id);if(!cur)return;if(!was)layer('item');drawItem();loadWatch(cur);loadInfo(cur);findSpotify(cur,true);$('#dr').classList.add('on');$('#shade').classList.add('on')}
+function openItem(id){const was=$('#dr').classList.contains('on');cur=st.items.find(i=>i.id===id);if(!cur)return;if(!was)layer('item');drawItem();loadWatch(cur);loadInfo(cur);findSpotify(cur,true);$('#dr').classList.add('on');$('#shade').classList.add('on')}
 function closeItem(){cur=null;$('#dr').classList.remove('on');$('#shade').classList.remove('on');unlayer('item')}
 $('#dlg').addEventListener('close',()=>unlayer('dlg'));
 /* back gesture: each open panel, dialog or search is a history step, and a guard step keeps a stray swipe from leaving the app */
@@ -1810,8 +1810,9 @@ function unlayer(k){for(let i=LS.length-1;i>=0;i--)if(LS[i].k===k&&!LS[i].dead){
 function closeSearch(){endBulk();$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()}
 addEventListener('popstate',()=>{if(location.hash.startsWith('#setup='))return;
   if(LS.length){const t=LS.pop();if(t.dead){history.back();return}
-    if(t.k==='item'){t.dead=1;cur=null;$('#dr').classList.remove('on');$('#shade').classList.remove('on')}
+    if(t.k==='item'){t.dead=1;DRS.length=0;drCur=null;cur=null;$('#dr').classList.remove('on');$('#shade').classList.remove('on')}
     else if(t.k==='dlg'){t.dead=1;$('#dlg').open&&$('#dlg').close()}
+    else if(t.k==='drp'){t.dead=1;drBack()}
     else if(t.k==='search')closeSearch();return}
   if(st.view!=='next'){st.view='next';try{history.replaceState(null,'','#next')}catch(e){}save();render();window.scrollTo(0,0)}
   else if(Date.now()-warnAt>2500){warnAt=Date.now();toast('Swipe back again to leave Checkit')}
@@ -4127,11 +4128,20 @@ const arR=()=>({type:'artist',title:AR.n,creator:'',art:AR.pic,url:AR.url,sub:''
 function arLib(){const k=AR.key,O={album:0,song:1};return st.items.filter(i=>i.type!=='artist'&&i.creator&&(brN(i.creator)===k||arParts(i.creator).includes(k)))
   .sort((a,b)=>(O[a.type]??2)-(O[b.type]??2)||cmpD(relD(b),relD(a))||a.title.localeCompare(b.title))}
 function arMore(){brIndex();return(AR.by||[]).filter(r=>!brHave(r))}
+/* artist albums fix (2026.11.27-4): the artist page used the album page's short "More by" list (first 100 Deezer releases, studio albums only, at most 24,
+   and titles with no Latin letters were dropped). Now it reads every page of the Deezer discography: albums and compilations in one row,
+   singles and EPs in a "Singles and EPs" row, newest first. Editions with the same title collapse to the earliest one. */
+async function arBy(aid){const L=[];for(let i=0;i<1000;i+=100){const j=await jsonp(`https://api.deezer.com/artist/${aid}/albums?limit=100&index=${i}&output=jsonp`),d=j.data||[];L.push(...d.filter(a=>a&&a.title));if(d.length<100||!j.next)break}
+  L.sort((a,b)=>String(a.release_date||'9').localeCompare(String(b.release_date||'9')));
+  const key=t=>brN(t)||String(t).toLowerCase().replace(/\(.*?\)|\[.*?\]/g,'').replace(/\s+/g,''),seen=new Set(),A=[],S=[],sg=x=>x.record_type==='single'||x.record_type==='ep';
+  for(const s of[0,1])for(const x of L){if(sg(x)!==!!s)continue;const k=key(x.title);if(!k||seen.has(k))continue;seen.add(k);
+    const r=simAl(x.title,AR.n,x.cover_xl||x.cover_big,x.cover_big||x.cover_medium,x.link||`https://www.deezer.com/album/${x.id}`,yr(x.release_date));r.rt=s?'s':'a';(s?S:A).push(r)}
+  return[...A.reverse(),...S.reverse()]}
 function arOpen(name,src,hist){const k=brN(name);if(!k)return;Object.assign(AR,{rel:null,hist:hist||[],top:null,topN:5,pu:new Map(),key:k,n:name,src:src||null,pic:'',fans:0,url:'',sp:'',by:null,busy:1,err:0});
   if(!$('#dr').classList.contains('on'))layer('item');cur=null;brPv=null;$('#dr').classList.add('on');$('#shade').classList.add('on');arDraw(1);$('#dr').scrollTop=0;
   (async()=>{try{const j=await jsonp(`https://api.deezer.com/search/artist?q=${encodeURIComponent(name)}&limit=5&output=jsonp`),l=j.data||[],a=l.find(x=>brN(x.name)===k)||l[0];
       if(AR.key!==k)return;if(a){AR.pic=a.picture_xl||a.picture_big||'';AR.fans=a.nb_fan||0;AR.url=a.link||''}arDraw();arTop(k,a?.id);arRel(k,a?.id);
-      const by=a?await simBy({title:'',creator:name},a.id):[];if(AR.key!==k)return;AR.by=by}catch(e){if(AR.key!==k)return;AR.err=1}
+      const by=a?await arBy(a.id):[];if(AR.key!==k)return;AR.by=by}catch(e){if(AR.key!==k)return;AR.err=1}
     AR.busy=0;arDraw()})();
   arSpot(k)}
 /* Popular: Last.fm top tracks (by listeners) when a Last.fm key is set, with covers from Deezer; otherwise Deezer's own top tracks. */
@@ -4165,13 +4175,14 @@ async function arSpot(k){if(!spOn())return;try{let a=null;const s=AR.src&&SPAL.g
     if(s)for(const t of s.T)for(const x of t.artists||[])if(!a&&spN(x.name)===spN(AR.n))a=x;
     if(!a){const j=await spApi('/search?type=artist&limit=5&market='+spMk()+'&q='+encodeURIComponent(AR.n)),L=j.artists?.items||[];a=L.find(x=>spN(x.name)===spN(AR.n))||null}
     if(a&&AR.key===k){AR.sp=a.external_urls?.spotify||'https://open.spotify.com/artist/'+a.id;arDraw()}}catch(e){}}
+const arRows=(R,h)=>R.length?`<div class="simh"><b>${h}</b><small>${R.length}</small></div><div class="simr">${R.map(([r,i])=>`<div class="bt" data-arm="${i}"><div class="bp">${brImg(r)}</div><div class="bm"><b>${esc(r.title)}</b><small>${esc(r.extra?.year||'')}</small></div><div class="ba">${brAct(r)}</div></div>`).join('')}</div>`:'';
 function arDraw(force){const d=$('#dr');if(!AR.key||cur||brPv||!d.classList.contains('on')||(!force&&!d.querySelector(':scope>.ar')))return;
   brIndex();const n=AR.n,pi={id:'ar'+AR.key,type:'artist',title:n,creator:'',art:AR.pic},L=arLib(),M=arMore(),src=AR.src;
   const sp=AR.sp||`https://open.spotify.com/search/${encodeURIComponent(n)}`,sx=[...d.querySelectorAll('.simr')].map(x=>x.scrollLeft);
   const yr2=i=>(relD(i)||'').slice(0,4),stl=i=>i.status==='done'||i.status==='again'?'Done':i.status==='prog'?'In progress':'Up next';
   const lib=L.length?`<div class="simh"><b>In your library</b><small>${L.length}</small></div><div class="simr">${L.map(i=>`<div class="bt" data-ari="${i.id}"><div class="bp">${brImg({title:i.title,art:i.art})}</div><div class="bm"><b>${esc(i.title)}</b><small>${[T[i.type],yr2(i),stl(i)].filter(Boolean).map(esc).join(', ')}</small></div></div>`).join('')}</div>`:'';
   const more=AR.busy?`<div class="simh"><b>More by ${esc(n)}</b></div><div class="simr">${simSk}</div>`:AR.err?`<p class="wn">Couldn’t load their albums. <button type="button" class="sp" data-arre>Try again</button></p>`
-    :M.length?`<div class="simh"><b>${L.length?'More by '+esc(n):'Albums'}</b><small>${M.length}</small></div><div class="simr">${M.map((r,i)=>`<div class="bt" data-arm="${i}"><div class="bp">${brImg(r)}</div><div class="bm"><b>${esc(r.title)}</b><small>${esc(r.extra?.year||'')}</small></div><div class="ba">${brAct(r)}</div></div>`).join('')}</div>`:'';
+    :arRows(M.map((r,i)=>[r,i]).filter(([r])=>r.rt!=='s'),L.length?'More by '+esc(n):'Albums')+arRows(M.map((r,i)=>[r,i]).filter(([r])=>r.rt==='s'),'Singles and EPs');
   d.innerHTML=`<div class="ip ar ${shape('album')}" style="${cs(src||pi)}"><button class="x" data-arx aria-label="Close">×</button>
    <div class="hero">${cover(pi,'big ini round')}<div class="ttl"><div class="mt">Artist${AR.fans?`, ${AR.fans.toLocaleString()} fans`:''}</div><h2>${esc(n)}</h2>${AR.hist.length?`<p><button type="button" class="arl" data-arb>‹ ${esc(AR.hist[AR.hist.length-1])}</button></p>`:src?`<p><button type="button" class="arl" data-arb>‹ ${esc(src.title)}</button></p>`:''}</div></div>
    <div class="lks"><a class="btn pri spal" href="${esc(sp)}" target="_blank" rel="noopener">Open in Spotify<span aria-hidden="true">↗</span></a></div>
@@ -4589,6 +4600,22 @@ async function npResume(){const d=NP.d;if(!d?.idle)return;const it=d.item,c=d.co
 $('#npb')?.addEventListener('click',ev=>{const b=ev.target.closest('[data-npk]');if(b&&b.dataset.npk!=='open'&&NP.d?.idle){ev.stopImmediatePropagation();ev.preventDefault();npResume()}},true);
 {const a0=bpAct;bpAct=async function(k){if(NP.d?.idle&&(k==='pp'||k==='next'||k==='prev'))return npResume();return a0.apply(this,arguments)}}
 if(spOn())npSoon(700);
+/* player thread (2026.11.27-3): back gesture inside the item panel. Moving between album, artist and browse pages in the open panel adds a history step
+   (layer 'drp'), so swiping back returns to the previous page instead of closing the panel. The panel's own ‹ back buttons use the same history. */
+const DRS=[];let drRest=0,drDepth=0;
+function drPage(){const d=$('#dr');if(!d.classList.contains('on'))return null;const s=d.scrollTop;
+  if(cur)return{t:'item',id:cur.id,s};if(brPv?.pv)return{t:'br',r:brPv.pv,k:brPv.title+'|'+brPv.creator,s};if(AR.key)return{t:'ar',n:AR.n,src:AR.src,hist:AR.hist,k:AR.key,s};return null}
+const drSame=(a,b)=>a&&b&&a.t===b.t&&(a.t==='item'?a.id===b.id:a.k===b.k);
+let drCur=null;
+function drWrap(f){return function(){if(drRest||drDepth)return f.apply(this,arguments);const on=$('#dr').classList.contains('on'),before=on&&drCur?{...drCur,s:$('#dr').scrollTop}:null;drDepth++;let r;try{r=f.apply(this,arguments)}finally{drDepth--}
+  const now=drPage();if(before&&now&&!drSame(before,now)){DRS.push(before);layer('drp')}if(now)drCur=now;return r}}
+openItem=drWrap(openItem);brOpen=drWrap(brOpen);arOpen=drWrap(arOpen);
+function drBack(){const pg=DRS.pop();if(!pg||!$('#dr').classList.contains('on'))return;drRest=1;
+  drCur=pg;try{if(pg.t==='item'){if(st.items.some(i=>i.id===pg.id)){AR.key='';brPv=null;openItem(pg.id)}}else if(pg.t==='br'){AR.key='';brOpen(pg.r)}else arOpen(pg.n,pg.src,pg.hist)}finally{drRest=0}
+  requestAnimationFrame(()=>{$('#dr').scrollTop=pg.s||0})}
+{const c0=closeItem;closeItem=function(){DRS.length=0;drCur=null;LS.forEach(x=>{if(x.k==='drp')x.dead=1});return c0.apply(this,arguments)}}
+/* in-panel back buttons: step back through history when there's a page to go back to */
+document.addEventListener('click',e=>{if(DRS.length&&e.target.closest?.('#dr [data-arb]')){e.stopPropagation();e.preventDefault();history.back()}},true);
 
 function localGroups(q){const ql=q.toLowerCase();
   const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${sLab(i).toLowerCase()}`,open:i.id,it:i}));
@@ -4942,19 +4969,19 @@ const eLo=(W,H)=>{const w=Math.ceil(W/8),h=Math.ceil(H/8);if(ELO.width!==w||ELO.
 const eVig=(col,inner)=>{const k=col+inner;if(EVIG[k])return EVIG[k];const c=document.createElement('canvas');c.width=c.height=128;const d=c.getContext('2d'),g=d.createRadialGradient(64,64,64*inner,64,64,64*1.42);g.addColorStop(0,eA(col,0));g.addColorStop(1,eA(col,1));d.fillStyle=g;d.fillRect(0,0,128,128);return EVIG[k]=c};
 const ECOD2={
   movie(x,W,H,t,dt,ds,o){const sy=scrollY;if(t>ECO.flT){ECO.flT=t+1/24;ECO.fl=ER();
-      ECO.specks=ER()<.35?Array.from({length:1+ER()*4|0},()=>({x:ER()*W,y:ER()*H,r:ER()*2.4+.4,wh:ER()<.3})):[];
-      if(!ECO.hair&&ER()<.015)ECO.hair={x:ER()*W,y:ER()*H,a:ER()*6,l:30+ER()*70,n:2+ER()*4|0};else if(ECO.hair&&--ECO.hair.n<=0)ECO.hair=null;
+      ECO.specks=ER()<.55?Array.from({length:1+ER()*7|0},()=>({x:ER()*W,y:ER()*H,r:ER()*2.4+.4,wh:ER()<.3})):[];
+      if(!ECO.hair&&ER()<.03)ECO.hair={x:ER()*W,y:ER()*H,a:ER()*6,l:30+ER()*70,n:2+ER()*4|0};else if(ECO.hair&&--ECO.hair.n<=0)ECO.hair=null;
       if(!ECO.scr||ER()<.03)ECO.scr=Array.from({length:ER()*3|0},()=>({x:ER()*W,v:(ER()-.5)*60}))}
-    let g=x.createRadialGradient(W/2,H*.42,0,W/2,H*.42,Math.max(W,H)*.75);g.addColorStop(0,`rgba(255,214,150,${(.06+ECO.fl*.02).toFixed(3)})`);g.addColorStop(1,'rgba(255,214,150,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
-    o.fillStyle=ECO.fl<.12?'rgba(0,0,0,.03)':`rgba(255,236,205,${(ECO.fl*.02).toFixed(3)})`;o.fillRect(0,0,W,H);
-    o.globalAlpha=.32;o.drawImage(eVig('#140a00',.5),0,0,W,H);o.globalAlpha=1;
-    for(const p of ECO.specks){o.fillStyle=p.wh?'rgba(255,245,225,.38)':'rgba(12,8,4,.42)';o.beginPath();o.ellipse(p.x,p.y,p.r,p.r*(.6+ER()*.6),ER()*3,0,7);o.fill()}
-    if(ECO.hair){const h=ECO.hair;o.strokeStyle='rgba(10,6,2,.38)';o.lineWidth=1;o.beginPath();o.moveTo(h.x,h.y);o.bezierCurveTo(h.x+Math.cos(h.a)*h.l,h.y+Math.sin(h.a)*h.l*.4,h.x-h.l*.3,h.y+h.l*.8,h.x+h.l*.5,h.y+h.l);o.stroke()}
-    for(const s of ECO.scr){s.x+=s.v*dt+(ER()-.5)*2;o.fillStyle='rgba(255,245,225,.08)';o.fillRect(s.x,0,1,H)}
-    if(t>ECO.nextCue){ECO.cueEnd=t+.42;ECO.nextCue=t+16+ER()*14}if(t<(ECO.cueEnd||0)){const cx=W-(W<700?44:90),cy=W<700?120:110,r=W<700?14:20;o.fillStyle='rgba(10,6,2,.45)';o.beginPath();o.arc(cx,cy,r,0,7);o.fill();o.strokeStyle='rgba(255,240,210,.35)';o.lineWidth=2;o.beginPath();o.arc(cx,cy,r*.62,0,7);o.stroke()}
-    if(ECO.sv>22){const y=(t*1400)%(H+40)-20;o.fillStyle='rgba(0,0,0,.25)';o.fillRect(0,y,W,8)}
-    const sw=W<700?7:18,hw=sw*.52,hh=sw*.38,pit=sw*.95,off=-((sy*.9+t*4)%pit);
-    [0,W-sw].forEach(x0=>{o.fillStyle='rgba(14,10,6,.78)';o.fillRect(x0,0,sw,H);o.fillStyle='rgba(236,222,192,.55)';for(let y=off;y<H+pit;y+=pit){o.beginPath();o.roundRect?o.roundRect(x0+(sw-hw)/2,y,hw,hh,hh*.3):o.rect(x0+(sw-hw)/2,y,hw,hh);o.fill()}
+    let g=x.createRadialGradient(W/2,H*.42,0,W/2,H*.42,Math.max(W,H)*.75);g.addColorStop(0,`rgba(255,214,150,${(.1+ECO.fl*.04).toFixed(3)})`);g.addColorStop(1,'rgba(255,214,150,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
+    o.fillStyle=ECO.fl<.12?'rgba(0,0,0,.07)':`rgba(255,236,205,${(ECO.fl*.045).toFixed(3)})`;o.fillRect(0,0,W,H);
+    o.globalAlpha=.55;o.drawImage(eVig('#140a00',.5),0,0,W,H);o.globalAlpha=1;
+    for(const p of ECO.specks){o.fillStyle=p.wh?'rgba(255,245,225,.6)':'rgba(12,8,4,.7)';o.beginPath();o.ellipse(p.x,p.y,p.r,p.r*(.6+ER()*.6),ER()*3,0,7);o.fill()}
+    if(ECO.hair){const h=ECO.hair;o.strokeStyle='rgba(10,6,2,.6)';o.lineWidth=1;o.beginPath();o.moveTo(h.x,h.y);o.bezierCurveTo(h.x+Math.cos(h.a)*h.l,h.y+Math.sin(h.a)*h.l*.4,h.x-h.l*.3,h.y+h.l*.8,h.x+h.l*.5,h.y+h.l);o.stroke()}
+    for(const s of ECO.scr){s.x+=s.v*dt+(ER()-.5)*2;o.fillStyle='rgba(255,245,225,.16)';o.fillRect(s.x,0,1,H)}
+    if(t>ECO.nextCue){ECO.cueEnd=t+.42;ECO.nextCue=t+16+ER()*14}if(t<(ECO.cueEnd||0)){const cx=W-(W<700?44:90),cy=W<700?120:110,r=W<700?14:20;o.fillStyle='rgba(10,6,2,.75)';o.beginPath();o.arc(cx,cy,r,0,7);o.fill();o.strokeStyle='rgba(255,240,210,.35)';o.lineWidth=2;o.beginPath();o.arc(cx,cy,r*.62,0,7);o.stroke()}
+    if(ECO.sv>22){const y=(t*1400)%(H+40)-20;o.fillStyle='rgba(0,0,0,.55)';o.fillRect(0,y,W,8)}
+    const sw=W<700?9:26,hw=sw*.52,hh=sw*.38,pit=sw*.95,off=-((sy*.9+t*4)%pit);
+    [0,W-sw].forEach(x0=>{o.fillStyle='rgba(14,10,6,.94)';o.fillRect(x0,0,sw,H);o.fillStyle='rgba(236,222,192,.85)';for(let y=off;y<H+pit;y+=pit){o.beginPath();o.roundRect?o.roundRect(x0+(sw-hw)/2,y,hw,hh,hh*.3):o.rect(x0+(sw-hw)/2,y,hw,hh);o.fill()}
       o.fillStyle='rgba(255,200,120,.08)';o.fillRect(x0===0?sw:x0-2,0,2,H)})},
   music(x,W,H,t,dt,ds,o){const acc=eAcc(),bt=60/96,ph=(t%bt)/bt,pulse=Math.exp(-ph*5),dir=ds<0?-1:1;ECO.rot+=dt*(1.2+Math.min(6,ECO.sv*.2))*dir;
     if(t>(ECO.colT||0)){ECO.colT=t+2.5;ECO.cols=moCols()}const cols=ECO.cols||['rgb(255,111,181)'];
