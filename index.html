@@ -1229,7 +1229,7 @@ body.pqdrag,body.pqdrag *{cursor:grabbing!important}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.28-2</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.28-3</small>
     </div></details>
   </div>
 </header>
@@ -5178,7 +5178,7 @@ document.addEventListener('dragstart',e=>{if(e.target.closest?.('#stage'))e.prev
 /* games two to a row on phones: Library covers and Browse (CSS `body[data-lgrp=game]`, `.bg.w`). */
 {const r1=moAfter;moAfter=function(){document.body.dataset.lgrp=st.view==='library'?st.grp:'';return r1.apply(this,arguments)}}
 /* upnext: Up next extras (upnext thread, 2026.11.25-2). Wraps drawNext. 1) Cover wall: your covers as a tilted wall drifting behind the crate (unWall). 2) Spin: a 🎲 Spin button runs a slot reel of covers that lands on a pick (unSpin). 3) The bill: the rows below the crate are set as a typographic program, with Now watching/playing, the TV and game orders (reorder with ⤒ ↑ ↓), and numbered columns (unBill; replaced the bento in 2026.11.25-4). Remove this block and the CSS block `/* upnext:` to revert. */
-const UN={t0:performance.now(),spin:0};
+const UN={t0:performance.now(),spin:0,seq:0,fb:0};
 const unH=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))|0;return h>>>0};
 function unWall(sec){if(!sec||sec.classList.contains('none'))return;
   let pool=st.items.filter(i=>i.art);if(pool.length<8)pool=st.items.slice();if(!pool.length)return;
@@ -5189,8 +5189,9 @@ function unWall(sec){if(!sec||sec.classList.contains('none'))return;
   w.firstChild.style.animationDelay=-((performance.now()-UN.t0)/1000)+'s';sec.prepend(w)}
 function unSpinBtn(sec){const nx=sec?.querySelector('#cnext');if(!nx||(pickQ?.length||0)<3)return;
   nx.insertAdjacentHTML('beforebegin','<button type="button" id="unspin" class="unspin" title="Let the reel pick one">🎲 Spin</button>')}
+/* 2026.11.28-3: each spin owns a token (UN.spin=++UN.seq), so a finished spin's backup timer or frame loop can't land or cut off the next one. Taps during a spin are ignored (button disabled). */
 function unSpin(again){if(UN.spin||!pickQ||pickQ.length<2)return;
-  {const s0=$('#stage');if(!again&&s0&&moOn()){const r=s0.getBoundingClientRect();if(r.top<64||r.bottom>innerHeight-70){UN.spin=1;scrollBy({top:r.top-80,behavior:'smooth'});setTimeout(()=>{UN.spin=0;unSpin(1)},450);return}}}
+  {const s0=$('#stage');if(!again&&s0&&moOn()){const r=s0.getBoundingClientRect();if(r.top<64||r.bottom>innerHeight-70){const w=UN.spin=++UN.seq;scrollBy({top:r.top-80,behavior:'smooth'});setTimeout(()=>{if(UN.spin!==w)return;UN.spin=0;unSpin(1)},450);return}}}
   const q=pickQ.slice(),n=q.length;
   let t=-1;const p=pickOne();if(p)t=q.indexOf(p.id);if(t<=0)t=1+Math.floor(Math.random()*(n-1));pk.last=q[t];
   const land=()=>{pickQ=[...q.slice(t),...q.slice(0,t)];crate.dir=0;render()};
@@ -5201,15 +5202,15 @@ function unSpin(again){if(UN.spin||!pickQ||pickQ.length<2)return;
   const reel=document.createElement('div');reel.className='unreel';reel.setAttribute('aria-hidden','true');reel.style.setProperty('--rs',S+'px');
   reel.style.top=Math.round(r.top-sr.top+r.height/2-S/2-20)+'px';reel.style.height=(S+40)+'px';
   reel.innerHTML=`<div class="rail">${items.map(it=>`<div class="rc">${cover(it,'ini')}</div>`).join('')}</div><div class="frame"></div><div class="ptr">▼</div>`;
-  sec.appendChild(reel);sec.classList.add('unspinning');UN.spin=1;const btn=$('#unspin');if(btn)btn.disabled=true;
+  sec.appendChild(reel);sec.classList.add('unspinning');const me=UN.spin=++UN.seq;clearTimeout(UN.fb);const btn=$('#unspin');if(btn)btn.disabled=true;
   const W=sr.width,x=k=>W/2-(k*(S+G)+S/2),rail=reel.firstChild,D=2700;
   const a=rail.animate([{transform:`translateX(${x(1)}px)`},{transform:`translateX(${x(K)}px)`}],{duration:D,easing:'cubic-bezier(.1,.65,.1,1)',fill:'forwards'});
   rail.animate([{filter:'blur(5px)'},{filter:'blur(5px)',offset:.35},{filter:'blur(0)',offset:.8},{filter:'blur(0)'}],{duration:D,fill:'forwards'});
-  let last=-1;const tick=()=>{if(!UN.spin)return;const m=new DOMMatrixReadOnly(getComputedStyle(rail).transform),k=Math.round((W/2-S/2-m.m41)/(S+G));if(k!==last){last=k;try{navigator.vibrate?.(3)}catch(e){}}requestAnimationFrame(tick)};requestAnimationFrame(tick);
-  const done=()=>{if(!UN.spin)return;UN.spin=0;land();const c=$('#stage .card.c0');if(c){const b=c.getBoundingClientRect();try{moBurst(b.left+b.width/2,b.top+b.height/2)}catch(e){}
+  let last=-1;const tick=()=>{if(UN.spin!==me)return;const m=new DOMMatrixReadOnly(getComputedStyle(rail).transform),k=Math.round((W/2-S/2-m.m41)/(S+G));if(k!==last){last=k;try{navigator.vibrate?.(3)}catch(e){}}requestAnimationFrame(tick)};requestAnimationFrame(tick);
+  const done=()=>{if(UN.spin!==me)return;UN.spin=0;clearTimeout(UN.fb);land();const c=$('#stage .card.c0');if(c){const b=c.getBoundingClientRect();try{moBurst(b.left+b.width/2,b.top+b.height/2)}catch(e){}
       c.animate([{transform:'scale(1.08)'},{transform:'none'}],{duration:420,easing:'cubic-bezier(.25,1.4,.4,1)'})}};
-  a.finished.then(()=>{const hit=rail.children[K];hit?.animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1.05)'}],{duration:320,easing:'ease-out',fill:'forwards'});setTimeout(done,380)}).catch(()=>{UN.spin=0});
-  setTimeout(()=>{if(UN.spin)done()},D+1500)}
+  a.finished.then(()=>{const hit=rail.children[K];hit?.animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1.05)'}],{duration:320,easing:'ease-out',fill:'forwards'});setTimeout(done,380)}).catch(()=>done());
+  UN.fb=setTimeout(done,D+1500)}
 function unBill(v){const crt=v.querySelector('.crate');if(!crt)return;
   const open=st.items.filter(i=>i.status!=='done');if(!open.length)return;
   const byAge=(a,b)=>ageDays(b)-ageDays(a),chk=open.filter(i=>i.status==='check'),old=[...chk].sort(byAge).slice(0,8),oldS=new Set(old.map(i=>i.id));
