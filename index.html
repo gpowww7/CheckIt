@@ -1213,6 +1213,8 @@ body.pqdrag,body.pqdrag *{cursor:grabbing!important}
 #bp .pmsim button:hover img{transform:translateY(-2px)}#bp .pmsim b{display:block;margin-top:7px;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#bp .pmsim small{display:block;font-size:12px;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #bp .pmsk2{flex:none;width:118px;height:150px;border-radius:6px;background:rgba(255,255,255,.06)}
 @media(min-width:761px){#bp .pmsim button,#bp .pmsim img,#bp .pmsk2{width:104px}#bp .pmsim img{height:104px}}
+/* search view (2026.11.28-2): long-press menu on search rows */
+.res [data-i]{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 </style>
 </head>
 <body>
@@ -1227,7 +1229,7 @@ body.pqdrag,body.pqdrag *{cursor:grabbing!important}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.28-1</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.28-2</small>
     </div></details>
   </div>
 </header>
@@ -1937,7 +1939,7 @@ document.addEventListener('click',e=>{
   if(m){$('#menu').open=false;menu(m.dataset.m)}
   if(e.target.id==='clr')upd(()=>st.items=st.items.filter(i=>!i.sample),'Cleared sample items');
   if(e.target.closest('#pick'))pickDlg();
-  if(!e.target.closest('.add')&&!e.target.closest('dialog')){endBulk();$('#res').classList.remove('on');$('.add').classList.remove('full')}
+  if(!e.target.closest('.add')&&!e.target.closest('dialog,#pqm,#pqms')){endBulk();$('#res').classList.remove('on');$('.add').classList.remove('full')}
   if(!e.target.closest('#menu'))$('#menu').open=false});
 document.addEventListener('click',e=>{const g=e.target.closest('[data-gq]');if(g){e.stopPropagation();gqMove(g.dataset.gid,g.dataset.gq);return}
   const gs=e.target.closest('[data-gstart]');if(gs){const it=st.items.find(i=>i.id===gs.dataset.gstart);if(it)upd(()=>setSt2(it,'prog'),`${QT2[it.type]?.on||'Started'} ${it.title}`)}
@@ -1967,7 +1969,7 @@ document.addEventListener('touchend',()=>{if(!sw)return;const{tr,dx,on}=sw;sw=nu
   if(-dx>rmAt(tr))removeItem(it);else if(Math.abs(dx)>90){const ns=dx>0?'done':'again';upd(()=>{setSt2(it,ns)},`Marked ${sLab({type:it.type},ns).toLowerCase()}`)}});
 /* full-screen search on phones */
 const phone=()=>matchMedia('(max-width:760px)').matches;
-$('#q').addEventListener('focus',()=>{if(phone())$('.add').classList.add('full');if(!$('#q').value.trim()&&!$('#res').classList.contains('on')){hi=-1;exp.clear();showTrend()}});
+$('#q').addEventListener('focus',()=>{if(phone())$('.add').classList.add('full');{const q=$('#q').value.trim();if(q&&!isUrl(q)&&!$('#res').classList.contains('on')&&rs.length)showRes(localGroups(q),lastNote)}if(!$('#q').value.trim()&&!$('#res').classList.contains('on')){hi=-1;exp.clear();showTrend()}});
 $('#qc').addEventListener('click',()=>{endBulk();$('#q').value='';$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()});
 /* quick add card */
 let qt;
@@ -2047,6 +2049,21 @@ function startBulk(){bulk=true;bulkN=0;document.body.classList.add('bulk');$('#q
 function endBulk(){if(!bulk)return;bulk=false;document.body.classList.remove('bulk')}
 const bulkBar=()=>`<div class="bk"><div><b>Adding things you’ve already done</b><span>Search, then tap a result to save it to Done. Tap ♥ to save it as an all-time favorite.${bulkN?` ${bulkN} added so far.`:''} Have Letterboxd? <button type="button" class="lk" data-m="lbx">Import it</button></span></div><button type="button" data-bkx>Finish</button></div>`;
 function refreshRes(){const q=$('#q').value.trim(),sc=$('#res').scrollTop;if(!q)showTrend();else if(!isUrl(q))showRes(localGroups(q),lastNote);$('#res').scrollTop=sc;if(!phone()){$('#q').focus();$('#q').select()}}
+/* search view (2026.11.28-2): long-press (or right-click) an artist, album or song result for Open album / Open artist / Add / Seen it. Tap still adds. */
+const resMus=x=>!!(x?.add&&x.it&&!x.open&&['artist','album','song'].includes(x.add.type)&&x.add.title);
+function resHide(){$('#res').classList.remove('on');$('.add').classList.remove('full');$('#q').blur()}
+function resMenu(el,x){const a=x.add,o=[],vb=a.type==='game'?'Played it':'Seen it';
+  if(a.type==='album')o.push(['Open album',()=>{resHide();brOpen({type:'album',title:a.title,creator:a.creator||'',art:a.art||'',url:a.url||'',extra:{...(a.extra||{})},sub:x.sub||''})},'See it without adding']);
+  const ar=a.type==='artist'?a.title:a.creator;if(ar)o.push(['Open artist',()=>{resHide();arOpen(ar)},a.type==='artist'?'See their page without adding':ar]);
+  o.push(['Add to Up next',()=>{const it=addItem(a,false);findSpotify(it)}],[vb,()=>addDone(a),'Save it straight to Done']);
+  RML.f=Date.now();navigator.vibrate?.(10);pqMenu(el,a.title+(a.creator?' · '+a.creator:''),o)}
+const RML={tm:0,x:0,y:0,f:0};
+{const R=$('#res'),row=t=>{const b=t.closest?.('#res [data-i]'),x=b&&!bulk?rs[+b.dataset.i]:null;return resMus(x)?[b,x]:null};
+  R.addEventListener('pointerdown',e=>{if(e.button>0)return;const r=row(e.target);if(!r)return;clearTimeout(RML.tm);RML.x=e.clientX;RML.y=e.clientY;RML.tm=setTimeout(()=>{RML.tm=0;resMenu(r[0],r[1])},480)});
+  R.addEventListener('pointermove',e=>{if(RML.tm&&Math.hypot(e.clientX-RML.x,e.clientY-RML.y)>10){clearTimeout(RML.tm);RML.tm=0}});
+  ['pointerup','pointercancel','scroll'].forEach(k=>R.addEventListener(k,()=>{clearTimeout(RML.tm);RML.tm=0},true));
+  R.addEventListener('contextmenu',e=>{const r=row(e.target);if(!r)return;e.preventDefault();clearTimeout(RML.tm);RML.tm=0;if(Date.now()-RML.f>600)resMenu(r[0],r[1])});
+  document.addEventListener('click',e=>{if(Date.now()-RML.f<700&&!e.target.closest?.('#pqm')){e.preventDefault();e.stopImmediatePropagation()}},true)}
 function resRow(x,i){const b=`<button type="button" data-i="${i}" class="${i===hi?'hi':''}${x.more?' more':''}">${x.it?cover(x.it,'mini'):''}<div><div>${esc(x.label)}</div><small>${esc(x.sub||'')}</small></div></button>`;
   if(!x.add||!x.it)return b;
   return `<div class="rw">${b}<button type="button" class="sd" data-sd="${i}" ${bulk?'aria-label="Save as a favorite" title="Done and favorite"':'title="Already seen, heard or played it? Save it straight to Done"'}>${bulk?heartSvg(0)+'Fave':x.add.type==='game'?'Played it':'Seen it'}</button></div>`}
