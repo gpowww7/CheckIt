@@ -1207,7 +1207,7 @@ body.pqdrag,body.pqdrag *{cursor:grabbing!important}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.27-4</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.27-6</small>
     </div></details>
   </div>
 </header>
@@ -4039,12 +4039,15 @@ async function spDo(it,i,act,btn){const t=it?.info?.tracks?.[i];if(!t)return;
   if(btn){if(btn.classList.contains('busy'))return;btn.classList.add('busy')}
   let tr=null,al=null;
   try{al=await spAlbum(it).catch(e=>{if(e.st===401||e.st===403)throw e;return null});tr=al&&spMatch(al,t,i,it.info.tracks.length);
-    if(!tr){al=null;const j=await spApi('/search?type=track&limit=5&market='+spMk()+'&q='+encodeURIComponent(`track:${t.t} artist:${t.a||it.creator||''}`));tr=j.tracks?.items?.[0]||null}
+    const spFind=x=>spApi('/search?type=track&limit=5&market='+spMk()+'&q='+encodeURIComponent(`track:${x.t} artist:${x.a||it.creator||''}`)).then(j=>{const L=j.tracks?.items||[];return L.find(y=>spN(y.name)===spN(x.t))||L[0]||null});
+    if(!tr){tr=await spFind(t);if(tr&&al&&tr.album?.id!==al.id)al=null}
     if(!tr){toast('Couldn’t find that track on Spotify');return}
-    const body=JSON.stringify(al?{context_uri:'spotify:album:'+al.id,offset:{uri:tr.uri}}:{uris:[tr.uri]});
+    let rest=[];if(!al&&act!=='q')rest=(await Promise.all(it.info.tracks.slice(i+1,i+40).map(x=>spFind(x).catch(()=>null)))).filter(Boolean);
+    const body=JSON.stringify(al?{context_uri:'spotify:album:'+al.id,offset:{uri:tr.uri}}:{uris:[tr.uri,...rest.map(x=>x.uri)]});
     const go=d=>act==='q'?spApi('/me/player/queue?uri='+encodeURIComponent(tr.uri)+(d?'&device_id='+d:''),{method:'POST'}):spApi('/me/player/play'+(d?'?device_id='+d:''),{method:'PUT',body});
     try{await go()}catch(e){if(e.st!==404)throw e;const D=(await spApi('/me/player/devices')).devices||[];const d=D.find(x=>x.is_active&&!x.is_restricted)||D.find(x=>!x.is_restricted);if(!d)throw{st:404};await go(d.id)}
     toast(act==='q'?`Queued in Spotify: ${t.t}`:`Playing in Spotify: ${t.t}`);npSoon(700);
+    if(act!=='q'&&typeof PQ!=='undefined'&&PQ.cq){PQ.cq=null;try{localStorage.removeItem('checkit.cq')}catch(e){}}
     if(act!=='q'&&btn){document.querySelectorAll('#dr .trk li.spnow').forEach(x=>x.classList.remove('spnow'));btn.closest('li')?.classList.add('spnow')}
   }catch(e){const url=tr?.external_urls?.spotify||(tr?'https://open.spotify.com/track/'+tr.id:spot(it));
     if(e.st===401){spSet(null);spLogin([it.id,i,act]);return}
