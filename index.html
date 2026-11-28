@@ -1193,6 +1193,26 @@ body.pqdrag,body.pqdrag *{cursor:grabbing!important}
 @keyframes pqin{from{opacity:0;transform:translateY(14px)}}@keyframes pqfade{from{opacity:0}}
 @media(prefers-reduced-motion:reduce){#pqm,#pqms{animation:none}#bp .bpq li.qr{transition:none}}
 .toast{width:max-content;max-width:calc(100vw - 32px)}
+/* player thread (2026.11.27-5): drop zones on the mini player while dragging an album or song */
+.npdz{display:none;position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:3}
+#npb.dropok .npdz{display:flex}#npb.dropok{outline:2px dashed var(--acc);outline-offset:3px}
+.npdz i{flex:1;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:13px;color:var(--ink);background:color-mix(in srgb,var(--bg) 88%,transparent);transition:background .12s}
+.npdz i+i{border-left:1px solid var(--rule)}
+#npb.dropl .npdz i:first-child,#npb.dropr .npdz i:last-child{background:color-mix(in srgb,var(--acc) 45%,var(--bg));color:#fff}
+#dr .trk.spt li[draggable=true]{cursor:grab}
+/* player thread (2026.11.28-1): Keep listening under Up next */
+#bp .pqmore{margin-top:22px}#bp .pqmore[hidden]{display:none}
+#bp .pmh{margin:0 0 2px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);font-weight:600}
+#bp .pmhd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:14px 0 6px}#bp .pmhd b{font-size:15px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bp .pmhd button{flex:none;font-size:12.5px;font-weight:600;color:var(--c2);padding:2px 0}#bp .pmhd button:hover{text-decoration:underline}
+#bp .pmpop li{cursor:pointer}#bp .pmpop li:hover{background:rgba(255,255,255,.06)}#bp .pmpop li:focus-visible{outline:2px solid var(--c2);outline-offset:-2px}
+#bp .pmpop .pmq{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.8);margin-right:-4px}#bp .pmpop .pmq svg{width:18px;height:18px}#bp .pmpop .pmq:hover{background:rgba(255,255,255,.12);color:#fff}
+#bp .pmsk i{width:40px;height:40px;border-radius:4px;background:rgba(255,255,255,.07);flex:none}#bp .pmsk b,#bp .pmsk small{background:rgba(255,255,255,.06);border-radius:3px;width:60%;margin:2px 0}
+#bp .pmsim{display:flex;gap:12px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:thin;scroll-snap-type:x proximity}
+#bp .pmsim button{flex:none;width:118px;text-align:left;scroll-snap-align:start}#bp .pmsim img{display:block;width:118px;height:118px;border-radius:6px;object-fit:cover;background:rgba(255,255,255,.08);box-shadow:0 6px 16px rgba(0,0,0,.35);transition:transform .15s}
+#bp .pmsim button:hover img{transform:translateY(-2px)}#bp .pmsim b{display:block;margin-top:7px;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#bp .pmsim small{display:block;font-size:12px;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bp .pmsk2{flex:none;width:118px;height:150px;border-radius:6px;background:rgba(255,255,255,.06)}
+@media(min-width:761px){#bp .pmsim button,#bp .pmsim img,#bp .pmsk2{width:104px}#bp .pmsim img{height:104px}}
 </style>
 </head>
 <body>
@@ -1207,7 +1227,7 @@ body.pqdrag,body.pqdrag *{cursor:grabbing!important}
     </div>
     <nav class="views" aria-label="Sections"><button data-v="next">Up next</button><button data-v="library">Library</button><button data-v="diary">Diary</button><button data-v="browse">Browse</button></nav>
     <details class="menu" id="menu"><summary>More</summary><div>
-      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.27-6</small>
+      <button data-m="bulk">Add past favorites</button><button data-m="lbx">Import from Letterboxd</button><button data-m="export">Export backup</button><button data-m="import">Import backup</button><button data-m="settings">Settings</button><button data-m="account" hidden>Sign in to sync</button><small class="ver">Version 2026.11.28-1</small>
     </div></details>
   </div>
 </header>
@@ -4447,7 +4467,7 @@ function pqRow(t,q,lock){const im=t.album?.images||[],u=(im[im.length-1]||{}).ur
   return`<li class="qr${lock?' lock':''}" data-q="${q}"><div class="qbg" aria-hidden="true"><span class="qbn">${lock?'Already queued':NPI.next+' Play next'}</span><span class="qbx">Remove ✕</span></div><div class="qfg"><img alt="" loading="lazy" draggable="false"${u?` src="${esc(u)}"`:''}><span class="qtx" tabindex="0" role="button" title="Open the album" aria-label="${esc(t.name)}, ${esc(sub)}. Open the album"><b>${esc(t.name)}</b><small>${esc(sub)}</small></span>${lock?'<i class="qlk">Queued</i>':`<em>${pqMs(t.duration_ms)}</em>`}<span class="qx">${lock?'':`<button type="button" data-qa="n" aria-label="Play next" title="Play next">${NPI.next}</button>`}<button type="button" data-qa="x" aria-label="Remove" title="Remove">✕</button></span>${lock?'':`<button type="button" class="qh" aria-label="Drag to reorder" title="Drag to reorder">${PQH}</button>`}</div></li>`}
 function pqDraw(){const ol=BP.el?.querySelector('.bpqq');if(!ol)return;const S=PQ.S.map(x=>x.u);PQ.vis=PQ.locked.filter(t=>!rmOne(S,t.uri));
   ol.innerHTML=PQ.vis.length||PQ.E.length?PQ.vis.map((t,k)=>pqRow(t,'l'+k,1)).join('')+PQ.E.map((t,k)=>pqRow(t,'e'+k,0)).join('')+'<li class="pqhint">Swipe right to play next, left to remove. Hold to reorder. Tap a song for its album.</li>'
-    :'<li class="bpqe">Nothing queued. Long-press any album cover, or use the queue button on a tracklist, to line songs up here.</li>'}
+    :'<li class="bpqe">Nothing queued yet. Pick something from Keep listening below, long-press any album cover, or use the queue button on a tracklist.</li>'}
 const pqT=q=>q[0]==='l'?PQ.vis[+q.slice(1)]:PQ.E[+q.slice(1)];
 function pqAct(q,a){const k=+q.slice(1);
   if(q[0]==='l'){const t=PQ.vis[k];if(!t)return;if(a==='n'){toast('Already queued to play next');pqDraw();return}
@@ -4619,6 +4639,91 @@ function drBack(){const pg=DRS.pop();if(!pg||!$('#dr').classList.contains('on'))
 {const c0=closeItem;closeItem=function(){DRS.length=0;drCur=null;LS.forEach(x=>{if(x.k==='drp')x.dead=1});return c0.apply(this,arguments)}}
 /* in-panel back buttons: step back through history when there's a page to go back to */
 document.addEventListener('click',e=>{if(DRS.length&&e.target.closest?.('#dr [data-arb]')){e.stopPropagation();e.preventDefault();history.back()}},true);
+
+/* player thread (2026.11.27-5): computer extras for the player.
+   - Right-click a song in the big player's Up next: Open album, Play next, Move to top / bottom, Remove.
+   - Keyboard in Up next: focus a song (Tab), then Alt+↑/↓ moves it, N plays it next, Delete removes it, Enter opens its album.
+   - Drag an album cover (anywhere) or a tracklist song onto the mini player: drop on the left half = Play next, right half = Add to end of queue.
+   - Shortcuts anywhere (not while typing): Space play/pause, Shift+→ next, Shift+← previous, P opens or closes the big player. */
+function pqRowMenu(li,x,y){const q=li.dataset.q,t=pqT(q);if(!t)return;const lock=q[0]==='l',k=+q.slice(1),E=PQ.E;
+  const o=[['Open album',()=>bpOpenAlb(t)]];
+  if(!lock){if(k>0)o.push(['Play next',()=>pqAct(q,'n')]);if(k>0)o.push(['Move to top',()=>pqMove(k,0)]);if(k<E.length-1)o.push(['Move to bottom',()=>pqMove(k,E.length-1)])}
+  o.push(['Remove from queue',()=>pqAct(q,'x')]);
+  const a={getBoundingClientRect:()=>({left:x,top:y,bottom:y,right:x})};pqMenu(a,t.name,o)}
+{const e0=bpEl;bpEl=function(){const had=BP.el,e=e0();if(!had){const ol=e.querySelector('.bpqq');
+    ol.addEventListener('contextmenu',ev=>{const li=ev.target.closest('li.qr');if(!li||ev.pointerType==='touch'||PQ.g)return;ev.preventDefault();pqRowMenu(li,ev.clientX,ev.clientY)});
+    ol.addEventListener('keydown',ev=>{const li=ev.target.closest('li.qr');if(!li||ev.target.closest('.qx button,.qh'))return;const q=li.dataset.q,k=+q.slice(1),lock=q[0]==='l';
+      const refocus=i=>{PQ.fq='e'+i;setTimeout(()=>BP.el.querySelector(`.bpqq li.qr[data-q="e${i}"] .qtx`)?.focus(),30)};
+      if(ev.altKey&&(ev.key==='ArrowUp'||ev.key==='ArrowDown')&&!lock){ev.preventDefault();const to=Math.max(0,Math.min(PQ.E.length-1,k+(ev.key==='ArrowUp'?-1:1)));if(to!==k){pqMove(k,to);refocus(to)}}
+      else if(ev.key==='Delete'||ev.key==='Backspace'){ev.preventDefault();pqAct(q,'x');refocus(Math.max(0,k-1))}
+      else if((ev.key==='n'||ev.key==='N')&&!lock){ev.preventDefault();pqAct(q,'n');refocus(0)}})}return e}}
+/* drag to the mini player */
+const PQD={on:0};
+function pqDragData(el){const c=el.closest?.('[data-id]');if(c&&!c.closest('#bp')){const it=st.items.find(i=>i.id===c.dataset.id);if(it?.type==='album')return'a:'+it.id}
+  const li=el.closest?.('#dr .trk.spt li');if(li&&cur){const b=li.querySelector('[data-spp]');if(b)return't:'+cur.id+':'+b.dataset.spp}return''}
+document.addEventListener('dragstart',e=>{if(!st.spc||!spDesk())return;const d=pqDragData(e.target);if(!d)return;e.dataTransfer.setData('text/x-checkit',d);e.dataTransfer.effectAllowed='copy';
+  const n=$('#npb');if(n&&!n.hidden){PQD.on=1;n.classList.add('dropok')}});
+document.addEventListener('dragend',()=>{PQD.on=0;const n=$('#npb');n?.classList.remove('dropok','dropl','dropr')});
+new MutationObserver(()=>{if(!spDesk())return;document.querySelectorAll('#dr .trk.spt li:not([draggable])').forEach(li=>li.setAttribute('draggable','true'))}).observe($('#dr'),{childList:true,subtree:true});
+{const n=npEl();n.insertAdjacentHTML('beforeend','<span class="npdz" aria-hidden="true"><i>Play next</i><i>Add to end</i></span>');
+  const side=ev=>{const r=n.getBoundingClientRect();return ev.clientX<r.left+r.width/2?'l':'r'};
+  n.addEventListener('dragover',ev=>{if(!PQD.on)return;ev.preventDefault();ev.dataTransfer.dropEffect='copy';const s=side(ev);n.classList.toggle('dropl',s==='l');n.classList.toggle('dropr',s==='r')});
+  n.addEventListener('dragleave',ev=>{if(!n.contains(ev.relatedTarget))n.classList.remove('dropl','dropr')});
+  n.addEventListener('drop',ev=>{const d=ev.dataTransfer.getData('text/x-checkit');if(!d)return;ev.preventDefault();const mode=side(ev)==='l'?'next':'end';n.classList.remove('dropok','dropl','dropr');PQD.on=0;
+    const [k,id,i]=d.split(':'),it=st.items.find(x=>x.id===id);if(!it)return;
+    if(k==='a')pqRun(()=>pqAlbumOf(it),mode,it.title);else{const tt=it.info?.tracks?.[+i];pqRun(async()=>[await pqTrackOf(it,+i)],mode,tt?.t||'song')}})}
+/* shortcuts */
+document.addEventListener('keydown',e=>{if(e.defaultPrevented||e.metaKey||e.ctrlKey||e.altKey||!spOn()||!NP.d)return;const a=document.activeElement,typing=/INPUT|TEXTAREA|SELECT/.test(a?.tagName)||a?.isContentEditable;
+  if(typing||$('#dlg')?.open||$('#pqm'))return;
+  if(e.key===' '&&!a?.closest?.('button,a,[role=button],summary,#bp .qtx')){e.preventDefault();BP.on?bpAct('pp'):$('#npb [data-npk=pp]')?.click()}
+  else if(e.shiftKey&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){e.preventDefault();const k=e.key==='ArrowRight'?'next':'prev';BP.on?bpAct(k):NP.d?.idle?npResume():spCmd('/me/player/'+(k==='next'?'next':'previous'),'POST').then(()=>npSoon(600),spCmdErr)}
+  else if((e.key==='p'||e.key==='P')&&!e.shiftKey){e.preventDefault();BP.on?bpClose():bpOpen()}});
+/* keep keyboard focus on the same queue row when the list redraws */
+{const d0=pqDraw;pqDraw=function(){const a=document.activeElement,li=a?.closest?.('#bp .bpqq li.qr'),q=li?li.dataset.q:null;d0.apply(this,arguments);
+  if(q)BP.el.querySelector(`.bpqq li.qr[data-q="${q}"] .qtx`)?.focus({preventScroll:true})}}
+
+/* player thread (2026.11.28-1): "Keep listening" under the big player's Up next, so a short queue has somewhere to go.
+   Popular by the current artist (Deezer top songs, minus what's playing or already queued): tap for Play now / Play next / Add to end / Open album, + = Play next, Add all = add them to the end.
+   Similar albums (Last.fm similar artists when there's a key, else Deezer related artists, same as album pages): tap for Play album / Play next / Add to end / Open album.
+   Songs are matched to Spotify by search when you use them. Cached per artist for this visit. */
+const PM={};let pmKey='';
+const pmArtist=()=>BP.d?.item?.artists?.[0]?.name||'';
+async function pmLoad(name){const k=brN(name);if(!k||PM[k])return;const s=PM[k]={busy:1,top:[],like:[]};
+  let aid=null;try{aid=await simDzArtist(name)}catch(e){}
+  const[top,like]=await Promise.all([
+    (async()=>{if(!aid)return[];const j=await jsonp(`https://api.deezer.com/artist/${aid}/top?limit=15&output=jsonp`);return(j.data||[]).filter(t=>t.title).map(t=>({t:t.title_short||t.title,a:t.artist?.name||name,al:t.album?.title||'',img:t.album?.cover_small||t.album?.cover_medium||'',art:t.album?.cover_xl||t.album?.cover_big||'',s:t.duration||0}))})().catch(()=>[]),
+    (st.lfm?simLikeLfm({creator:name}).catch(()=>simLikeDz(aid)):simLikeDz(aid)).catch(()=>[])]);
+  const seen=new Set();s.top=top.filter(x=>{const n=brN(x.t);if(!n||seen.has(n))return false;seen.add(n);return true});s.like=like||[];s.busy=0;if(brN(pmArtist())===k)pmDraw()}
+function pmTop(s){const skip=new Set([BP.d?.item,...PQ.vis,...PQ.E].filter(Boolean).map(t=>brN(t.name)));return s.top.filter(x=>!skip.has(brN(x.t))).slice(0,6)}
+function pmDraw(){const box=BP.el?.querySelector('.pqmore');if(!box)return;const name=pmArtist(),k=brN(name);box.hidden=BP.el.querySelector('.bpqq').hidden||!k;if(!k)return;
+  if(!PM[k]){pmLoad(name);}const s=PM[k]||{busy:1};pmKey=k;
+  const sk=n=>'<li class="pmsk"><i></i><span><b>&nbsp;</b><small>&nbsp;</small></span></li>'.repeat(n);
+  const T=s.busy?[]:pmTop(s);box._top=T;box._like=s.like||[];
+  box.innerHTML=`<h3 class="pmh">Keep listening</h3>
+  <div class="pmhd"><b>Popular by ${esc(name)}</b>${T.length>1?`<button type="button" data-pmall>Add all ${T.length}</button>`:''}</div>
+  <ol class="pmpop">${s.busy?sk(3):T.length?T.map((t,i)=>`<li data-pmt="${i}" tabindex="0" role="button"><img alt="" loading="lazy"${t.img?` src="${esc(t.img)}"`:''}><span><b>${esc(t.t)}</b><small>${esc(t.al)}</small></span><em>${pqMs(t.s*1000)}</em><button type="button" class="pmq" data-pmq="${i}" aria-label="Play ${esc(t.t)} next" title="Play next">${SPQ}</button></li>`).join(''):'<li class="bpqe">No popular songs found for this artist.</li>'}</ol>
+  ${s.busy||s.like?.length?`<div class="pmhd"><b>Similar albums</b></div><div class="pmsim">${s.busy?'<span class="pmsk2"></span>'.repeat(4):s.like.map((r,i)=>`<button type="button" data-pms="${i}" title="${esc(r.title)} · ${esc(r.creator)}"><img alt="" loading="lazy"${r.thumb||r.art?` src="${esc(r.thumb||r.art)}"`:''}><b>${esc(r.title)}</b><small>${esc(r.creator)}</small></button>`).join('')}</div>`:''}`}
+const pmTr=new Map();
+async function pmTrack(t){const k=brN(t.t)+'|'+brN(t.a);if(pmTr.has(k))return pmTr.get(k);
+  const j=await spApi('/search?type=track&limit=5&market='+spMk()+'&q='+encodeURIComponent(`track:${t.t} artist:${t.a}`)),L=j.tracks?.items||[];
+  const x=L.find(y=>spN(y.name)===spN(t.t)&&y.artists.some(a=>spN(a.name)===spN(t.a)))||L.find(y=>y.artists.some(a=>spN(a.name)===spN(t.a)))||null;const m=x&&pqMin(x);pmTr.set(k,m);return m}
+const pmAlb=r=>({id:'pm'+brN(r.creator+' '+r.title).replace(/ /g,'-'),type:'album',title:r.title,creator:r.creator,art:r.art||r.thumb||''});
+function pmOpen(r){bpClose();setTimeout(()=>brOpen(r),60)}
+async function pmPlayNow(get){if(!pqReady())return;try{const T=(await get()).filter(Boolean);if(!T.length){toast('Couldn’t find that on Spotify');return}
+  await spDev(d=>spApi('/me/player/play'+(d?'?device_id='+d:''),{method:'PUT',body:JSON.stringify({uris:T.map(t=>t.uri)})}));PQ.cq={t:T,i:0};pqSave('checkit.cq',PQ.cq);toast(`Playing in Spotify: ${T[0].name}`);npSoon(700)}catch(e){pqErr(e)}}
+function pmWire(e){const box=document.createElement('div');box.className='pqmore';box.hidden=true;e.querySelector('.bpqq').after(box);
+  box.addEventListener('click',ev=>{const T=box._top||[],L=box._like||[],name=pmArtist();
+    const q=ev.target.closest('[data-pmq]');if(q){const t=T[+q.dataset.pmq];if(t)pqRun(async()=>[await pmTrack(t)],'next',t.t);return}
+    if(ev.target.closest('[data-pmall]')){pqRun(async()=>Promise.all(T.map(t=>pmTrack(t).catch(()=>null))),'end',`${T.length} songs by ${name}`);return}
+    const r=ev.target.closest('[data-pmt]');if(r){const t=T[+r.dataset.pmt];if(!t)return;const g=async()=>[await pmTrack(t)];
+      pqMenu(r,t.t+' · '+t.a,[['Play now',()=>pmPlayNow(g)],...pqOpts(g,t.t),...(t.al?[['Open album',()=>pmOpen({type:'album',title:t.al,creator:t.a,art:t.art,url:''})]]:[])]);return}
+    const a=ev.target.closest('[data-pms]');if(a){const x=L[+a.dataset.pms];if(!x)return;const it=pmAlb(x);
+      pqMenu(a,x.title+' · '+x.creator,[['Play album',()=>spAlbPlay(it)],...pqOpts(()=>pqAlbumOf(it),x.title),['Open album',()=>pmOpen(x)]])}});
+  box.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.matches('[data-pmt]')){ev.preventDefault();ev.target.click()}});
+  e.addEventListener('click',ev=>{if(ev.target.closest('[data-bpt]'))setTimeout(()=>{box.hidden=e.querySelector('.bpqq').hidden||!pmArtist()},0)})}
+{const e0=bpEl;bpEl=function(){const had=BP.el,e=e0();if(!had)pmWire(e);return e}}
+{const d0=pqDraw;pqDraw=function(){d0.apply(this,arguments);pmDraw()}}
+{const s0=bpSync;bpSync=async function(d){const r=await s0.apply(this,arguments);if(BP.on&&brN(pmArtist())!==pmKey)pmDraw();return r}}
 
 function localGroups(q){const ql=q.toLowerCase();
   const mine=st.items.filter(i=>inGrp(i,sf)&&(i.title+' '+i.creator).toLowerCase().includes(ql)).slice(0,3).map(i=>({label:i.title,sub:`In your list, ${sLab(i).toLowerCase()}`,open:i.id,it:i}));
